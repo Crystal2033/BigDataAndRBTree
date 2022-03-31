@@ -30,7 +30,7 @@ private:
 	void find_way(const TKey, std::list<RBNode**>&) ; //const
 	void insertFixUp(std::list<RBNode**>&);
 	void addRepeatKey(const RBNode* node, std::list<RBNode**>& way);
-
+	RBNode* getParentNode(const RBNode*, const std::list<RBNode**>&);
 
 	void prefix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
 	void infix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
@@ -126,17 +126,46 @@ void print_tree(const TKey& key, const TData& data, int depth = 0)
 template <typename TKey, typename TData>
 void RedBlackTree<TKey, TData>::insertFixUp(std::list<RBNode**>& way)
 {
+	RBNode* checking_node = *(way.back());
+	RBNode* parent_node = getParentNode(checking_node, way);
+	RBNode* grandpa_node;
+	if (parent_node != nullptr)
+	{
+		while (parent_node->color != RED)
+		{
+			grandpa_node = getParentNode(parent_node, way); //100% exists, because parent is RED and inserted is RED, grandpa -- BLACK
+		}
+	}
+	
 	root->color = BLACK;
 }
 
 template <typename TKey, typename TData>
-void RedBlackTree < TKey, TData>::addRepeatKey(const RBNode* node, std::list<RBNode**>& way)
+void RedBlackTree <TKey, TData>::addRepeatKey(const RBNode* node, std::list<RBNode**>& way)
 {
 	if ((*(way.back()))->repeat_keys_nodes == nullptr)
 	{
 		(*(way.back()))->repeat_keys_nodes = new std::list<RBNode*>;
 	}
 	(*(way.back()))->repeat_keys_nodes->push_back(const_cast<RBNode*>(node));
+}
+
+
+template <typename TKey, typename TData>
+typename RedBlackTree<TKey, TData>::RBNode* RedBlackTree<TKey, TData>::getParentNode(const RBNode* child_node, const std::list<RBNode**>& way)
+{
+	RBNode* parent_node;
+	for (auto iter : way){
+		if (*iter == child_node) {
+			if (iter == *(way.begin())){
+				return nullptr;
+				//throw ParentNodeNotExistsException("Parent node wasn`t found.");
+			}
+			return parent_node;
+		}
+		parent_node = *iter;
+	}
+	throw ParentNodeNotExistsException("Parent node wasn`t found.");
 }
 #pragma endregion
 
@@ -178,7 +207,7 @@ TData& RedBlackTree<TKey, TData>::find(const TKey& key) const // TODO: можно чер
 			iterator = iterator->left;
 		}
 		else{ // == 0
-			return iterator->data;
+			return iterator->data; //TODO: RETURN LIST OF KEYS(COULD REPEAT)
 		}
 	}
 	throw KeyNotFoundException<TKey>("Key doesn`t exist", key);

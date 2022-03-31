@@ -22,5 +22,9 @@ int main(int argc, char* argv[])
 	{
 		std::cout << red << err.what() << "Key value: " << yellow << err.get_error_key() << white << std::endl;
 	}
+	catch (ParentNodeNotExistsException& err)
+	{
+		std::cout << red << err.what() << white << std::endl;
+	}
 	return 0;
 }
