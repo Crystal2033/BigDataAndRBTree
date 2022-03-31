@@ -31,7 +31,6 @@ private:
 	void findWay(const TKey, std::stack<RBNode**>&) ; //const
 	void insertFixUp(std::stack<RBNode**>&);
 	void addRepeatKey(const RBNode* node, std::stack<RBNode**>& way);
-	//RBNode* getParentNode(const RBNode*, const std::stack<RBNode**>&);
 	RBNode* leftRotation(RBNode* old_root);
 	RBNode* rightRotation(RBNode* old_root);
 
@@ -93,7 +92,7 @@ typename RedBlackTree<TKey, TData>::RBNode* RedBlackTree<TKey, TData>::leftRotat
 		return old_root;
 	}
 
-	if (old_root->right_child == nullptr)
+	if (old_root->right == nullptr)
 	{
 		return old_root;
 	}
@@ -113,15 +112,15 @@ typename RedBlackTree<TKey, TData>::RBNode* RedBlackTree<TKey, TData>::rightRota
 		return old_root;
 	}
 
-	if (old_root->left_child == nullptr)
+	if (old_root->left == nullptr)
 	{
 		return old_root;
 	}
 
 	RBNode* old_root_temp = old_root;
-	old_root = old_root->left_child;
-	old_root_temp->left_child = old_root->right_child;
-	old_root->right_child = old_root_temp;
+	old_root = old_root->left;
+	old_root_temp->left = old_root->right;
+	old_root->right = old_root_temp;
 	return old_root;
 }
 #pragma endregion
@@ -143,7 +142,7 @@ void RedBlackTree<TKey, TData>::findWay(const TKey key, std::stack<RBNode**>& wa
 			way.push(iterator);
 		}
 		else if (compare_result < 0) {
-			iterator = &((*iterator)->right);
+			iterator = &((*iterator)->left);
 			way.push(iterator);
 		}
 		else { // if insert: last element is parent of curr key kid. If find: have to check last in list children and find key, else throw
@@ -178,36 +177,108 @@ void RedBlackTree<TKey, TData>::insertFixUp(std::stack<RBNode**>& way)
 	if (way.size() != 0)
 	{
 		parent_node = *(way.top());
-	}
-	
-	//RBNode* parent_node = getParentNode(checking_node, way);
-	
-	//if (parent_node != nullptr)
-	//{
-		//while (parent_node != nullptr && parent_node->color != RED)
-		//{
-		//	grandpa_node = getParentNode(parent_node, way); //100% exists, because parent is RED and inserted is RED, grandpa -- BLACK
-		//	if ((grandpa_node != nullptr) && checking_node == grandpa_node->left)
-		//	{
-		//		RBNode* uncle_node = grandpa_node->right; //he is exist, because our tree is balanced
-		//		if (uncle_node->color == RED)
-		//		{
-		//			parent_node->color = BLACK;
-		//			uncle_node->color = BLACK;
-		//			grandpa_node->color = RED;
-		//			checking_node = grandpa_node;
-		//			parent_node = getParentNode(checking_node, way);
-		//		}
-		//	}
-		//	else if (checking_node == parent_node->right)
-		//	{
-		//		checking_node = parent_node;
-		//		grandpa_node->left = leftRotation(checking_node);
-		//		parent_node = getParentNode(checking_node, way);
-		//	}
+		way.pop();
+		while ((parent_node != nullptr) && parent_node->color == RED)
+		{
+			grandpa_node = *(way.top());
+			way.pop();
+			if (parent_node == grandpa_node->left)
+			{
+				RBNode* uncle_node = grandpa_node->right;
 
-		//}
-	//}
+				if ((uncle_node != nullptr) && uncle_node->color == RED)
+				{
+					parent_node->color = BLACK;
+					uncle_node->color = BLACK;
+					grandpa_node->color = RED;
+					checking_node = grandpa_node;
+					if (way.size() == 0)
+					{
+						parent_node = nullptr;
+					}
+					else
+					{
+						parent_node = *(way.top());
+						way.pop();
+					}
+					continue;
+				}
+				else if (checking_node == parent_node->right)
+				{
+					RBNode* future_parent_node = checking_node;
+					checking_node = parent_node;
+					grandpa_node->left = leftRotation(checking_node);
+					parent_node = future_parent_node;
+				}
+				parent_node->color = BLACK;
+				grandpa_node->color = RED;
+				if (way.size() == 0)
+				{
+					root = rightRotation(grandpa_node);
+				}
+				else
+				{
+					RBNode* great_grandpa_node = *(way.top());
+					way.pop();
+					if (great_grandpa_node->right == grandpa_node)
+					{
+						great_grandpa_node->right = rightRotation(grandpa_node);
+					}
+					else if (great_grandpa_node->left == grandpa_node)
+					{
+						great_grandpa_node->left = rightRotation(grandpa_node);
+					}
+				}
+			}//TODO EVERYTHIN ELSE
+			else
+			{
+				RBNode* uncle_node = grandpa_node->left; // Uncle exists because tree is balanced
+				if ((uncle_node != nullptr) && uncle_node->color == RED)
+				{
+					parent_node->color = BLACK;
+					uncle_node->color = BLACK;
+					grandpa_node->color = RED;
+					checking_node = grandpa_node;
+					if (way.size() == 0)
+					{
+						parent_node = nullptr;
+					}
+					else
+					{
+						parent_node = *(way.top());
+						way.pop();
+					}
+					continue;
+				}
+				else if (checking_node == parent_node->left)
+				{
+					RBNode* future_parent_node = checking_node;
+					checking_node = parent_node;
+					grandpa_node->right = rightRotation(checking_node);
+					parent_node = future_parent_node;
+				}
+				parent_node->color = BLACK;
+				grandpa_node->color = RED;
+				if (way.size() == 0)
+				{
+					root = leftRotation(grandpa_node);
+				}
+				else
+				{
+					RBNode* great_grandpa_node = *(way.top());
+					way.pop();
+					if (great_grandpa_node->left == grandpa_node)
+					{
+						great_grandpa_node->left = leftRotation(grandpa_node);
+					}
+					else if (great_grandpa_node->right == grandpa_node)
+					{
+						great_grandpa_node->right = leftRotation(grandpa_node);
+					}
+				}
+			}
+		}
+	}
 	
 	root->color = BLACK;
 }
@@ -223,22 +294,6 @@ void RedBlackTree <TKey, TData>::addRepeatKey(const RBNode* node, std::stack<RBN
 }
 
 
-//template <typename TKey, typename TData>
-//typename RedBlackTree<TKey, TData>::RBNode* RedBlackTree<TKey, TData>::getParentNode(const RBNode* child_node, const std::list<RBNode**>& way)
-//{
-//	RBNode* parent_node;
-//	for (auto iter : way){
-//		if (*iter == child_node) {
-//			if (iter == *(way.begin())){
-//				return nullptr;
-//				//throw ParentNodeNotExistsException("Parent node wasn`t found.");
-//			}
-//			return parent_node;
-//		}
-//		parent_node = *iter;
-//	}
-//	throw ParentNodeNotExistsException("Parent node wasn`t found.");
-//}
 #pragma endregion
 
 #pragma region ADD
@@ -247,7 +302,7 @@ void RedBlackTree<TKey, TData>::add(const TKey& key, const TData& data)
 {
 	std::stack<RBNode**> way;
 	findWay(key, way);
-	
+	std::cout << yellow << "INSERTING. " << cyan << key << " : " << data << white << std::endl;
 	if (*(way.top()) != nullptr){ //“о есть указатель указывает на узел, а если при вставке он не пуст, значит, там повторный ключ.
 		RBNode* repeat_key_node = new RBNode(key, data, RED);
 		addRepeatKey(repeat_key_node, way);
@@ -290,7 +345,7 @@ TData& RedBlackTree<TKey, TData>::find(const TKey& key) const // TODO: можно чер
 template <typename TKey, typename TData>
 void RedBlackTree<TKey, TData>::remove(const TKey& key)
 {
-
+	
 }
 #pragma endregion
 
