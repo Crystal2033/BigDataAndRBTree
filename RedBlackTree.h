@@ -2,6 +2,7 @@
 #include "Container.h"
 #include "Comparator.h"
 #include "Exceptions.h"
+#include <stack>
 #include <list>
 typedef enum {RED, BLACK} COLOR;
 
@@ -27,10 +28,12 @@ private:
 	RBNode* root;
 	Comparator<TKey>* comparator;
 
-	void find_way(const TKey, std::list<RBNode**>&) ; //const
-	void insertFixUp(std::list<RBNode**>&);
-	void addRepeatKey(const RBNode* node, std::list<RBNode**>& way);
-	RBNode* getParentNode(const RBNode*, const std::list<RBNode**>&);
+	void findWay(const TKey, std::stack<RBNode**>&) ; //const
+	void insertFixUp(std::stack<RBNode**>&);
+	void addRepeatKey(const RBNode* node, std::stack<RBNode**>& way);
+	//RBNode* getParentNode(const RBNode*, const std::stack<RBNode**>&);
+	RBNode* leftRotation(RBNode* old_root);
+	RBNode* rightRotation(RBNode* old_root);
 
 	void prefix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
 	void infix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
@@ -81,25 +84,67 @@ RedBlackTree<TKey, TData>::RedBlackTree(Comparator<TKey>* const& cmp)
 }
 #pragma endregion
 
+#pragma region ROTATIONS
+template <typename TKey, typename TData>
+typename RedBlackTree<TKey, TData>::RBNode* RedBlackTree<TKey, TData>::leftRotation(RBNode* old_root)
+{
+	if (old_root == nullptr)
+	{
+		return old_root;
+	}
+
+	if (old_root->right_child == nullptr)
+	{
+		return old_root;
+	}
+
+	RBNode* old_root_temp = old_root;
+	old_root = old_root->right;
+	old_root_temp->right = old_root->left;
+	old_root->left = old_root_temp;
+	return old_root;
+}
+
+template <typename TKey, typename TData>
+typename RedBlackTree<TKey, TData>::RBNode* RedBlackTree<TKey, TData>::rightRotation(RBNode* old_root)
+{
+	if (old_root == nullptr)
+	{
+		return old_root;
+	}
+
+	if (old_root->left_child == nullptr)
+	{
+		return old_root;
+	}
+
+	RBNode* old_root_temp = old_root;
+	old_root = old_root->left_child;
+	old_root_temp->left_child = old_root->right_child;
+	old_root->right_child = old_root_temp;
+	return old_root;
+}
+#pragma endregion
+
 #pragma region assist methods
 /// ’ран€тс€ точные указатели на узлы. ѕри вставке в листе остаетс€ указатель (пуста€ веточка) на который нужно навесить вставл€емый узел.
 /// Ќужно учитывать, что может добавитьс€ повторный ключ -> в добавлении нужно это обработать и добавить повтор€ющийс€ по ключу узел в лист в узле.
 /// ѕри поиске (например, в удалении) в конце листа указатель на блок, который совпадает с ключом. ѕроверки после выполнени€ find_way не нужны!!!
 template <typename TKey, typename TData>
-void RedBlackTree<TKey, TData>::find_way(const TKey key, std::list<RBNode**>& way)
+void RedBlackTree<TKey, TData>::findWay(const TKey key, std::stack<RBNode**>& way)
 {
 	RBNode** iterator = &root;
-	way.push_back(iterator);
+	way.push(iterator);
 	while (*iterator)
 	{
 		int compare_result = comparator->compare(key, (*iterator)->key);
 		if (compare_result > 0) {
 			iterator = &((*iterator)->right);
-			way.push_back(iterator);
+			way.push(iterator);
 		}
 		else if (compare_result < 0) {
 			iterator = &((*iterator)->right);
-			way.push_back(iterator);
+			way.push(iterator);
 		}
 		else { // if insert: last element is parent of curr key kid. If find: have to check last in list children and find key, else throw
 			return;
@@ -124,64 +169,91 @@ void print_tree(const TKey& key, const TData& data, int depth = 0)
 }
 
 template <typename TKey, typename TData>
-void RedBlackTree<TKey, TData>::insertFixUp(std::list<RBNode**>& way)
+void RedBlackTree<TKey, TData>::insertFixUp(std::stack<RBNode**>& way)
 {
-	RBNode* checking_node = *(way.back());
-	RBNode* parent_node = getParentNode(checking_node, way);
+	RBNode* checking_node = *(way.top());
+	RBNode* parent_node;
 	RBNode* grandpa_node;
-	if (parent_node != nullptr)
+	way.pop();
+	if (way.size() != 0)
 	{
-		while (parent_node->color != RED)
-		{
-			grandpa_node = getParentNode(parent_node, way); //100% exists, because parent is RED and inserted is RED, grandpa -- BLACK
-		}
+		parent_node = *(way.top());
 	}
+	
+	//RBNode* parent_node = getParentNode(checking_node, way);
+	
+	//if (parent_node != nullptr)
+	//{
+		//while (parent_node != nullptr && parent_node->color != RED)
+		//{
+		//	grandpa_node = getParentNode(parent_node, way); //100% exists, because parent is RED and inserted is RED, grandpa -- BLACK
+		//	if ((grandpa_node != nullptr) && checking_node == grandpa_node->left)
+		//	{
+		//		RBNode* uncle_node = grandpa_node->right; //he is exist, because our tree is balanced
+		//		if (uncle_node->color == RED)
+		//		{
+		//			parent_node->color = BLACK;
+		//			uncle_node->color = BLACK;
+		//			grandpa_node->color = RED;
+		//			checking_node = grandpa_node;
+		//			parent_node = getParentNode(checking_node, way);
+		//		}
+		//	}
+		//	else if (checking_node == parent_node->right)
+		//	{
+		//		checking_node = parent_node;
+		//		grandpa_node->left = leftRotation(checking_node);
+		//		parent_node = getParentNode(checking_node, way);
+		//	}
+
+		//}
+	//}
 	
 	root->color = BLACK;
 }
 
 template <typename TKey, typename TData>
-void RedBlackTree <TKey, TData>::addRepeatKey(const RBNode* node, std::list<RBNode**>& way)
+void RedBlackTree <TKey, TData>::addRepeatKey(const RBNode* node, std::stack<RBNode**>& way)
 {
-	if ((*(way.back()))->repeat_keys_nodes == nullptr)
+	if ((*(way.top()))->repeat_keys_nodes == nullptr)
 	{
-		(*(way.back()))->repeat_keys_nodes = new std::list<RBNode*>;
+		(*(way.top()))->repeat_keys_nodes = new std::list<RBNode*>;
 	}
-	(*(way.back()))->repeat_keys_nodes->push_back(const_cast<RBNode*>(node));
+	(*(way.top()))->repeat_keys_nodes->push_back(const_cast<RBNode*>(node));
 }
 
 
-template <typename TKey, typename TData>
-typename RedBlackTree<TKey, TData>::RBNode* RedBlackTree<TKey, TData>::getParentNode(const RBNode* child_node, const std::list<RBNode**>& way)
-{
-	RBNode* parent_node;
-	for (auto iter : way){
-		if (*iter == child_node) {
-			if (iter == *(way.begin())){
-				return nullptr;
-				//throw ParentNodeNotExistsException("Parent node wasn`t found.");
-			}
-			return parent_node;
-		}
-		parent_node = *iter;
-	}
-	throw ParentNodeNotExistsException("Parent node wasn`t found.");
-}
+//template <typename TKey, typename TData>
+//typename RedBlackTree<TKey, TData>::RBNode* RedBlackTree<TKey, TData>::getParentNode(const RBNode* child_node, const std::list<RBNode**>& way)
+//{
+//	RBNode* parent_node;
+//	for (auto iter : way){
+//		if (*iter == child_node) {
+//			if (iter == *(way.begin())){
+//				return nullptr;
+//				//throw ParentNodeNotExistsException("Parent node wasn`t found.");
+//			}
+//			return parent_node;
+//		}
+//		parent_node = *iter;
+//	}
+//	throw ParentNodeNotExistsException("Parent node wasn`t found.");
+//}
 #pragma endregion
 
 #pragma region ADD
 template <typename TKey, typename TData>
 void RedBlackTree<TKey, TData>::add(const TKey& key, const TData& data)
 {
-	std::list<RBNode**> way;
-	find_way(key, way);
+	std::stack<RBNode**> way;
+	findWay(key, way);
 	
-	if (*(way.back()) != nullptr){ //“о есть указатель указывает на узел, а если при вставке он не пуст, значит, там повторный ключ.
+	if (*(way.top()) != nullptr){ //“о есть указатель указывает на узел, а если при вставке он не пуст, значит, там повторный ключ.
 		RBNode* repeat_key_node = new RBNode(key, data, RED);
 		addRepeatKey(repeat_key_node, way);
 	}
 	else{
-		*(way.back()) = new RBNode(key, data, RED);
+		*(way.top()) = new RBNode(key, data, RED);
 	}
 
 	insertFixUp(way);
