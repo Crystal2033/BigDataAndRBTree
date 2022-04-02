@@ -34,6 +34,11 @@ private:
 	RBNode* leftRotation(RBNode* old_root);
 	RBNode* rightRotation(RBNode* old_root);
 
+	void transplant(RBNode* const& parent_u, RBNode* const& u_node, RBNode* const& v_node); //#TODO: const убрать?
+	void rb_delete(RBNode* z_node, std::stack<RBNode**>& way);
+	std::pair<RBNode*, RBNode*> tree_minimum(RBNode* const& x_node); //mb return RBNode*;
+	void delete_node(RBNode* del_node);
+
 	void prefix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
 	void infix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
 	void postfix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
@@ -342,10 +347,110 @@ TData& RedBlackTree<TKey, TData>::find(const TKey& key) const // TODO: можно чер
 #pragma endregion
 
 #pragma region REMOVE
+
+#pragma region assist methods for delete
+
 template <typename TKey, typename TData>
-void RedBlackTree<TKey, TData>::remove(const TKey& key)
+void RedBlackTree<TKey, TData>::transplant(RBNode* const& parent_u, RBNode* const& u_node, RBNode* const& v_node)
 {
-	
+	if (parent_u == nullptr) {
+		root = v_node;
+	}
+	else if (u_node == parent_u->left) {
+		parent_u->left = v_node;
+	}
+	else {
+		parent_u->right = v_node;
+	}
+}
+
+
+template <typename TKey, typename TData>
+std::pair<typename RedBlackTree<TKey, TData>::RBNode*, typename RedBlackTree<TKey, TData>::RBNode*> RedBlackTree<TKey, TData>::tree_minimum(RBNode* const& x_node)
+{
+	std::pair<RBNode*, RBNode*> y_node_and_y_parent;
+	RBNode* y_node_iter = x_node;
+	RBNode* y_parent_node = nullptr;
+	while (y_node_iter->left != nullptr) {
+		y_parent_node = y_node_iter;
+		y_node_iter = y_node_iter->left;
+	}
+	y_node_and_y_parent.first = y_node_iter;
+	y_node_and_y_parent.second = y_parent_node;
+	return y_node_and_y_parent; // if y_parent_node == nullptr --> x_node is min. there are no loop iterations.
+}
+#pragma endregion
+
+template <typename TKey, typename TData>
+void RedBlackTree<TKey, TData>::remove(const TKey& key) //like Kormen
+{
+	std::cout << purple << key << white << std::endl;
+	if (root == nullptr){
+		throw KeyNotFoundException<TKey>("Key wasn`t found. Tree is empty.", key);
+	}
+	std::stack<RBNode**> way;
+	findWay(key, way);
+	if ((*(way.top()))->key != key){
+		throw KeyNotFoundException<TKey>("Key wasn`t found.", key);
+	}
+	rb_delete(*(way.top()), way);
+}
+
+template <typename TKey, typename TData>
+void RedBlackTree<TKey, TData>::delete_node(RBNode* del_node)
+{
+	del_node->left = nullptr;
+	del_node->right = nullptr;
+	delete del_node;
+}
+
+template <typename TKey, typename TData>
+void RedBlackTree<TKey, TData>::rb_delete(RBNode* z_node, std::stack<RBNode**>& way)
+{
+	way.pop();// delete z_node from stack.
+	RBNode* y_node = z_node;
+	COLOR y_orig_color = y_node->color;
+	RBNode* parent_z_node = nullptr;
+	if (!way.empty()) {
+		parent_z_node = *(way.top());
+		way.pop();
+	}
+
+	if (z_node->left == nullptr){
+		RBNode* x_node = z_node->right;
+		transplant(parent_z_node, z_node, z_node->right);
+	}
+	else if (z_node->right == nullptr) {
+		RBNode* x_node = z_node->left;
+		transplant(parent_z_node, z_node, z_node->left);
+	}
+	else {
+		std::pair<RBNode*, RBNode*> y_node_y_parent;
+		y_node_y_parent = tree_minimum(z_node->right);
+		y_node = y_node_y_parent.first;
+		RBNode* y_parent = y_node_y_parent.second;
+		y_orig_color = y_node->color;
+		RBNode* x_node = y_node->right;
+		if (y_parent == nullptr){ //it means that z_node is a parent for the y_node.
+			//x_node->parent = y_node; this is don`t need for us.
+		}
+		else
+		{
+			transplant(y_parent, y_node, y_node->right);
+			y_node->right = z_node->right;
+		}
+		transplant(parent_z_node, z_node, y_node);
+		y_node->left = z_node->left;
+		y_node->color = z_node->color;
+
+	}
+
+	delete_node(z_node);
+
+	if (y_orig_color == BLACK)
+	{
+		std::cout << purple << "FIXUP after DELETE" << white << std::endl;
+	}
 }
 #pragma endregion
 

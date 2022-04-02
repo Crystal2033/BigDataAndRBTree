@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <windows.h>
-
+//static float tmp = 0.0;
 inline std::ostream& blue(std::ostream& s)
 {
     HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -50,6 +50,16 @@ inline std::ostream& white(std::ostream& s)
     HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hStdout,
         FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+    return s;
+}
+
+inline std::ostream& pink(std::ostream& s)
+{
+    //tmp+=0.1;
+    HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hStdout,
+        FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+    
     return s;
 }
 

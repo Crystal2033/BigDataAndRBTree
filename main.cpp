@@ -22,13 +22,51 @@ int main(int argc, char* argv[])
 		tree->add(170, "Eva");
 		tree->add(500, "asdasd");
 
-		tree->add(-100, "asdasd");
+		tree->add(0, "asdasd");
 		tree->add(234, "asdadasd");
 		tree->add(340, "asdasdads");
 		tree->add(520, "Leasdasdasdna");
 		tree->add(10, "asdasdasd");
 		tree->infix_stepover_tree(print_tree);
-		std::cout << green << "Hello world!" << white << std::endl;
+		//std::cout << cyan << tree->find(80) << white <<std::endl;
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(100);
+		tree->infix_stepover_tree(print_tree);
+
+
+		/*std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(100);
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(200);
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(150);
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(300);
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(500);
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(520);
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(10);
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(234);
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(170);
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(12);
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(250);
+		tree->infix_stepover_tree(print_tree);*/
 	}
 	catch (KeyNotFoundException<int>& err)
 	{
@@ -37,10 +75,6 @@ int main(int argc, char* argv[])
 	catch (KeyAlreadyExistsException<int>& err)
 	{
 		std::cout << red << err.what() << "Key value: " << yellow << err.get_error_key() << white << std::endl;
-	}
-	catch (ParentNodeNotExistsException& err)
-	{
-		std::cout << red << err.what() << white << std::endl;
 	}
 	return 0;
 }

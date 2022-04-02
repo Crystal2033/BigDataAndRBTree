@@ -60,16 +60,4 @@ KeyAlreadyExistsException<TKey>::KeyAlreadyExistsException(const std::string& st
 //===================================================================================
 //===================================================================================
 
-class ParentNodeNotExistsException : public Exception  //probably don`t need
-{
-public:
-	ParentNodeNotExistsException(const std::string&);
-	const char* what() const override { return error_msg.c_str(); }
-};
-
-
-ParentNodeNotExistsException::ParentNodeNotExistsException(const std::string& str)
-{
-	error_msg = str;
-}
 #pragma endregion
