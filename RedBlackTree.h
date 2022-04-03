@@ -38,6 +38,7 @@ private:
 	void rb_delete(RBNode* z_node, std::stack<RBNode**>& way);
 	std::pair<RBNode*, RBNode*> tree_minimum(RBNode* const& x_node); //mb return RBNode*;
 	void delete_node(RBNode* del_node);
+	void deleteFixUp(RBNode* x_node, std::stack<RBNode**>& way);
 
 	void prefix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
 	void infix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
@@ -412,29 +413,33 @@ void RedBlackTree<TKey, TData>::rb_delete(RBNode* z_node, std::stack<RBNode**>& 
 	COLOR y_orig_color = y_node->color;
 	RBNode* parent_z_node = nullptr;
 	RBNode* parent_x_node;
+	RBNode* x_node;
 	if (!way.empty()) {
 		parent_z_node = *(way.top());
 		way.pop();
 	}
 
 	if (z_node->left == nullptr){
-		RBNode* x_node = z_node->right;
+		x_node = z_node->right;
 		transplant(parent_z_node, z_node, z_node->right);
 		parent_x_node = parent_z_node;
 	}
 	else if (z_node->right == nullptr) {
-		RBNode* x_node = z_node->left;
+		x_node = z_node->left;
 		transplant(parent_z_node, z_node, z_node->left);
 		parent_x_node = parent_z_node;
 	}
 	else {
 		std::pair<RBNode*, RBNode*> y_node_y_parent;
+		RBNode* y_parent = z_node;
 		y_node_y_parent = tree_minimum(z_node->right);
 		y_node = y_node_y_parent.first;
-		RBNode* y_parent = y_node_y_parent.second;
+		if (y_node_y_parent.second != nullptr) {
+			y_parent = y_node_y_parent.second;
+		}
 		y_orig_color = y_node->color;
-		RBNode* x_node = y_node->right;
-		if (y_parent == nullptr){ //it means that z_node is a parent for the y_node.
+		x_node = y_node->right;
+		if (y_parent == z_node){ //it means that z_node is a parent for the y_node.
 			//x_node->parent = y_node; this is don`t need for us.
 		}
 		else
@@ -445,16 +450,43 @@ void RedBlackTree<TKey, TData>::rb_delete(RBNode* z_node, std::stack<RBNode**>& 
 		transplant(parent_z_node, z_node, y_node);
 		y_node->left = z_node->left;
 		y_node->color = z_node->color;
-		parent_x_node = y_parent;
+		if (y_parent != z_node)
+		{
+			parent_x_node = y_parent;
+		}
+		else {
+			parent_x_node = y_node;
+		}
 
 	}
+	
+	delete_node(z_node); 
 
-	delete_node(z_node);
+	if (root == nullptr) // parent_x_node and x_node are nullptr. То есть этот случай отрезает наш, возможно, пустой стек дальше.
+	{
+		return;
+	}
 
 	if (y_orig_color == BLACK)
 	{
-		std::cout << purple << "FIXUP after DELETE" << white << std::endl;
+		std::stack<RBNode**> way_to_x_node;
+		if (parent_x_node != nullptr)
+		{
+			findWay(parent_x_node->key, way_to_x_node);
+		}
+		else
+		{
+			findWay(x_node->key, way_to_x_node);
+		}
+		deleteFixUp(x_node, way_to_x_node); // x_node is on the top of the stack.
 	}
+}
+
+template <typename TKey, typename TData>
+void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>& way)
+{
+	//RBNode* x_node = 
+	std::cout << red << "FIXING" << white << std::endl;
 }
 #pragma endregion
 

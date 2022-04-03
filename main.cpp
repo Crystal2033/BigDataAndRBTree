@@ -29,12 +29,12 @@ int main(int argc, char* argv[])
 		tree->add(10, "asdasdasd");
 		tree->infix_stepover_tree(print_tree);
 		//std::cout << cyan << tree->find(80) << white <<std::endl;
-		std::cout << pink << "DELETE:" << white << std::endl;
-		tree->remove(100);
-		tree->infix_stepover_tree(print_tree);
-
-
 		/*std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(150);*/
+		//tree->infix_stepover_tree(print_tree);
+
+
+		std::cout << pink << "DELETE:" << white << std::endl;
 		tree->remove(100);
 		tree->infix_stepover_tree(print_tree);
 		std::cout << pink << "DELETE:" << white << std::endl;
@@ -66,7 +66,10 @@ int main(int argc, char* argv[])
 		tree->infix_stepover_tree(print_tree);
 		std::cout << pink << "DELETE:" << white << std::endl;
 		tree->remove(250);
-		tree->infix_stepover_tree(print_tree);*/
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(75);
+		tree->infix_stepover_tree(print_tree);
 	}
 	catch (KeyNotFoundException<int>& err)
 	{
