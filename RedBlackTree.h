@@ -411,6 +411,7 @@ void RedBlackTree<TKey, TData>::rb_delete(RBNode* z_node, std::stack<RBNode**>& 
 	RBNode* y_node = z_node;
 	COLOR y_orig_color = y_node->color;
 	RBNode* parent_z_node = nullptr;
+	RBNode* parent_x_node;
 	if (!way.empty()) {
 		parent_z_node = *(way.top());
 		way.pop();
@@ -419,10 +420,12 @@ void RedBlackTree<TKey, TData>::rb_delete(RBNode* z_node, std::stack<RBNode**>& 
 	if (z_node->left == nullptr){
 		RBNode* x_node = z_node->right;
 		transplant(parent_z_node, z_node, z_node->right);
+		parent_x_node = parent_z_node;
 	}
 	else if (z_node->right == nullptr) {
 		RBNode* x_node = z_node->left;
 		transplant(parent_z_node, z_node, z_node->left);
+		parent_x_node = parent_z_node;
 	}
 	else {
 		std::pair<RBNode*, RBNode*> y_node_y_parent;
@@ -442,6 +445,7 @@ void RedBlackTree<TKey, TData>::rb_delete(RBNode* z_node, std::stack<RBNode**>& 
 		transplant(parent_z_node, z_node, y_node);
 		y_node->left = z_node->left;
 		y_node->color = z_node->color;
+		parent_x_node = y_parent;
 
 	}
 
