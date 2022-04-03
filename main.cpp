@@ -10,11 +10,13 @@ int main(int argc, char* argv[])
 		{
 			tree->add(i, " ");
 		}*/
-		tree->add(150, "Pasha");
-		tree->add(200, "Kesha");
-		tree->add(250, "Lesha");
-		tree->add(100, "Lena");
+		
 		tree->add(300, "Sema");
+		tree->add(250, "Lesha");
+		tree->add(200, "Pasha");
+		tree->add(150, "Kesha");
+		tree->add(100, "Lena");
+		
 
 		tree->add(75, "Alfred");
 		tree->add(80, "Sergey");
@@ -33,18 +35,21 @@ int main(int argc, char* argv[])
 		tree->remove(150);*/
 		//tree->infix_stepover_tree(print_tree);
 
-
-		std::cout << pink << "DELETE:" << white << std::endl;
-		tree->remove(100);
+		tree->remove(300);
 		tree->infix_stepover_tree(print_tree);
 		std::cout << pink << "DELETE:" << white << std::endl;
-		tree->remove(200);
-		tree->infix_stepover_tree(print_tree);
+		
 		std::cout << pink << "DELETE:" << white << std::endl;
 		tree->remove(150);
 		tree->infix_stepover_tree(print_tree);
 		std::cout << pink << "DELETE:" << white << std::endl;
-		tree->remove(300);
+		
+		tree->remove(100);
+		tree->infix_stepover_tree(print_tree);
+		std::cout << pink << "DELETE:" << white << std::endl;
+		tree->remove(250);
+		tree->infix_stepover_tree(print_tree);
+		/*
 		tree->infix_stepover_tree(print_tree);
 		std::cout << pink << "DELETE:" << white << std::endl;
 		tree->remove(500);
@@ -69,7 +74,7 @@ int main(int argc, char* argv[])
 		tree->infix_stepover_tree(print_tree);
 		std::cout << pink << "DELETE:" << white << std::endl;
 		tree->remove(75);
-		tree->infix_stepover_tree(print_tree);
+		tree->infix_stepover_tree(print_tree);*/
 	}
 	catch (KeyNotFoundException<int>& err)
 	{
