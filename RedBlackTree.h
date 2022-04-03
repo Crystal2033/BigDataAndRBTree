@@ -414,6 +414,7 @@ void RedBlackTree<TKey, TData>::rb_delete(RBNode* z_node, std::stack<RBNode**>& 
 	RBNode* parent_x_node;
 	if (!way.empty()) {
 		parent_z_node = *(way.top());
+
 		way.pop();
 	}
 
