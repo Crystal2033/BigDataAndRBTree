@@ -37,7 +37,7 @@ private:
 	void transplant(RBNode* const& parent_u, RBNode* const& u_node, RBNode* const& v_node); //#TODO: const убрать?
 	void rb_delete(RBNode* z_node, std::stack<RBNode**>& way);
 	std::pair<RBNode*, RBNode*> tree_minimum(RBNode* const& x_node); //mb return RBNode*;
-	void delete_node(RBNode* del_node);
+	void delete_node(RBNode*& del_node);
 	void deleteFixUp(RBNode* x_node, std::stack<RBNode**>& way);
 
 	void prefix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
@@ -398,11 +398,12 @@ void RedBlackTree<TKey, TData>::remove(const TKey& key) //like Kormen
 }
 
 template <typename TKey, typename TData>
-void RedBlackTree<TKey, TData>::delete_node(RBNode* del_node)
+void RedBlackTree<TKey, TData>::delete_node(RBNode*& del_node)
 {
 	del_node->left = nullptr;
 	del_node->right = nullptr;
 	delete del_node;
+	del_node = nullptr;
 }
 
 template <typename TKey, typename TData>
@@ -470,7 +471,7 @@ void RedBlackTree<TKey, TData>::rb_delete(RBNode* z_node, std::stack<RBNode**>& 
 	if (y_orig_color == BLACK)
 	{
 		std::stack<RBNode**> way_to_x_node;
-		if (parent_x_node != nullptr)
+		if (parent_x_node != nullptr)// two nodes in the tree. And deleting root
 		{
 			findWay(parent_x_node->key, way_to_x_node);
 		}
@@ -485,7 +486,118 @@ void RedBlackTree<TKey, TData>::rb_delete(RBNode* z_node, std::stack<RBNode**>& 
 template <typename TKey, typename TData>
 void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>& way)
 {
-	//RBNode* x_node = 
+	//if x_node == nullptr --> only parent exists. And x_node is BLACK sentinel.
+	COLOR x_color;
+	RBNode* parent_x_node = nullptr;
+	std::stack<RBNode**> current_way = way;
+	if (x_node == nullptr){
+		x_color = BLACK;
+	}
+	else {
+		x_color = x_node->color;
+	}
+
+	while (x_node != root && x_color == BLACK) //if x_node != root --> we have parent for x.
+	{ 
+		parent_x_node = *(current_way.top());
+		current_way.pop();
+		if (x_node == parent_x_node->left)
+		{
+			RBNode* w_node = parent_x_node->right;
+			if (w_node->color == RED)
+			{
+				//////////////case1{
+				w_node->color = BLACK;
+				parent_x_node->color = RED;
+				RBNode* grandpa_x = nullptr;
+				if (current_way.empty())
+				{
+					root = leftRotation(parent_x_node);
+				}
+				else
+				{
+					grandpa_x = *(current_way.top());
+					current_way.pop();
+					if (parent_x_node == grandpa_x->left) {
+						grandpa_x->left = leftRotation(parent_x_node);
+					}
+					else if (parent_x_node == grandpa_x->right) {
+						grandpa_x->right = leftRotation(parent_x_node);
+					}
+					w_node = parent_x_node->right;
+				}
+
+				current_way = std::stack<RBNode**>(); //clear stack
+				findWay(x_node->key, current_way); // после поворота у нас уже может быть другой путь до корня. из-за case 1 (left_rotate)
+				x_node = *(current_way.top());
+				current_way.pop();
+				parent_x_node = *(current_way.top());
+				current_way.pop();
+			}
+			//////////////case1}
+			//////////////case2{
+			if ((w_node->left == nullptr && w_node->right == nullptr) || (w_node->left->color == BLACK && w_node->right->color == BLACK))
+			{
+
+				w_node->color = RED;	 
+				x_node = parent_x_node;
+				if (!current_way.empty())
+				{
+					parent_x_node = *(current_way.top());
+					current_way.pop();
+				}
+				else
+				{
+					parent_x_node = nullptr;
+				}
+
+			}
+			//////////////case2}
+			
+			else
+			{
+				//////////////case3{
+				if ((w_node->right == nullptr) || w_node->right->color == BLACK)
+				{
+					if (w_node->left != nullptr)
+					{
+						w_node->left->color = BLACK;
+					}
+					w_node->color = RED;
+					parent_x_node->right = rightRotation(w_node);
+					w_node = parent_x_node->right;
+				}
+				//////////////case3}
+				//////////////case4{
+				w_node->color = parent_x_node->color;
+				parent_x_node->color = BLACK;
+				w_node->right->color = BLACK;
+
+				RBNode* grandpa_x = nullptr;
+				if (current_way.empty())
+				{
+					root = leftRotation(parent_x_node);
+				}
+				else
+				{
+					grandpa_x = *(current_way.top());
+					current_way.pop();
+					if (parent_x_node == grandpa_x->left) {
+						grandpa_x->left = leftRotation(parent_x_node);
+					}
+					else if (parent_x_node == grandpa_x->right) {
+						grandpa_x->right = leftRotation(parent_x_node);
+					}
+					w_node = parent_x_node->right;
+				}
+				x_node = root;
+				//////////////case4}
+
+			}
+
+			
+		}
+	}
 	std::cout << red << "FIXING" << white << std::endl;
 }
 #pragma endregion
