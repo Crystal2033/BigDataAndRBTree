@@ -490,7 +490,7 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 	COLOR x_color;
 	RBNode* parent_x_node = nullptr;
 	std::stack<RBNode**> current_way = way;
-	if (x_node == nullptr){
+	if (x_node == nullptr) {
 		x_color = BLACK;
 	}
 	else {
@@ -498,13 +498,22 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 	}
 
 	while (x_node != root && x_color == BLACK) //if x_node != root --> we have parent for x.
-	{ 
+	{
 		parent_x_node = *(current_way.top());
 		current_way.pop();
 		if (x_node == parent_x_node->left)
 		{
 			RBNode* w_node = parent_x_node->right;
-			if (w_node->color == RED)
+			COLOR w_node_color;
+			if (w_node == nullptr)
+			{
+				w_node_color = BLACK;
+			}
+			else
+			{
+				w_node_color = w_node->color;
+			}
+			if (w_node_color== RED)
 			{
 				//////////////case1{
 				w_node->color = BLACK;
@@ -528,19 +537,52 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 				}
 
 				current_way = std::stack<RBNode**>(); //clear stack
-				findWay(x_node->key, current_way); // после поворота у нас уже может быть другой путь до корня. из-за case 1 (left_rotate)
-				x_node = *(current_way.top());
-				current_way.pop();
+				if (x_node != nullptr)
+				{
+					findWay(x_node->key, current_way); // после поворота у нас уже может быть другой путь до корня. из-за case 1 (left_rotate)
+					x_node = *(current_way.top());
+					current_way.pop();
+				}
+				else //if (parent_x_node != nullptr)
+				{
+					findWay(parent_x_node->key, current_way);
+				}
+
 				parent_x_node = *(current_way.top());
 				current_way.pop();
 			}
 			//////////////case1}
 			//////////////case2{
-			if ((w_node->left == nullptr && w_node->right == nullptr) || (w_node->left->color == BLACK && w_node->right->color == BLACK))
+			COLOR w_node_right_color;
+			COLOR w_node_left_color;
+			if (w_node->right == nullptr)
+			{
+				w_node_right_color = BLACK;
+			}
+			else
+			{
+				w_node_right_color = w_node->right->color;
+			}
+
+			if (w_node->left == nullptr)
+			{
+				w_node_left_color = BLACK;
+			}
+			else
+			{
+				w_node_left_color = w_node->left->color;
+			}
+			if ( (w_node_left_color == BLACK) && (w_node_right_color == BLACK))
 			{
 
-				w_node->color = RED;	 
+				w_node->color = RED;
 				x_node = parent_x_node;
+				if (x_node == nullptr) {
+					x_color = BLACK;
+				}
+				else {
+					x_color = x_node->color;
+				}
 				if (!current_way.empty())
 				{
 					parent_x_node = *(current_way.top());
@@ -553,7 +595,7 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 
 			}
 			//////////////case2}
-			
+
 			else
 			{
 				//////////////case3{
@@ -595,10 +637,150 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 
 			}
 
-			
 		}
+		else
+		{
+			RBNode* w_node = parent_x_node->left;
+			COLOR w_node_color;
+			if (w_node == nullptr)
+			{
+				w_node_color = BLACK;
+			}
+			else
+			{
+				w_node_color = w_node->color;
+			}
+			if (w_node_color == RED)
+			{
+				//////////////case1{
+				w_node->color = BLACK;
+				parent_x_node->color = RED;
+				RBNode* grandpa_x = nullptr;
+				if (current_way.empty())
+				{
+					root = rightRotation(parent_x_node);
+				}
+				else
+				{
+					grandpa_x = *(current_way.top());
+					current_way.pop();
+					if (parent_x_node == grandpa_x->right) {
+						grandpa_x->right = rightRotation(parent_x_node);
+					}
+					else if (parent_x_node == grandpa_x->left) {
+						grandpa_x->left = rightRotation(parent_x_node);
+					}
+					w_node = parent_x_node->left;
+				}
+
+				current_way = std::stack<RBNode**>(); //clear stack
+				if (x_node != nullptr)
+				{
+					findWay(x_node->key, current_way); // после поворота у нас уже может быть другой путь до корня. из-за case 1 (left_rotate)
+					x_node = *(current_way.top());
+					current_way.pop();
+				}
+				else //if (parent_x_node != nullptr)
+				{
+					findWay(parent_x_node->key, current_way);
+				}
+				
+				parent_x_node = *(current_way.top());
+				current_way.pop();
+			}
+			//////////////case1}
+			//////////////case2{
+			COLOR w_node_right_color;
+			COLOR w_node_left_color;
+			if (w_node->right == nullptr)
+			{
+				w_node_right_color = BLACK;
+			}
+			else
+			{
+				w_node_right_color = w_node->right->color;
+			}
+
+			if (w_node->left == nullptr)
+			{
+				w_node_left_color = BLACK;
+			}
+			else
+			{
+				w_node_left_color = w_node->left->color;
+			}
+			if ((w_node_right_color == BLACK) && (w_node_left_color == BLACK))
+			{
+
+				w_node->color = RED;
+				x_node = parent_x_node;
+				if (x_node == nullptr) {
+					x_color = BLACK;
+				}
+				else {
+					x_color = x_node->color;
+				}
+				if (!current_way.empty())
+				{
+					parent_x_node = *(current_way.top());
+					current_way.pop();
+				}
+				else
+				{
+					parent_x_node = nullptr;
+				}
+
+			}
+			//////////////case2}
+
+			else
+			{
+				//////////////case3{
+				if ((w_node->left == nullptr) || w_node->left->color == BLACK)
+				{
+					if (w_node->right != nullptr)
+					{
+						w_node->right->color = BLACK;
+					}
+					w_node->color = RED;
+					parent_x_node->left = leftRotation(w_node);
+					w_node = parent_x_node->left;
+				}
+				//////////////case3}
+				//////////////case4{
+				w_node->color = parent_x_node->color;
+				parent_x_node->color = BLACK;
+				w_node->left->color = BLACK;
+
+				RBNode* grandpa_x = nullptr;
+				if (current_way.empty())
+				{
+					root = rightRotation(parent_x_node);
+				}
+				else
+				{
+					grandpa_x = *(current_way.top());
+					current_way.pop();
+					if (parent_x_node == grandpa_x->right) {
+						grandpa_x->right = rightRotation(parent_x_node);
+					}
+					else if (parent_x_node == grandpa_x->left) {
+						grandpa_x->left = rightRotation(parent_x_node);
+					}
+					w_node = parent_x_node->left;
+				}
+				x_node = root;
+				//////////////case4}
+
+			}
+		}
+		
 	}
 	std::cout << red << "FIXING" << white << std::endl;
+	if (x_node != nullptr)
+	{
+		x_node->color = BLACK;
+	}
 }
 #pragma endregion
 
