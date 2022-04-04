@@ -46,8 +46,6 @@ private:
 public:
 	RedBlackTree(Comparator<TKey>* const &);
 	void add(const TKey&, const TData&) override;
-	
-
 	void remove(const TKey&) override;
 	TData& find(const TKey&) const override;
 	
@@ -173,6 +171,41 @@ void print_tree(const TKey& key, const TData& data, int depth = 0)
 	std::cout << blue << "Data: " << data << "." << white << std::endl;
 }
 
+
+
+template <typename TKey, typename TData>
+void RedBlackTree <TKey, TData>::addRepeatKey(const RBNode* node, std::stack<RBNode**>& way)
+{
+	if ((*(way.top()))->repeat_keys_nodes == nullptr)
+	{
+		(*(way.top()))->repeat_keys_nodes = new std::list<RBNode*>;
+	}
+	(*(way.top()))->repeat_keys_nodes->push_back(const_cast<RBNode*>(node));
+}
+
+
+#pragma endregion
+
+#pragma region ADD
+template <typename TKey, typename TData>
+void RedBlackTree<TKey, TData>::add(const TKey& key, const TData& data)
+{
+	std::stack<RBNode**> way;
+	findWay(key, way);
+	//std::cout << yellow << "INSERTING. " << cyan << key << " : " << data << white << std::endl;
+	if (*(way.top()) != nullptr){ //“о есть указатель указывает на узел, а если при вставке он не пуст, значит, там повторный ключ.
+		RBNode* repeat_key_node = new RBNode(key, data, RED);
+		addRepeatKey(repeat_key_node, way);
+	}
+	else{
+		*(way.top()) = new RBNode(key, data, RED);
+	}
+
+	insertFixUp(way);
+	return;
+	
+}
+
 template <typename TKey, typename TData>
 void RedBlackTree<TKey, TData>::insertFixUp(std::stack<RBNode**>& way)
 {
@@ -235,7 +268,7 @@ void RedBlackTree<TKey, TData>::insertFixUp(std::stack<RBNode**>& way)
 						great_grandpa_node->left = rightRotation(grandpa_node);
 					}
 				}
-			}//TODO EVERYTHIN ELSE
+			}
 			else
 			{
 				RBNode* uncle_node = grandpa_node->left; // Uncle exists because tree is balanced
@@ -285,41 +318,8 @@ void RedBlackTree<TKey, TData>::insertFixUp(std::stack<RBNode**>& way)
 			}
 		}
 	}
-	
+
 	root->color = BLACK;
-}
-
-template <typename TKey, typename TData>
-void RedBlackTree <TKey, TData>::addRepeatKey(const RBNode* node, std::stack<RBNode**>& way)
-{
-	if ((*(way.top()))->repeat_keys_nodes == nullptr)
-	{
-		(*(way.top()))->repeat_keys_nodes = new std::list<RBNode*>;
-	}
-	(*(way.top()))->repeat_keys_nodes->push_back(const_cast<RBNode*>(node));
-}
-
-
-#pragma endregion
-
-#pragma region ADD
-template <typename TKey, typename TData>
-void RedBlackTree<TKey, TData>::add(const TKey& key, const TData& data)
-{
-	std::stack<RBNode**> way;
-	findWay(key, way);
-	std::cout << yellow << "INSERTING. " << cyan << key << " : " << data << white << std::endl;
-	if (*(way.top()) != nullptr){ //“о есть указатель указывает на узел, а если при вставке он не пуст, значит, там повторный ключ.
-		RBNode* repeat_key_node = new RBNode(key, data, RED);
-		addRepeatKey(repeat_key_node, way);
-	}
-	else{
-		*(way.top()) = new RBNode(key, data, RED);
-	}
-
-	insertFixUp(way);
-	return;
-	
 }
 #pragma endregion
 
@@ -385,7 +385,7 @@ std::pair<typename RedBlackTree<TKey, TData>::RBNode*, typename RedBlackTree<TKe
 template <typename TKey, typename TData>
 void RedBlackTree<TKey, TData>::remove(const TKey& key) //like Kormen
 {
-	std::cout << purple << key << white << std::endl;
+	//std::cout << purple << key << white << std::endl;
 	if (root == nullptr){
 		throw KeyNotFoundException<TKey>("Key wasn`t found. Tree is empty.", key);
 	}
@@ -633,7 +633,6 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 				//////////////case4}
 
 			}
-
 		}
 		else
 		{
@@ -767,7 +766,6 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 		}
 		
 	}
-	std::cout << red << "FIXING" << white << std::endl;
 	if (x_node != nullptr)
 	{
 		x_node->color = BLACK;

@@ -1,43 +1,58 @@
 #include"Colours.h"
 #include "RedBlackTree.h"
+#include <chrono>
+#include <map>
 int main(int argc, char* argv[])
 {
 	Comparator<int>* comparator = new ComparatorInt(INCREASE);
 	try
 	{
+		
+
+		
+		std::map<int, std::string> map;
 		RedBlackTree<int, std::string>* tree = new RedBlackTree<int, std::string>(comparator);
+		auto begin = std::chrono::steady_clock::now();
 		for (int i = 0; i <= 500; i++)
 		{
-			tree->infix_stepover_tree(print_tree);
-			std::cout << green << "ADD:" << white << std::endl;
+			//tree->infix_stepover_tree(print_tree);
+			//std::cout << green << "ADD:" << white << std::endl;
 			tree->add(i, " ");
+			//map.insert(std::make_pair(i, " "));
 		}
 
 		for (int i = 450; i != 425; i--)
 		{
-			tree->infix_stepover_tree(print_tree);
-			std::cout << red << "DELETE:" << white << std::endl;
-			tree->	remove(i);
+			//tree->infix_stepover_tree(print_tree);
+			//std::cout << red << "DELETE:" << white << std::endl;
+			tree->remove(i);
+			//map.erase(i);
 		}
 
 
 		for (int i = 150; i != 200; i++)
 		{
-			tree->infix_stepover_tree(print_tree);
-			std::cout << red << "DELETE:" << white << std::endl;
+			//tree->infix_stepover_tree(print_tree);
+			//std::cout << red << "DELETE:" << white << std::endl;
 			tree->remove(i);
+			//map.erase(i);
 		}
 
 		for (int i = 475; i != 500; i++)
 		{
-			tree->infix_stepover_tree(print_tree);
-			std::cout << red << "DELETE:" << white << std::endl;
+			//tree->infix_stepover_tree(print_tree);
+			//std::cout << red << "DELETE:" << white << std::endl;
 			tree->remove(i);
+			//map.erase(i);
 		}
 
-		std::cout << cyan << "REMAINED:" << white << std::endl;
-		tree->infix_stepover_tree(print_tree);
+		//std::cout << cyan << "REMAINED:" << white << std::endl;
 		
+
+		auto end = std::chrono::steady_clock::now();
+		//tree->infix_stepover_tree(print_tree);
+		auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+		std::cout << yellow << "The time: " << cyan << elapsed_ms.count() << yellow << " ms" << white << std::endl;
 		/*tree->add(300, "Sema");
 		tree->add(250, "Lesha");
 		tree->add(200, "Pasha");
