@@ -28,15 +28,15 @@ private:
 	RBNode* root;
 	Comparator<TKey>* comparator;
 
-	void findWay(const TKey, std::stack<RBNode**>&) ; //const
+	void findWay(const TKey, std::stack<RBNode**>&) const;
 	void insertFixUp(std::stack<RBNode**>&);
 	void addRepeatKey(const RBNode* node, std::stack<RBNode**>& way);
 	RBNode* leftRotation(RBNode* old_root);
 	RBNode* rightRotation(RBNode* old_root);
 
-	void transplant(RBNode* const& parent_u, RBNode* const& u_node, RBNode* const& v_node); //#TODO: const убрать?
+	void transplant(RBNode* const& parent_u, RBNode* const& u_node, RBNode* const& v_node);
 	void rb_delete(RBNode* z_node, std::stack<RBNode**>& way);
-	std::pair<RBNode*, RBNode*> tree_minimum(RBNode* const& x_node); //mb return RBNode*;
+	std::pair<RBNode*, RBNode*> tree_minimum(RBNode* const& x_node);
 	void delete_node(RBNode*& del_node);
 	void deleteFixUp(RBNode* x_node, std::stack<RBNode**>& way);
 
@@ -136,9 +136,9 @@ typename RedBlackTree<TKey, TData>::RBNode* RedBlackTree<TKey, TData>::rightRota
 /// Ќужно учитывать, что может добавитьс€ повторный ключ -> в добавлении нужно это обработать и добавить повтор€ющийс€ по ключу узел в лист в узле.
 /// ѕри поиске (например, в удалении) в конце листа указатель на блок, который совпадает с ключом. ѕроверки после выполнени€ find_way не нужны!!!
 template <typename TKey, typename TData>
-void RedBlackTree<TKey, TData>::findWay(const TKey key, std::stack<RBNode**>& way)
+void RedBlackTree<TKey, TData>::findWay(const TKey key, std::stack<RBNode**>& way) const
 {
-	RBNode** iterator = &root;
+	RBNode** iterator = const_cast<RBNode**>(&root);
 	way.push(iterator);
 	while (*iterator)
 	{
@@ -536,7 +536,6 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 					else if (parent_x_node == grandpa_x->right) {
 						grandpa_x->right = leftRotation(parent_x_node);
 					}
-					//w_node = parent_x_node->right;
 				}
 
 				current_way = std::stack<RBNode**>(); //clear stack
@@ -556,7 +555,7 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 					parent_x_node = *(current_way.top());
 					current_way.pop();
 				}
-				w_node = parent_x_node->right; //added 04.04.2022
+				w_node = parent_x_node->right;
 			}
 			//////////////case1}
 			//////////////case2{
@@ -590,15 +589,6 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 				else {
 					x_color = x_node->color;
 				}
-				/*if (!current_way.empty()) //deleted 04.04.2022 because it returns to start
-				{
-					parent_x_node = *(current_way.top());
-					current_way.pop();
-				}
-				else
-				{
-					parent_x_node = nullptr;
-				}*/
 
 			}
 			//////////////case2}
@@ -677,7 +667,6 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 					else if (parent_x_node == grandpa_x->left) {
 						grandpa_x->left = rightRotation(parent_x_node);
 					}
-					//w_node = parent_x_node->left;
 				}
 
 				current_way = std::stack<RBNode**>(); //clear stack
@@ -697,7 +686,7 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 					parent_x_node = *(current_way.top());
 					current_way.pop();
 				}
-				w_node = parent_x_node->left; //added 04.04.2022
+				w_node = parent_x_node->left;
 			}
 			//////////////case1}
 			//////////////case2{
@@ -731,15 +720,6 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 				else {
 					x_color = x_node->color;
 				}
-				/*if (!current_way.empty())
-				{
-					parent_x_node = *(current_way.top());
-					current_way.pop();
-				}
-				else
-				{
-					parent_x_node = nullptr;
-				}*/
 
 			}
 			//////////////case2}

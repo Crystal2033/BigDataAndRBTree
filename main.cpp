@@ -6,38 +6,39 @@ int main(int argc, char* argv[])
 	try
 	{
 		RedBlackTree<int, std::string>* tree = new RedBlackTree<int, std::string>(comparator);
-		/*for(int i = 100; i != -1; i--)
+		for (int i = 0; i <= 500; i++)
 		{
 			tree->infix_stepover_tree(print_tree);
 			std::cout << green << "ADD:" << white << std::endl;
 			tree->add(i, " ");
 		}
 
-		for (int i = 0; i != 50; i++)
+		for (int i = 450; i != 425; i--)
 		{
 			tree->infix_stepover_tree(print_tree);
-			std::cout << pink << "DELETE:" << white << std::endl;
+			std::cout << red << "DELETE:" << white << std::endl;
+			tree->	remove(i);
+		}
+
+
+		for (int i = 150; i != 200; i++)
+		{
+			tree->infix_stepover_tree(print_tree);
+			std::cout << red << "DELETE:" << white << std::endl;
 			tree->remove(i);
 		}
 
-		for (int i = 50; i != -1; i--)
+		for (int i = 475; i != 500; i++)
 		{
 			tree->infix_stepover_tree(print_tree);
-			std::cout << green << "ADD:" << white << std::endl;
-			tree->add(i, " ");
+			std::cout << red << "DELETE:" << white << std::endl;
+			tree->remove(i);
 		}
+
+		std::cout << cyan << "REMAINED:" << white << std::endl;
 		tree->infix_stepover_tree(print_tree);
-
-
-		for (int i = 100; i != -1; i--)
-		{
-			tree->infix_stepover_tree(print_tree);
-			std::cout << pink << "DELETE:" << white << std::endl;
-			tree->remove(i);
-		}
-		tree->infix_stepover_tree(print_tree);*/
 		
-		tree->add(300, "Sema");
+		/*tree->add(300, "Sema");
 		tree->add(250, "Lesha");
 		tree->add(200, "Pasha");
 		tree->add(150, "Kesha");
@@ -54,12 +55,12 @@ int main(int argc, char* argv[])
 		tree->add(234, "asdadasd");
 		tree->add(340, "asdasdads");
 		tree->add(520, "Leasdasdasdna");
-		tree->add(10, "asdasdasd");
+		tree->add(10, "asdasdasd");*/
 		//tree->infix_stepover_tree(print_tree);
 		//std::cout << cyan << tree->find(80) << white <<std::endl;
 		/*std::cout << pink << "DELETE:" << white << std::endl;
 		tree->remove(150);*/
-		tree->infix_stepover_tree(print_tree);
+		/*tree->infix_stepover_tree(print_tree);
 
 		tree->remove(300);
 		tree->infix_stepover_tree(print_tree);
@@ -94,12 +95,9 @@ int main(int argc, char* argv[])
 		std::cout << pink << "DELETE:" << white << std::endl;
 		tree->remove(12);
 		tree->infix_stepover_tree(print_tree);
-		/*std::cout << pink << "DELETE:" << white << std::endl;
-		tree->remove(250);
-		tree->infix_stepover_tree(print_tree);*/
 		std::cout << pink << "DELETE:" << white << std::endl;
 		tree->remove(75);
-		tree->infix_stepover_tree(print_tree);
+		tree->infix_stepover_tree(print_tree);*/
 	}
 	catch (KeyNotFoundException<int>& err)
 	{
