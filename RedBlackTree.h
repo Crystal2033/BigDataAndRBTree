@@ -391,7 +391,7 @@ void RedBlackTree<TKey, TData>::remove(const TKey& key) //like Kormen
 	}
 	std::stack<RBNode**> way;
 	findWay(key, way);
-	if ((*(way.top()))->key != key){
+	if (*(way.top()) == nullptr){
 		throw KeyNotFoundException<TKey>("Key wasn`t found.", key);
 	}
 	rb_delete(*(way.top()), way);
@@ -499,8 +499,11 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 
 	while (x_node != root && x_color == BLACK) //if x_node != root --> we have parent for x.
 	{
-		parent_x_node = *(current_way.top());
-		current_way.pop();
+		if (!current_way.empty())
+		{
+			parent_x_node = *(current_way.top());
+			current_way.pop();
+		}
 		if (x_node == parent_x_node->left)
 		{
 			RBNode* w_node = parent_x_node->right;
@@ -533,7 +536,7 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 					else if (parent_x_node == grandpa_x->right) {
 						grandpa_x->right = leftRotation(parent_x_node);
 					}
-					w_node = parent_x_node->right;
+					//w_node = parent_x_node->right;
 				}
 
 				current_way = std::stack<RBNode**>(); //clear stack
@@ -548,8 +551,12 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 					findWay(parent_x_node->key, current_way);
 				}
 
-				parent_x_node = *(current_way.top());
-				current_way.pop();
+				if (!current_way.empty())
+				{
+					parent_x_node = *(current_way.top());
+					current_way.pop();
+				}
+				w_node = parent_x_node->right; //added 04.04.2022
 			}
 			//////////////case1}
 			//////////////case2{
@@ -583,7 +590,7 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 				else {
 					x_color = x_node->color;
 				}
-				if (!current_way.empty())
+				/*if (!current_way.empty()) //deleted 04.04.2022 because it returns to start
 				{
 					parent_x_node = *(current_way.top());
 					current_way.pop();
@@ -591,7 +598,7 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 				else
 				{
 					parent_x_node = nullptr;
-				}
+				}*/
 
 			}
 			//////////////case2}
@@ -670,7 +677,7 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 					else if (parent_x_node == grandpa_x->left) {
 						grandpa_x->left = rightRotation(parent_x_node);
 					}
-					w_node = parent_x_node->left;
+					//w_node = parent_x_node->left;
 				}
 
 				current_way = std::stack<RBNode**>(); //clear stack
@@ -685,8 +692,12 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 					findWay(parent_x_node->key, current_way);
 				}
 				
-				parent_x_node = *(current_way.top());
-				current_way.pop();
+				if (!current_way.empty())
+				{
+					parent_x_node = *(current_way.top());
+					current_way.pop();
+				}
+				w_node = parent_x_node->left; //added 04.04.2022
 			}
 			//////////////case1}
 			//////////////case2{
@@ -720,7 +731,7 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 				else {
 					x_color = x_node->color;
 				}
-				if (!current_way.empty())
+				/*if (!current_way.empty())
 				{
 					parent_x_node = *(current_way.top());
 					current_way.pop();
@@ -728,7 +739,7 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 				else
 				{
 					parent_x_node = nullptr;
-				}
+				}*/
 
 			}
 			//////////////case2}
