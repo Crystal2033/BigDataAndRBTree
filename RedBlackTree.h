@@ -3,7 +3,6 @@
 #include "Comparator.h"
 #include "Exceptions.h"
 #include <stack>
-#include <list>
 typedef enum {RED, BLACK} COLOR;
 
 
@@ -47,7 +46,7 @@ public:
 	RedBlackTree(Comparator<TKey>* const &);
 	void add(const TKey&, const TData&) override;
 	void remove(const TKey&) override;
-	TData& find(const TKey&) const override;
+	std::list<TData> find(const TKey&) const override;
 	
 
 	void prefix_stepover_tree(void(*call_back)(const TKey&, const TData&, int)) const;
@@ -325,7 +324,7 @@ void RedBlackTree<TKey, TData>::insertFixUp(std::stack<RBNode**>& way)
 
 #pragma region FIND
 template <typename TKey, typename TData>
-TData& RedBlackTree<TKey, TData>::find(const TKey& key) const // TODO: можно через find_way, наверное, сделать
+std::list<TData> RedBlackTree<TKey, TData>::find(const TKey& key) const // TODO: можно через find_way, наверное, сделать
 {
 	if (root == nullptr){
 		throw KeyNotFoundException<TKey>("Key doesn`t exist", key);
@@ -340,7 +339,17 @@ TData& RedBlackTree<TKey, TData>::find(const TKey& key) const // TODO: можно чер
 			iterator = iterator->left;
 		}
 		else{ // == 0
-			return iterator->data; //TODO: RETURN LIST OF KEYS(COULD REPEAT)
+			std::list<TData> found_data;
+			if (iterator->repeat_keys_nodes == nullptr || iterator->repeat_keys_nodes->empty()) {
+				found_data.push_back(iterator->data);
+			}
+			else {
+				for (auto node : *(iterator->repeat_keys_nodes)) {
+					found_data.push_back(node->data);
+				}
+				found_data.push_back(iterator->data);
+			}
+			return found_data; //TODO: RETURN LIST OF KEYS(COULD REPEAT)
 		}
 	}
 	throw KeyNotFoundException<TKey>("Key doesn`t exist", key);
@@ -390,11 +399,19 @@ void RedBlackTree<TKey, TData>::remove(const TKey& key) //like Kormen
 		throw KeyNotFoundException<TKey>("Key wasn`t found. Tree is empty.", key);
 	}
 	std::stack<RBNode**> way;
+	
+	
 	findWay(key, way);
-	if (*(way.top()) == nullptr){
+	RBNode* node_for_delete = *(way.top());
+	if (node_for_delete == nullptr){
 		throw KeyNotFoundException<TKey>("Key wasn`t found.", key);
 	}
-	rb_delete(*(way.top()), way);
+	if (node_for_delete->repeat_keys_nodes == nullptr || node_for_delete->repeat_keys_nodes->empty()){
+		rb_delete(node_for_delete, way);
+	}
+	else {
+		node_for_delete->repeat_keys_nodes->pop_front();
+	}
 }
 
 template <typename TKey, typename TData>
@@ -766,7 +783,7 @@ void RedBlackTree<TKey, TData>::deleteFixUp(RBNode* x_node, std::stack<RBNode**>
 		}
 		
 	}
-	if (x_node != nullptr)
+	if (x_node != nullptr) //проверка на дурака.
 	{
 		x_node->color = BLACK;
 	}
