@@ -324,7 +324,7 @@ void RedBlackTree<TKey, TData>::insertFixUp(std::stack<RBNode**>& way)
 
 #pragma region FIND
 template <typename TKey, typename TData>
-std::list<TData*> RedBlackTree<TKey, TData>::find(const TKey& key) // TODO: можно через find_way, наверное, сделать
+std::list<TData*> RedBlackTree<TKey, TData>::find(const TKey& key)
 {
 	if (root == nullptr){
 		throw KeyNotFoundException<TKey>("Key doesn`t exist", key);
@@ -349,7 +349,7 @@ std::list<TData*> RedBlackTree<TKey, TData>::find(const TKey& key) // TODO: можн
 				}
 				found_data.push_back(&(iterator->data));
 			}
-			return found_data; //TODO: RETURN LIST OF KEYS(COULD REPEAT)
+			return found_data;
 		}
 	}
 	throw KeyNotFoundException<TKey>("Key doesn`t exist", key);
