@@ -46,7 +46,7 @@ public:
 	RedBlackTree(Comparator<TKey>* const &);
 	void add(const TKey&, const TData&) override;
 	void remove(const TKey&) override;
-	std::list<TData> find(const TKey&) const override;
+	std::list<TData*> find(const TKey&) override;
 	
 
 	void prefix_stepover_tree(void(*call_back)(const TKey&, const TData&, int)) const;
@@ -324,7 +324,7 @@ void RedBlackTree<TKey, TData>::insertFixUp(std::stack<RBNode**>& way)
 
 #pragma region FIND
 template <typename TKey, typename TData>
-std::list<TData> RedBlackTree<TKey, TData>::find(const TKey& key) const // TODO: можно через find_way, наверное, сделать
+std::list<TData*> RedBlackTree<TKey, TData>::find(const TKey& key) // TODO: можно через find_way, наверное, сделать
 {
 	if (root == nullptr){
 		throw KeyNotFoundException<TKey>("Key doesn`t exist", key);
@@ -339,15 +339,15 @@ std::list<TData> RedBlackTree<TKey, TData>::find(const TKey& key) const // TODO:
 			iterator = iterator->left;
 		}
 		else{ // == 0
-			std::list<TData> found_data;
+			std::list<TData*> found_data;
 			if (iterator->repeat_keys_nodes == nullptr || iterator->repeat_keys_nodes->empty()) {
-				found_data.push_back(iterator->data);
+				found_data.push_back(&(iterator->data));
 			}
 			else {
 				for (auto node : *(iterator->repeat_keys_nodes)) {
-					found_data.push_back(node->data);
+					found_data.push_back(&(node->data));
 				}
-				found_data.push_back(iterator->data);
+				found_data.push_back(&(iterator->data));
 			}
 			return found_data; //TODO: RETURN LIST OF KEYS(COULD REPEAT)
 		}
