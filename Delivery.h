@@ -5,9 +5,9 @@ public:
 	std::string sender;            // Отправитель contries  DONE
 	std::string reciever;          // Получатель  contries  DONE
 	std::string content;           // Содержимое  contents  DONE
-	double weight;                 // Вес
-	double price;                  // Цена содержимого
-	double deliver_price;          // Цена доставки
+	int weight;                    // Вес
+	int price;                     // Цена содержимого
+	int deliver_price;             // Цена доставки
 
 	std::string destination;       // Пункт назначения companies DONE 
 	std::string departure_point;   // Пункт отсылки    companies DONE

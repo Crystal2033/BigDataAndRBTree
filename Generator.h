@@ -1,16 +1,17 @@
 #pragma once
 #include "Delivery.h"
 #include <list>
-#include <ctime>
+#include <random>
+#include <string>
 class InterfaceGenerator {
 public:
-	virtual std::list<Delivery*>* generateData() const = 0;
+	virtual void generateData(const std::string&) const = 0;
 	virtual ~InterfaceGenerator() = default;
 };
 
 class DeliGenerator : public InterfaceGenerator {
 public:
-	std::list<Delivery*>* generateData() const override;
+	void generateData(const std::string&) const override;
 	const std::vector<std::string> names {"Cyber", "Java", "C++", "Python", "Pascal", "Ruby", "Scratch",
 	"D", "R", "SQL", "MicrosoftAccept", "Joy", "Haskel", "Prolog", "ML", "Lisp", "Mercury", "Unlambda",
 	"Agba", "Forth", "Coq", "Refile", "Parsec", "LL", "JavaScript", "HTML", "Basic", "C", 
@@ -39,8 +40,21 @@ public:
 	~DeliGenerator() = default;
 };
 
-std::list<Delivery*>* DeliGenerator::generateData() const
+void DeliGenerator::generateData(const std::string& file_name) const
 {
+	std::random_device rd;   
+	std::mt19937 gen(rd());
+
+	unsigned int price;
+	std::string price_str;
+
+	unsigned int weight;
+	std::string weight_str;
+
+	unsigned int deliver_price;
+	std::string deliver_price_str;
+
+
 	/*std::cout << yellow << names.size() << white << std::endl;
 	for (auto name_in_vector : names) {
 		std::cout << purple << name_in_vector << blue << " " << name_in_vector.size() << white <<std::endl;
@@ -60,8 +74,21 @@ std::list<Delivery*>* DeliGenerator::generateData() const
 	for (auto company : companies) {
 		std::cout << pink << company << blue << " " << company.size() << white << std::endl;
 	}*/
+	for (int i = 0; i < 100; i++)
+	{
+		price = gen() %  1000000;// % 100000;
+		price_str = std::to_string(price);
+		
+		std::cout << green << price_str << blue << " " << price_str.size() << white << std::endl;
+		
+	}
+
+	for (int i = 0; i < 100; i++)
+	{
+		weight = gen() % 1000;// % 100000;
+		weight_str = std::to_string(weight);
+		std::cout << azure << weight_str << blue << " " << weight_str.size() << white << std::endl;
+	}
 	
 	
-	std::list<Delivery*>* my_list = new std::list<Delivery*>;
-	return my_list;
 }
