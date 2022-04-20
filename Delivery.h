@@ -1,10 +1,10 @@
 #pragma once
 class Delivery {
 public:
-	std::string name;              // Название груза.
-	std::string sender;            // Отправитель
-	std::string reciever;          // Получатель
-	std::string content;           // Содержимое
+	std::string name;              // Название груза. names
+	std::string sender;            // Отправитель contries
+	std::string reciever;          // Получатель contries
+	std::string content;           // Содержимое 
 	double weight;                 // Вес
 	double price;                  // Цена содержимого
 	double deliver_price;          // Цена доставки

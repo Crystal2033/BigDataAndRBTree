@@ -21,6 +21,12 @@ public:
 	"Uganda", "India", "Iceland", "France", "Italy", "Estonia", "Greece", "Chile", "Andora", "Armenia"
 	"Fiji", "Laos", "Netherlands", "Nepal", "Kuwait", "Kazakhstan", "Palau", "Peru", "Portugal", "Poland", 
 	"Togo", "Tongo", "Tuvalu", "Uruguay", "Yemen"};
+	const std::vector<std::string> contents { "Adobe", "Flash", "Develop", "IntelliJ", "PowerFlasher", "Eclipse",
+	"GNATStudio", "SlickEdit", "Fresh", "SASM", "BasicAndroid", "Gambas", "SmallBasic", "Xojo", "MonoDevelop",
+	"SharpDevelop", "AqulaSoft", "Anjuta", "Bulder", "AbstractFactory", "FactoryMethod", "CodeBlocks", "CodeLite",
+	"Geany", "CLion", "LabWindows", "Oracle", "XCode", "OpenWatcom", "NetBeans", "VSCode", "DevC++", "QTcreator", 
+	"SLIME", "Eiffel", "Plato", "BlueJ", "DrJava", "Servoy", "JCreator", "Atom", "Emacs", "Delphi", "MSEide", 
+	"Padre", "Eric", "PyCharm", "PIDA", "Spyder", "Thorny"};
 	DeliGenerator() = default;
 	~DeliGenerator() = default;
 };
@@ -29,12 +35,17 @@ std::list<Delivery*>* DeliGenerator::generateData() const
 {
 	std::cout << yellow << names.size() << white << std::endl;
 	for (auto name_in_vector : names) {
-		std::cout << purple << name_in_vector << white <<std::endl;
+		std::cout << purple << name_in_vector << blue << " " << name_in_vector.size() << white <<std::endl;
 	}
 
 	std::cout << yellow << countries.size() << white << std::endl;
 	for (auto country : countries) {
-		std::cout << green << country << white << std::endl;
+		std::cout << green << country << blue << " " << country.size() << white << std::endl;
+	}
+
+	std::cout << yellow << contents.size() << white << std::endl;
+	for (auto content : contents) {
+		std::cout << azure << content << blue << " " << content.size() << white << std::endl;
 	}
 	
 	//Delivery* dels = new Delivery;
