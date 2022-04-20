@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 		RedBlackTree<int, std::string>* tree = new RedBlackTree<int, std::string>(comparator);
 		InterfaceFactory* factory = new DeliGeneratorFactory;
 		InterfaceGenerator* generator = factory->createGenerator();
-		
+		generator->generateData();
 
 		auto begin = std::chrono::steady_clock::now();
 
