@@ -27,6 +27,12 @@ public:
 	"Geany", "CLion", "LabWindows", "Oracle", "XCode", "OpenWatcom", "NetBeans", "VSCode", "DevC++", "QTcreator", 
 	"SLIME", "Eiffel", "Plato", "BlueJ", "DrJava", "Servoy", "JCreator", "Atom", "Emacs", "Delphi", "MSEide", 
 	"Padre", "Eric", "PyCharm", "PIDA", "Spyder", "Thorny"};
+	const std::vector<std::string> companies { "Calera", "Chrysler", "Cigna", "CNN", "Tomcat", "Ford", "Peugeot",
+	"Mercedes", "Opel", "Nissan", "Porsche", "Clarion", "Coleco", "Fanta", "CocaCola", "Colt", "Deagle",
+	"Daewoo", "Datsun", "Dell", "NASA", "EMI", "Lada", "Zeus", "Fiat", "Glaxo", "Google", "Haribo", "SecretServices",
+	"Hitachi", "HTC", "Apple", "Samsung", "Intel", "Kesko", "Lukoil", "MineralWater", "Mazda", "Haval", "BMW", 
+	"Toyota", "LandRover", "Honda", "Lexus", "Fiat", "Suzuki", "KIA", "SsangYong", "Maserati", "Gaz"};
+
 	DeliGenerator() = default;
 	~DeliGenerator() = default;
 };
@@ -46,6 +52,11 @@ std::list<Delivery*>* DeliGenerator::generateData() const
 	std::cout << yellow << contents.size() << white << std::endl;
 	for (auto content : contents) {
 		std::cout << azure << content << blue << " " << content.size() << white << std::endl;
+	}
+
+	std::cout << yellow << companies.size() << white << std::endl;
+	for (auto company : companies) {
+		std::cout << pink << company << blue << " " << company.size() << white << std::endl;
 	}
 	
 	//Delivery* dels = new Delivery;
