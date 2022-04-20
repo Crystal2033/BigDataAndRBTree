@@ -1,6 +1,7 @@
 #pragma once
 #include "Delivery.h"
 #include <list>
+#include <ctime>
 class InterfaceGenerator {
 public:
 	virtual std::list<Delivery*>* generateData() const = 0;
@@ -32,14 +33,15 @@ public:
 	"Daewoo", "Datsun", "Dell", "NASA", "EMI", "Lada", "Zeus", "Fiat", "Glaxo", "Google", "Haribo", "SecretServices",
 	"Hitachi", "HTC", "Apple", "Samsung", "Intel", "Kesko", "Lukoil", "MineralWater", "Mazda", "Haval", "BMW", 
 	"Toyota", "LandRover", "Honda", "Lexus", "Fiat", "Suzuki", "KIA", "SsangYong", "Maserati", "Gaz"};
-
+	const std::vector<std::string> transport_types {"Car", "Plane", "Helicopter", "Rocket", "Van", "Lorry", 
+	"Boat", "Tractor", "MotorBike", "Ship"};
 	DeliGenerator() = default;
 	~DeliGenerator() = default;
 };
 
 std::list<Delivery*>* DeliGenerator::generateData() const
 {
-	std::cout << yellow << names.size() << white << std::endl;
+	/*std::cout << yellow << names.size() << white << std::endl;
 	for (auto name_in_vector : names) {
 		std::cout << purple << name_in_vector << blue << " " << name_in_vector.size() << white <<std::endl;
 	}
@@ -57,9 +59,9 @@ std::list<Delivery*>* DeliGenerator::generateData() const
 	std::cout << yellow << companies.size() << white << std::endl;
 	for (auto company : companies) {
 		std::cout << pink << company << blue << " " << company.size() << white << std::endl;
-	}
+	}*/
 	
-	//Delivery* dels = new Delivery;
+	
 	std::list<Delivery*>* my_list = new std::list<Delivery*>;
 	return my_list;
 }
