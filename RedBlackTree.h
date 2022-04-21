@@ -181,7 +181,7 @@ void print_tree_for_delivery(const TKey& key, const TData& data, int depth = 0)
 	{
 		std::cout << azure << "Depth: " << depth << "." << white << " " << std::endl;
 	}
-	std::cout << green << "Key: " << std::endl << key << "." << white << " " << std::endl;
+	std::cout << green << "Key: " << std::endl << key  << white << " " << std::endl;
 	std::cout << blue << "Data: " << std::endl << *data <<  white << std::endl;
 }
 

@@ -34,7 +34,7 @@ int ComparatorInt::compare(const int& left, const int& right) const
 {
 		if (left > right)
 		{
-			return (compare_status== INCREASE)? 1: -1;
+			return (compare_status == INCREASE)? 1: -1;
 		}
 		else if (left == right)
 		{
@@ -79,5 +79,38 @@ int ComparatorStr::compare(const std::string& left, const std::string& right) co
 		}
 		else return (compare_status == DECREASE) ? 1 : -1;
 
+}
+#pragma endregion
+
+#pragma region float compare
+class ComparatorFloat final : public Comparator<float>
+{
+private:
+	COMP_STATUS compare_status;
+public:
+	ComparatorFloat(COMP_STATUS);
+	int compare(const float& left, const float& right) const override;
+};
+
+ComparatorFloat::ComparatorFloat(COMP_STATUS status)
+{
+	compare_status = status;
+}
+
+int ComparatorFloat::compare(const float& left, const float& right) const
+{
+	float epsilone = 0.001;
+	if (left - right > epsilone)
+	{
+		return (compare_status == INCREASE) ? 1 : -1;
+	}
+	else if (fabs(left - right) < epsilone)
+	{
+		return 0;
+	}
+	else if (left - right < 0)
+	{
+		return (compare_status == DECREASE) ? 1 : -1;
+	}
 }
 #pragma endregion
