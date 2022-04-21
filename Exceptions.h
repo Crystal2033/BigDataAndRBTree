@@ -60,5 +60,16 @@ KeyAlreadyExistsException<TKey>::KeyAlreadyExistsException(const std::string& st
 //===================================================================================
 //===================================================================================
 
+class DeliveryNullException : public Exception
+{
+private:
 
+public:
+	DeliveryNullException(const std::string&);
+	const char* what() const override { return error_msg.c_str(); }
+};
+DeliveryNullException::DeliveryNullException(const std::string& str)
+{
+	error_msg = str;
+}
 #pragma endregion

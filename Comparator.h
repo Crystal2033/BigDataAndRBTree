@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <cctype>
 typedef enum {INCREASE, DECREASE} COMP_STATUS;
 template <typename TKey>
 class Comparator
@@ -10,6 +11,13 @@ public:
 	virtual ~Comparator() = default;
 };
 
+std::string to_lower_str(const std::string& str) {
+	std::string lower_str;
+	for (int i = 0; i < str.size(); i++) {
+		lower_str.push_back(tolower(str[i]));
+	}
+	return lower_str;
+}
 
 #pragma region Int Compare
 class ComparatorInt final : public Comparator<int>
@@ -61,12 +69,11 @@ ComparatorStr::ComparatorStr(COMP_STATUS status)
 
 int ComparatorStr::compare(const std::string& left, const std::string& right) const
 {
-
-		if (left.length() > right.length())
+		if (to_lower_str(left) > to_lower_str(right))
 		{
 			return (compare_status == INCREASE) ? 1 : -1;
 		}
-		else if (left.length() == right.length())
+		else if (to_lower_str(left) == to_lower_str(right))
 		{
 			return 0;
 		}

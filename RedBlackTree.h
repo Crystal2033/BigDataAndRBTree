@@ -170,6 +170,21 @@ void print_tree(const TKey& key, const TData& data, int depth = 0)
 	std::cout << blue << "Data: " << data << "." << white << std::endl;
 }
 
+template <typename TKey, typename TData>
+void print_tree_for_delivery(const TKey& key, const TData& data, int depth = 0)
+{
+	if (depth == 0)
+	{
+		std::cout << red << "ROOT: " << white << " ";
+	}
+	else
+	{
+		std::cout << azure << "Depth: " << depth << "." << white << " " << std::endl;
+	}
+	std::cout << green << "Key: " << std::endl << key << "." << white << " " << std::endl;
+	std::cout << blue << "Data: " << std::endl << *data <<  white << std::endl;
+}
+
 
 
 template <typename TKey, typename TData>
@@ -339,17 +354,17 @@ std::list<TData*> RedBlackTree<TKey, TData>::find(const TKey& key)
 			iterator = iterator->left;
 		}
 		else{ // == 0
-			std::list<TData*> found_data;
+			std::list<TData*>* found_data = new std::list<TData*>;
 			if (iterator->repeat_keys_nodes == nullptr || iterator->repeat_keys_nodes->empty()) {
-				found_data.push_back(&(iterator->data));
+				found_data->push_back(&(iterator->data));
 			}
 			else {
 				for (auto node : *(iterator->repeat_keys_nodes)) {
-					found_data.push_back(&(node->data));
+					found_data->push_back(&(node->data));
 				}
-				found_data.push_back(&(iterator->data));
+				found_data->push_back(&(iterator->data));
 			}
-			return found_data;
+			return *found_data;
 		}
 	}
 	throw KeyNotFoundException<TKey>("Key doesn`t exist", key);
