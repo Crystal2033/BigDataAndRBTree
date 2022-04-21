@@ -60,16 +60,5 @@ KeyAlreadyExistsException<TKey>::KeyAlreadyExistsException(const std::string& st
 //===================================================================================
 //===================================================================================
 
-class FileErrorException : public Exception
-{
-private:
 
-public:
-	FileErrorException(const std::string&);
-	const char* what() const override { return error_msg.c_str(); }
-};
-FileErrorException::FileErrorException(const std::string& str)
-{
-	error_msg = str;
-}
 #pragma endregion

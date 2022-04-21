@@ -4,17 +4,34 @@
 #include <map>
 #include "Queue.h"
 #include "Factory.h"
-
+//
 int main(int argc, char* argv[])
 {
 	
 	Comparator<int>* comparator = new ComparatorInt(INCREASE);
 	try
 	{
-		RedBlackTree<int, std::string>* tree = new RedBlackTree<int, std::string>(comparator);
+		RedBlackTree<int, Delivery*>* tree = new RedBlackTree<int, Delivery*>(comparator);
 		InterfaceFactory* factory = new DeliGeneratorFactory;
 		InterfaceGenerator* generator = factory->createGenerator();
-		generator->generateData();
+		std::list<Delivery*>* deliveries;
+		deliveries = &generator->generateData();
+		int counter = 0;
+		//FourInts* my_int = new FourInts;
+		/*while (1)
+		{
+			try
+			{
+				FourInts* my_int = new FourInts;
+				tree->add(counter, *my_int);
+				counter++;
+			}
+			catch (std::bad_alloc)
+			{
+				std::cout << red << counter << white << std::endl;
+			}
+		}*/
+		
 
 		auto begin = std::chrono::steady_clock::now();
 
