@@ -69,11 +69,21 @@ ComparatorStr::ComparatorStr(COMP_STATUS status)
 
 int ComparatorStr::compare(const std::string& left, const std::string& right) const
 {
-		if (to_lower_str(left) > to_lower_str(right))
+		/*if (to_lower_str(left) > to_lower_str(right))
 		{
 			return (compare_status == INCREASE) ? 1 : -1;
 		}
 		else if (to_lower_str(left) == to_lower_str(right))
+		{
+			return 0;
+		}
+		else return (compare_status == DECREASE) ? 1 : -1;*/
+
+		if (left > right)
+		{
+			return (compare_status == INCREASE) ? 1 : -1;
+		}
+		else if (left == right)
 		{
 			return 0;
 		}

@@ -9,16 +9,16 @@ int main(int argc, char* argv[])
 {
 	InterfaceFactory* factory = new DeliGeneratorFactory;
 	InterfaceGenerator* generator = factory->createGenerator();
-	Comparator<float>* comparator = new ComparatorFloat(INCREASE);
+	Comparator<std::string>* comparator = new ComparatorStr(INCREASE);
 	auto begin = std::chrono::steady_clock::now();
 	try
 	{
-		RedBlackTree<float, Delivery*>* tree = new RedBlackTree<float, Delivery*>(comparator);
+		RedBlackTree<std::string, Delivery*>* tree = new RedBlackTree<std::string, Delivery*>(comparator);
 		
 		std::list<Delivery*>* deliveries;
 		//auto begin = std::chrono::steady_clock::now();
 		//std::cout << azure << "================================================================" << std::endl;
-		for (int i = 0; i < 500; i++)
+		for (int i = 0; i < 500000; i++)
 		{
 			deliveries = &generator->generateData();
 			/*for (auto delivery : *deliveries) {
@@ -26,13 +26,13 @@ int main(int argc, char* argv[])
 			}*/
 			//std::cout << azure << "================================================================" << std::endl;
 			for (auto delivery : *deliveries) {
-				tree->add(delivery->weight, delivery);
+				tree->add(*delivery->content, delivery);
 			}
 			delete deliveries;
 		}
 		
 		auto end = std::chrono::steady_clock::now();
-		std::list<Delivery**> found_data = tree->find(18.1981);
+		std::list<Delivery**> found_data = tree->find("AqulaSoft");
 		for (auto delivery : found_data) {
 				std::cout << **delivery << std::endl;
 			}
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 		std::cout << yellow << "The time: " << cyan << elapsed_ms.count() << yellow << " ms" << white << std::endl;
 		//tree->infix_stepover_tree(print_tree_for_delivery);
 	}
-	catch (KeyNotFoundException<float>& err)
+	catch (KeyNotFoundException<std::string>& err)
 	{
 		std::cout << red << err.what() << "Key value: " << yellow << err.get_error_key() << white << std::endl;
 	}
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 	{
 		std::cout << red << err.what() << white << std::endl;
 	}
-	catch (KeyAlreadyExistsException<float>& err)
+	catch (KeyAlreadyExistsException<std::string>& err)
 	{
 		std::cout << red << err.what() << "Key value: " << yellow << err.get_error_key() << white << std::endl;
 	}
