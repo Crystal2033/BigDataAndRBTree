@@ -42,6 +42,8 @@ private:
 	void prefix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
 	void infix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
 	void postfix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
+
+	void clean_tree(RBNode* node_ptr);
 public:
 	RedBlackTree(Comparator<TKey>* const &);
 	void add(const TKey&, const TData&) override;
@@ -52,8 +54,26 @@ public:
 	void prefix_stepover_tree(void(*call_back)(const TKey&, const TData&, int)) const;
 	void infix_stepover_tree(void(*call_back)(const TKey&, const TData&, int)) const;
 	void postfix_stepover_tree(void(*call_back)(const TKey&, const TData&, int)) const;
-	~RedBlackTree() = default; // TODO
+	~RedBlackTree(); // TODO
 };
+
+#pragma region Destructor
+template <typename TKey, typename TData>
+RedBlackTree<TKey, TData>::~RedBlackTree() {
+	clean_tree(root);
+	root = nullptr;
+	comparator = nullptr;
+}
+
+template <typename TKey, typename TData>
+void RedBlackTree<TKey, TData>::clean_tree(RBNode* node_ptr) {
+	if (node_ptr != nullptr) {
+		clean_tree(node_ptr->right);
+		clean_tree(node_ptr->left);
+		delete node_ptr;
+	}
+}
+#pragma endregion
 
 #pragma region Constructor Node and RedBlackTree
 template <typename TKey, typename TData>

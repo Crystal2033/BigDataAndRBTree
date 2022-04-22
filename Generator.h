@@ -4,6 +4,7 @@
 #include <random>
 #include <string>
 #include <math.h>
+#include <boost/functional/hash.hpp>
 #define WEIGHT_FREE_LIMIT 1000
 #define WEIGHT_FINE 0.1
 
@@ -59,7 +60,7 @@ private:
 	Delivery& startChain();
 	Delivery& continueChain(std::string* const& last_dep_point);
 	void createData(Delivery& delivery, std::string* const& last_dep_point =nullptr) ;
-	float get_delivery_price(Delivery& delivery);
+	float get_delivery_price(Delivery& delivery) const;
 };
 
 
@@ -70,8 +71,8 @@ Delivery& DeliGenerator::startChain() {
 	return *delivery;
 }
 
-float DeliGenerator::get_delivery_price(Delivery& delivery) {
-	const float start_delivery_price = 300.0;
+float DeliGenerator::get_delivery_price(Delivery& delivery) const {
+	const float start_delivery_price = 200.0;
 	float total_delivery_price = start_delivery_price;
 	if (delivery.weight > WEIGHT_FREE_LIMIT) {
 		total_delivery_price += start_delivery_price * WEIGHT_FINE;
@@ -175,8 +176,13 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 
 	//////////////////////////////////////DEPARTURE_PRICE///////////////////////////////////////
 	
-	delivery.deliver_price = get_delivery_price(delivery);;
-
+	delivery.deliver_price = get_delivery_price(delivery);
+	
+	boost::hash<std::string> hash_str;
+	char random_char = char(' ' + (gen() % '['));
+	//std::cout << azure << "char= " << random_char << white << std::endl;
+	delivery.hash_code = hash_str(*delivery.content + *delivery.name + random_char);
+	//std::cout << purple << "hash= " << delivery.hash_code << white << std::endl;
 }
 
 std::list<Delivery*>& DeliGenerator::generateData()

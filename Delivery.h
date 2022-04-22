@@ -3,6 +3,7 @@
 class Delivery {
 public:
 	Delivery();
+	unsigned int hash_code;
 	std::string* name;             // Название груза. names DONE
 	std::string* content;          // Содержимое  contents  DONE
 	float weight;                    // Вес
@@ -19,6 +20,7 @@ public:
 };
 
 Delivery::Delivery() {
+	hash_code = 0;
 	name = nullptr;             
 	content = nullptr;          
 	weight = 0.0;               
@@ -34,6 +36,7 @@ Delivery::Delivery() {
 }
 
 std::ostream& operator<<(std::ostream& out, const Delivery& delivery) {
+	out << yellow << "HashCode: " << pink << delivery.hash_code << white << std::endl;
 	if (delivery.name != nullptr) {
 		out << yellow << "name: " << cyan << *delivery.name << white << std::endl;
 	}
@@ -56,6 +59,7 @@ std::ostream& operator<<(std::ostream& out, const Delivery& delivery) {
 	}
 
 	out << yellow << "price: " << green << delivery.price << " $" << white << std::endl;
+	out << yellow << "delivery price: " << green << delivery.deliver_price << " $" << white << std::endl;
 
 	if (delivery.sender != nullptr) {
 		out << yellow << "from (country): " << cyan << *delivery.sender << white << std::endl;
