@@ -72,4 +72,23 @@ DeliveryNullException::DeliveryNullException(const std::string& str)
 {
 	error_msg = str;
 }
+
+
+//===================================================================================
+//===================================================================================
+//===================================================================================
+
+
+class ComparatorNullException : public Exception
+{
+private:
+
+public:
+	ComparatorNullException(const std::string&);
+	const char* what() const override { return error_msg.c_str(); }
+};
+ComparatorNullException::ComparatorNullException(const std::string& str)
+{
+	error_msg = str;
+}
 #pragma endregion

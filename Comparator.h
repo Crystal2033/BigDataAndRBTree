@@ -92,6 +92,50 @@ int ComparatorStr::compare(const std::string& left, const std::string& right) co
 }
 #pragma endregion
 
+#pragma region StrPointer comparator
+class ComparatorStrPtr final : public Comparator<std::string*>
+{
+private:
+	COMP_STATUS compare_status;
+public:
+	ComparatorStrPtr(COMP_STATUS);
+	int compare(std::string* const& left, std::string* const& right) const override; // по длине строки.
+};
+
+ComparatorStrPtr::ComparatorStrPtr(COMP_STATUS status)
+{
+	compare_status = status;
+}
+
+int ComparatorStrPtr::compare(std::string* const& left, std::string* const& right) const
+{
+	/*if (to_lower_str(left) > to_lower_str(right))
+	{
+		return (compare_status == INCREASE) ? 1 : -1;
+	}
+	else if (to_lower_str(left) == to_lower_str(right))
+	{
+		return 0;
+	}
+	else return (compare_status == DECREASE) ? 1 : -1;*/
+	if (left == nullptr || right == nullptr)
+	{
+		throw ComparatorNullException("Trying to unpointer nullptr.");
+	}
+
+	if (left > right)
+	{
+		return (compare_status == INCREASE) ? 1 : -1;
+	}
+	else if (left == right)
+	{
+		return 0;
+	}
+	else return (compare_status == DECREASE) ? 1 : -1;
+
+}
+#pragma endregion
+
 #pragma region float compare
 class ComparatorFloat final : public Comparator<float>
 {
