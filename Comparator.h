@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <cctype>
+#include "Exceptions.h"
 typedef enum {INCREASE, DECREASE} COMP_STATUS;
 template <typename TKey>
 class Comparator
