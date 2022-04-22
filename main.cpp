@@ -174,15 +174,18 @@ int main(int argc, char* argv[])
 						{
 							Comparator<float>* comparator = new ComparatorFloat(INCREASE);
 							RedBlackTree<float, Delivery*>* tree = new RedBlackTree<float, Delivery*>(comparator);
+							std::cout << cyan << "To start " << blue << "generating " << cyan << "data press keyboard button." << white << std::endl;
 							generate_data_float_cmp(tree, choice_number);
+							tree->infix_stepover_tree(print_tree_for_delivery);
 							delete tree;
 							delete comparator;
 						}
 						else //string comparator
 						{
-							Comparator<std::string>* comparator = new ComparatorStr(INCREASE);
+							Comparator<std::string*>* comparator = new ComparatorStrPtr(INCREASE);
 							RedBlackTree<std::string*, Delivery*>* tree = new RedBlackTree<std::string*, Delivery*>(comparator);
 							generate_data_str_cmp(tree, choice_number);
+							tree->infix_stepover_tree(print_tree_for_delivery);
 							delete tree;
 							delete comparator;
 						}

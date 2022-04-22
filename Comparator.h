@@ -123,11 +123,11 @@ int ComparatorStrPtr::compare(std::string* const& left, std::string* const& righ
 		throw ComparatorNullException("Trying to unpointer nullptr.");
 	}
 
-	if (left > right)
+	if (*left > *right)
 	{
 		return (compare_status == INCREASE) ? 1 : -1;
 	}
-	else if (left == right)
+	else if (*left == *right)
 	{
 		return 0;
 	}
