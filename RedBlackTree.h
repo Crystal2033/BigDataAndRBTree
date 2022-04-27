@@ -448,6 +448,7 @@ void RedBlackTree<TKey, TData>::remove(const TKey& key) //like Kormen
 		rb_delete(node_for_delete, way);
 	}
 	else {
+		std::cout << red <<"DELETING REPEATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 		node_for_delete->repeat_keys_nodes->pop_front();
 	}
 }

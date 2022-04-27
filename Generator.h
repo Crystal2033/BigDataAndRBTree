@@ -164,7 +164,6 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 			break;
 		}
 	}
-	
 
 	//////////////////////////////////////DESTINATION///////////////////////////////////////
 	random_number = gen() % companies.size();

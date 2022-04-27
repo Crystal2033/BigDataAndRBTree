@@ -191,8 +191,9 @@ int main(int argc, char* argv[])
 							getchar();
 							getchar();
 							manager.generateData(choice_number);
+							
 							//generate_data_float_cmp(tree, choice_number, generator);
-							tree->infix_stepover_tree(print_tree_for_deliv_pair_float);
+							//tree->infix_stepover_tree(print_tree_for_deliv_pair_float);
 							while (true)
 							{
 								//todo find, add, remove
@@ -214,7 +215,7 @@ int main(int argc, char* argv[])
 							
 							manager.generateData(choice_number);
 							//generate_data_str_cmp(tree, choice_number, generator);
-							tree->infix_stepover_tree(print_tree_for_deliv_pair_str);
+							//tree->infix_stepover_tree(print_tree_for_deliv_pair_str);
 							while (true)
 							{
 								//todo find, add, remove

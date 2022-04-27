@@ -28,7 +28,7 @@ void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::generate
 
 	auto begin = std::chrono::steady_clock::now();
 
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 500000; i++)
 	{
 		deliveries = &generator->generateData();
 
@@ -78,6 +78,7 @@ void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::generate
 	}
 
 	auto end = std::chrono::steady_clock::now();
+	std::cout << azure << "Generated value: " << cyan << generator->get_generated_value() << white << std::endl;
 	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
 
@@ -90,7 +91,7 @@ void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::generateData(co
 
 	auto begin = std::chrono::steady_clock::now();
 
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 500000; i++)
 	{
 		deliveries = &generator->generateData();
 
@@ -118,8 +119,9 @@ void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::generateData(co
 		}
 		delete deliveries;
 	}
-
+	
 	auto end = std::chrono::steady_clock::now();
+	std::cout << azure << "Generated value: " << cyan << generator->get_generated_value() << white << std::endl;
 	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
 }
