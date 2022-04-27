@@ -5,6 +5,10 @@
 #include "Queue.h"
 #include "Factory.h"
 #include <cctype>
+#include "DeliveryManager.h"
+
+void print_tree_for_deliv_pair_str(const std::pair<std::string*, unsigned int>& key, Delivery* const& data, int depth = 0);
+void print_tree_for_deliv_pair_float(const std::pair<float, unsigned int>& key, Delivery* const& data, int depth = 0);
 
 int user_choice(const int left_edge, const int right_edge)
 {
@@ -23,126 +27,142 @@ int user_choice(const int left_edge, const int right_edge)
 	return choice_number;
 }
 
-void generate_data_str_cmp(Container<std::string, Delivery*>* container, const int cmp_choice, InterfaceGenerator* generator) {
-	std::list<Delivery*>* deliveries;
-	
-
-	auto begin = std::chrono::steady_clock::now();
-
-	for (int i = 0; i < 50; i++)
-	{
-		deliveries = &generator->generateData();
-
-		for (auto delivery : *deliveries) {
-			
-			switch (cmp_choice)
-			{
-				case 1: //name
-				{
-					container->add(*delivery->name, delivery);
-					break;
-				}
-				case 2: //content
-				{
-					container->add(*delivery->content, delivery);
-					break;
-				}
-				case 6: //sender
-				{
-					container->add(*delivery->sender, delivery);
-					break;
-				}
-				case 7: //departure point
-				{
-					container->add(*delivery->departure_comp, delivery);
-					break;
-				}
-				case 8: //reciever
-				{
-					container->add(*delivery->reciever, delivery);
-					break;
-				}
-				case 9: //destination point
-				{
-					container->add(*delivery->destination_comp, delivery);
-					break;
-				}
-				case 10: //type of transport
-				{
-					container->add(*delivery->type_of_transport, delivery);
-					break;
-				}
-			}
-			
-		}
-		delete deliveries;
-	}
-
-	auto end = std::chrono::steady_clock::now();
-	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
-
+void chooseComparator()
+{
+	std::cout << cyan << "You have to choose the comparator by field for your tree (input 1-10):" << yellow << std::endl;
+	std::cout << "1. Name" << std::endl << "2. Content" << std::endl << "3. Weight" << std::endl
+		<< "4. Price" << std::endl << "5. Delivery price" << std::endl << "6. Sender (from country)" << std::endl
+		<< "7. Departure point (by company)" << std::endl << "8. Reciever (to country)" << std::endl
+		<< "9. Destination point (for company)" << std::endl << "10. Type of transport" << std::endl << "> " << white;
+}
+void greetings() {
+	std::cout << cyan << "Hello, my name is Kulikov Pavel, FIIT, M80-211B-20." << white << std::endl;
+	std::cout << cyan << "This is a programm which can store and work with your data (" << green << "add" << cyan << " / "
+		<< yellow << "find" << cyan << " / " << red << "delete" << cyan << " / " << blue << "generate" << cyan
+		<< ")." << white << std::endl << std::endl;
 }
 
-void generate_data_float_cmp(Container<float, Delivery*>* container, const int cmp_choice, InterfaceGenerator* generator) {
-	
-	std::list<Delivery*>* deliveries;
-
-
-	auto begin = std::chrono::steady_clock::now();
-
-	for (int i = 0; i < 50; i++)
-	{
-		deliveries = &generator->generateData();
-
-		for (auto delivery : *deliveries) {
-
-			switch (cmp_choice)
-			{
-				case 3: //weight
-				{
-					container->add(delivery->weight, delivery);
-					break;
-				}
-				case 4: //price
-				{
-					container->add(delivery->price, delivery);
-					break;
-				}
-				case 5: //delivery price
-				{
-					container->add(delivery->deliver_price, delivery);
-					break;
-				}
-			}
-
-		}
-		delete deliveries;
-	}
-
-	auto end = std::chrono::steady_clock::now();
-	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
-
+void chooseCollection() {
+	std::cout << cyan << "At first you have to choose the type of collection (input 1 or 2): " << std::endl
+		<< yellow << "1. Red Black tree." << std::endl << "2. Queue" << white << std::endl << yellow << "> " << white;
 }
+
+//void generate_data_str_cmp(Container<std::string*, Delivery*>* container, const int cmp_choice, InterfaceGenerator* generator) {
+//	std::list<Delivery*>* deliveries;
+//	
+//
+//	auto begin = std::chrono::steady_clock::now();
+//
+//	for (int i = 0; i < 50; i++)
+//	{
+//		deliveries = &generator->generateData();
+//
+//		for (auto delivery : *deliveries) {
+//			
+//			switch (cmp_choice)
+//			{
+//				case 1: //name
+//				{
+//					container->add(delivery->name, delivery);
+//					break;
+//				}
+//				case 2: //content
+//				{
+//					container->add(delivery->content, delivery);
+//					break;
+//				}
+//				case 6: //sender
+//				{
+//					container->add(delivery->sender, delivery);
+//					break;
+//				}
+//				case 7: //departure point
+//				{
+//					container->add(delivery->departure_comp, delivery);
+//					break;
+//				}
+//				case 8: //reciever
+//				{
+//					container->add(delivery->reciever, delivery);
+//					break;
+//				}
+//				case 9: //destination point
+//				{
+//					container->add(delivery->destination_comp, delivery);
+//					break;
+//				}
+//				case 10: //type of transport
+//				{
+//					container->add(delivery->type_of_transport, delivery);
+//					break;
+//				}
+//			}
+//			
+//		}
+//		delete deliveries;
+//	}
+//
+//	auto end = std::chrono::steady_clock::now();
+//	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+//	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
+//
+//}
+//
+//void generate_data_float_cmp(Container<float, Delivery*>* container, const int cmp_choice, InterfaceGenerator* generator) {
+//	
+//	std::list<Delivery*>* deliveries;
+//
+//
+//	auto begin = std::chrono::steady_clock::now();
+//
+//	for (int i = 0; i < 50; i++)
+//	{
+//		deliveries = &generator->generateData();
+//
+//		for (auto delivery : *deliveries) {
+//
+//			switch (cmp_choice)
+//			{
+//				case 3: //weight
+//				{
+//					container->add(delivery->weight, delivery);
+//					break;
+//				}
+//				case 4: //price
+//				{
+//					container->add(delivery->price, delivery);
+//					break;
+//				}
+//				case 5: //delivery price
+//				{
+//					container->add(delivery->deliver_price, delivery);
+//					break;
+//				}
+//			}
+//
+//		}
+//		delete deliveries;
+//	}
+//
+//	auto end = std::chrono::steady_clock::now();
+//	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+//	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
+//
+//}
 
 int main(int argc, char* argv[])
 {
 	InterfaceFactory* factory = new DeliGeneratorFactory;
 	InterfaceGenerator* generator = factory->createGenerator();
-	//Comparator<float>* comparator = new ComparatorFloat(INCREASE);
-	std::cout << cyan << "Hello, my name is Kulikov Pavel, FIIT, M80-211B-20." << white << std::endl;
-	std::cout << cyan << "This is a programm which can store and work with your data (" << green << "add" << cyan << " / "
-		      << yellow << "find" << cyan << " / " << red << "delete" << cyan << " / " << blue << "generate" << cyan 
-		      << ")." << white << std::endl << std::endl;
 	int choice_number;
 	try
 	{
+		greetings();
+		
 		while (true)
 		{
-			std::cout << cyan << "At first you have to choose the type of collection (input 1 or 2): " << std::endl
-				      << yellow << "1. Red Black tree." << std::endl << "2. Queue" << white << std::endl << yellow << "> " << white;
-
+			
+			chooseCollection();
 			choice_number = user_choice(1, 2);
 			if (choice_number == -1)
 			{
@@ -154,11 +174,7 @@ int main(int argc, char* argv[])
 				std::cout << green << "Red Black tree was chosen." << white << std::endl;
 				while (true)
 				{
-					std::cout << cyan << "You have to choose the comparator by field for your tree (input 1-10):" << yellow << std::endl;
-					std::cout << "1. Name" << std::endl << "2. Content" << std::endl << "3. Weight" << std::endl
-						<< "4. Price" << std::endl << "5. Delivery price" << std::endl << "6. Sender (from country)" << std::endl
-						<< "7. Departure point (by company)" << std::endl << "8. Reciever (to country)" << std::endl
-						<< "9. Destination point (for company)" << std::endl << "10. Type of transport" << std::endl << "> " << white;
+					chooseComparator();
 					choice_number = user_choice(1, 10);
 					if (choice_number == -1)
 					{
@@ -168,15 +184,18 @@ int main(int argc, char* argv[])
 					{
 						if (choice_number > 2 && choice_number < 6) //float comparator
 						{
-							Comparator<float>* comparator = new ComparatorFloat(INCREASE);
-							RedBlackTree<float, Delivery*>* tree = new RedBlackTree<float, Delivery*>(comparator);
+							Comparator<std::pair<float, unsigned int>>* comparator = new ComparatorPairFloat(INCREASE);
+							RedBlackTree<std::pair<float, unsigned int>, Delivery*>* tree = new RedBlackTree<std::pair<float, unsigned int>, Delivery*>(comparator);
+							DeliveryManager< std::pair<float, unsigned int>, Delivery*> manager(tree, generator);
 							std::cout << cyan << "To start " << blue << "generating " << cyan << "data press any keyboard button." << white << std::endl;
 							getchar();
-							generate_data_float_cmp(tree, choice_number, generator);
-							tree->infix_stepover_tree(print_tree_for_delivery);
+							getchar();
+							manager.generateData(choice_number);
+							//generate_data_float_cmp(tree, choice_number, generator);
+							tree->infix_stepover_tree(print_tree_for_deliv_pair_float);
 							while (true)
 							{
-								//todo
+								//todo find, add, remove
 								break;
 							}
 							delete tree;
@@ -185,15 +204,20 @@ int main(int argc, char* argv[])
 						}
 						else //string comparator
 						{
-							Comparator<std::string>* comparator = new ComparatorStr(INCREASE);
-							RedBlackTree<std::string, Delivery*>* tree = new RedBlackTree<std::string, Delivery*>(comparator);
+							Comparator<std::pair<std::string*, unsigned int>>* comparator = new ComparatorPairStr(INCREASE);
+							RedBlackTree<std::pair<std::string*, unsigned int>, Delivery*>* tree = new RedBlackTree<std::pair<std::string*, unsigned int>, Delivery*>(comparator);
+							DeliveryManager< std::pair<std::string*, unsigned int>, Delivery*> manager(tree, generator);
+
 							std::cout << cyan << "To start " << blue << "generating " << cyan << "data press any keyboard button." << white << std::endl;
 							getchar();
-							generate_data_str_cmp(tree, choice_number, generator);
-							tree->infix_stepover_tree(print_tree_for_delivery);
+							getchar();
+							
+							manager.generateData(choice_number);
+							//generate_data_str_cmp(tree, choice_number, generator);
+							tree->infix_stepover_tree(print_tree_for_deliv_pair_str);
 							while (true)
 							{
-								//todo
+								//todo find, add, remove
 								break;
 							}
 							delete tree;
@@ -251,4 +275,32 @@ int main(int argc, char* argv[])
 
 	}
 	return 0;
+}
+
+void print_tree_for_deliv_pair_str(const std::pair<std::string*, unsigned int>& key, Delivery* const& data, int depth)
+{
+	if (depth == 0)
+	{
+		std::cout << red << "ROOT: " << white << " ";
+	}
+	else
+	{
+		std::cout << azure << "Depth: " << depth << "." << white << " " << std::endl;
+	}
+	std::cout << red << "Key: " << green << *key.first << white << " " << red << "Hash: " << pink << key.second << white << " " << std::endl;
+	std::cout << blue << "Data: " << std::endl << *data << white << std::endl;
+}
+
+void print_tree_for_deliv_pair_float(const std::pair<float, unsigned int>& key, Delivery* const& data, int depth)
+{
+	if (depth == 0)
+	{
+		std::cout << red << "ROOT: " << white << " ";
+	}
+	else
+	{
+		std::cout << azure << "Depth: " << depth << "." << white << " " << std::endl;
+	}
+	std::cout << red << "Key: " << green << key.first << white << " " << red << "Hash: " << pink <<key.second << white << " " << std::endl;
+	std::cout << blue << "Data: " << std::endl << *data << white << std::endl;
 }
