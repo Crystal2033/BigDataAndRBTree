@@ -48,7 +48,7 @@ public:
 	RedBlackTree(Comparator<TKey>* const &);
 	void add(const TKey&, const TData&) override;
 	void remove(const TKey&) override;
-	std::list<TData*> find(const TKey&) override;
+	std::list<TData> find(const TKey&) override;
 	void stepover(void(*call_back)(const TKey&, const TData&, int)) override; //const override;
 	
 
@@ -363,11 +363,12 @@ void RedBlackTree<TKey, TData>::insertFixUp(std::stack<RBNode**>& way)
 
 #pragma region FIND
 template <typename TKey, typename TData>
-std::list<TData*> RedBlackTree<TKey, TData>::find(const TKey& key)
+std::list<TData> RedBlackTree<TKey, TData>::find(const TKey& key)
 {
 	if (root == nullptr){
 		throw KeyNotFoundException<TKey>("Key doesn`t exist", key);
 	}
+	std::list<TData>* found_data = new std::list<TData>;
 	RBNode* iterator = root;
 	while (iterator){
 		int compare_result = comparator->compare(key, iterator->key);
@@ -378,20 +379,21 @@ std::list<TData*> RedBlackTree<TKey, TData>::find(const TKey& key)
 			iterator = iterator->left;
 		}
 		else{ // == 0
-			std::list<TData*>* found_data = new std::list<TData*>;
+			
 			if (iterator->repeat_keys_nodes == nullptr || iterator->repeat_keys_nodes->empty()) {
-				found_data->push_back(&(iterator->data));
+				found_data->push_back(iterator->data);
 			}
 			else {
 				for (auto node : *(iterator->repeat_keys_nodes)) {
-					found_data->push_back(&(node->data));
+					found_data->push_back(node->data);
 				}
-				found_data->push_back(&(iterator->data));
+				found_data->push_back(iterator->data);
 			}
 			return *found_data;
 		}
 	}
-	throw KeyNotFoundException<TKey>("Key doesn`t exist", key);
+	return *found_data;
+	//throw KeyNotFoundException<TKey>("Key doesn`t exist", key);
 }
 #pragma endregion
 

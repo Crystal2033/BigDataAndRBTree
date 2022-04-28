@@ -3,23 +3,24 @@
 #include "Container.h"
 #include <chrono>
 #include <string>
-
+typedef enum RequestType {POST, GET} REQ_TYPE;
 template <typename TKey, typename TData>
 class DeliveryManager {
 private:
 	Container<TKey, TData>* collection;
 	InterfaceGenerator<Delivery>* generator;
-	std::string choice_str;
-	void set_choice_str(const int choice_num);
+	std::string comp_str;
+	DELITYPES comp_type;
+	void setChoice(const int choice_num);
 	std::string* getStringInput(DELITYPES type, const std::string& request_str);
 	std::string* addToDataPool(DELITYPES type, const std::string& str);
 
-	float getFloatInput(DELITYPES type, const std::string& request_str);
+	float getFloatInput(REQ_TYPE type, const std::string& request_str);
 
 
 	public:
 	void generateData(const int user_choice);
-	const std::string& getStringChoice() const { return choice_str; };
+	const std::string& getStringChoice() const { return comp_str; };
 
 	void addData();
 	std::list<Delivery*> findData();
@@ -48,58 +49,68 @@ void DeliveryManager<TKey, TData>::PrintData(void (*callback)(const TKey&, const
 
 #pragma region Generation
 template <typename TKey, typename TData>
-void DeliveryManager<TKey, TData>::set_choice_str(const int choice_num)
+void DeliveryManager<TKey, TData>::setChoice(const int choice_num)
 {
 	switch (choice_num)
 	{
 		case 1:
 		{
-			choice_str = "Name";
+			comp_str = "Name";
+			comp_type = NAME;
 			break;
 		}
 		case 2:
 		{
-			choice_str = "Content";
+			comp_str = "Content";
+			comp_type = CONTENT;
 			break;
 		}
 		case 3:
 		{
-			choice_str = "Weight";
+			comp_str = "Weight";
+			comp_type = WEIGHT;
 			break;
 		}
 		case 4:
 		{
-			choice_str = "Price";
+			comp_str = "Price";
+			comp_type = PRICE;
 			break;
 		}
 		case 5:
 		{
-			choice_str = "Delivery price";
+			comp_type = DELI_PRICE;
+			comp_str = "Delivery price";
 			break;
 		}
 		case 6:
 		{
-			choice_str = "Sender (from country)";
+			comp_type = SENDER;
+			comp_str = "Sender (from country)";
 			break;
 		}
 		case 7:
 		{
-			choice_str = "Departure point (by company)";
+			comp_type = DEPART;
+			comp_str = "Departure point (by company)";
 			break;
 		}
 		case 8:
 		{
-			choice_str = "Reciever (to country)";
+			comp_type = RECIEVER;
+			comp_str = "Reciever (to country)";
 			break;
 		}
 		case 9:
 		{
-			choice_str = "Destination point (for company)";
+			comp_type = DESTINATION;
+			comp_str = "Destination point (for company)";
 			break;
 		}
 		case 10:
 		{
-			choice_str = "Type of transport";
+			comp_type = TRANSPORT;
+			comp_str = "Type of transport";
 			break;
 		}
 		//TODO: TIME 11( SEND ), 12 ( RECIEVE )
@@ -142,7 +153,7 @@ std::string* DeliveryManager<TKey, TData>::addToDataPool(DELITYPES type, const s
 }
 
 template<typename TKey, typename TData>
-float DeliveryManager<TKey, TData>::getFloatInput(DELITYPES type, const std::string& request_str)
+float DeliveryManager<TKey, TData>::getFloatInput(REQ_TYPE req_type, const std::string& request_str)
 {
 	std::string number_str = "";
 	float number = 0.0;
@@ -154,7 +165,14 @@ float DeliveryManager<TKey, TData>::getFloatInput(DELITYPES type, const std::str
 		dot_counter = 0;
 		number_err = false;
 		number_str.clear();
-		std::cout << blue << "Please, input data in " << yellow << request_str << blue << " field: (example: 123.45)" << white << std::endl << "> ";
+		if (req_type == POST)
+		{
+			std::cout << blue << "Please, input data in " << yellow << request_str << blue << " field: (example: 123.45)" << white << std::endl << "> ";
+		}
+		else if (req_type == GET)
+		{
+			std::cout << blue << "Please, input data which you want to find, comparator is a" << yellow << request_str << blue << " field: (example: 123.45)" << white << std::endl << "> ";
+		}
 		std::cin >> number_str;
 		for (int i = 0; i < number_str.size(); i++)
 		{
@@ -207,8 +225,8 @@ Delivery* DeliveryManager<TKey, TData>::createUserDelivery()
 	Delivery* delivery = new Delivery;
 	delivery->name = getStringInput(NAME, "name");
 	delivery->content = getStringInput(CONTENT, "content");
-	delivery->weight = getFloatInput(WEIGHT, "weight");
-	delivery->price = getFloatInput(PRICE, "price");
+	delivery->weight = getFloatInput(POST, "weight");
+	delivery->price = getFloatInput(POST, "price");
 	delivery->sender = getStringInput(SENDER, "sender (from country)");
 	delivery->departure_comp = getStringInput(DEPART, "departure point (by company)");
 	delivery->reciever = getStringInput(RECIEVER, "reciever (to country)");
@@ -224,48 +242,48 @@ void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::generate
 {
 	std::list<Delivery*>* deliveries;
 
-	set_choice_str(cmp_choice);
+	setChoice(cmp_choice);
 	auto begin = std::chrono::steady_clock::now();
 
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 1000000; i++)
 	{
 		deliveries = &generator->generateData();
 
 		for (auto delivery : *deliveries) {
 
-			switch (cmp_choice)
+			switch (comp_type)
 			{
-				case 1: //name
+				case NAME: //name
 				{
 					collection->add(std::make_pair(delivery->name, delivery->hash_code), delivery);
 					break;
 				}
-				case 2: //content
+				case CONTENT: //content
 				{
 					collection->add(std::make_pair(delivery->content, delivery->hash_code), delivery);
 					break;
 				}
-				case 6: //sender
+				case SENDER: //sender
 				{
 					collection->add(std::make_pair(delivery->sender, delivery->hash_code), delivery);
 					break;
 				}
-				case 7: //departure point
+				case DEPART: //departure point
 				{
 					collection->add(std::make_pair(delivery->departure_comp, delivery->hash_code), delivery);
 					break;
 				}
-				case 8: //reciever
+				case RECIEVER: //reciever
 				{
 					collection->add(std::make_pair(delivery->reciever, delivery->hash_code), delivery);
 					break;
 				}
-				case 9: //destination point
+				case DESTINATION: //destination point
 				{
 					collection->add(std::make_pair(delivery->destination_comp, delivery->hash_code), delivery);
 					break;
 				}
-				case 10: //type of transport
+				case TRANSPORT: //type of transport
 				{
 					collection->add(std::make_pair(delivery->type_of_transport, delivery->hash_code), delivery);
 					break;
@@ -289,28 +307,28 @@ void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::generateData(co
 {
 	std::list<Delivery*>* deliveries;
 
-	set_choice_str(cmp_choice);
+	setChoice(cmp_choice);
 	auto begin = std::chrono::steady_clock::now();
 
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 1000000; i++)
 	{
 		deliveries = &generator->generateData();
 
 		for (auto delivery : *deliveries) {
 
-			switch (cmp_choice)
+			switch (comp_type)
 			{
-				case 3: //weight
+				case WEIGHT: //weight
 				{
 					collection->add(std::make_pair(delivery->weight, delivery->hash_code), delivery);
 					break;
 				}
-				case 4: //price
+				case PRICE: //price
 				{
 					collection->add(std::make_pair(delivery->price, delivery->hash_code), delivery);
 					break;
 				}
-				case 5: //delivery price
+				case DELI_PRICE: //delivery price
 				{
 					collection->add(std::make_pair(delivery->deliver_price, delivery->hash_code), delivery);
 					break;
@@ -330,10 +348,74 @@ void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::generateData(co
 
 
 #pragma region AddRequest
-template <typename TKey, typename TData>
-void DeliveryManager<TKey, TData>::addData()
+
+void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::addData()
 {
 	Delivery* createdDeliv = createUserDelivery();
+	switch (comp_type)
+	{
+		case WEIGHT: //weight
+		{
+			collection->add(std::make_pair(createdDeliv->weight, createdDeliv->hash_code), createdDeliv);
+			break;
+		}
+		case PRICE: //price
+		{
+			collection->add(std::make_pair(createdDeliv->price, createdDeliv->hash_code), createdDeliv);
+			break;
+		}
+		case DELI_PRICE: //delivery price
+		{
+			collection->add(std::make_pair(createdDeliv->deliver_price, createdDeliv->hash_code), createdDeliv);
+			break;
+		}
+	}
+	std::cout << std::endl << green << "Added new delivery:" << std::endl;
+	std::cout << *createdDeliv << std::endl;
+}
+
+
+void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::addData()
+{
+	Delivery* createdDeliv = createUserDelivery();
+	switch (comp_type)
+	{
+		case NAME: //name
+		{
+			collection->add(std::make_pair(createdDeliv->name, createdDeliv->hash_code), createdDeliv);
+			break;
+		}
+		case CONTENT: //content
+		{
+			collection->add(std::make_pair(createdDeliv->content, createdDeliv->hash_code), createdDeliv);
+			break;
+		}
+		case SENDER: //sender
+		{
+			collection->add(std::make_pair(createdDeliv->sender, createdDeliv->hash_code), createdDeliv);
+			break;
+		}
+		case DEPART: //departure point
+		{
+			collection->add(std::make_pair(createdDeliv->departure_comp, createdDeliv->hash_code), createdDeliv);
+			break;
+		}
+		case RECIEVER: //reciever
+		{
+			collection->add(std::make_pair(createdDeliv->reciever, createdDeliv->hash_code), createdDeliv);
+			break;
+		}
+		case DESTINATION: //destination point
+		{
+			collection->add(std::make_pair(createdDeliv->destination_comp, createdDeliv->hash_code), createdDeliv);
+			break;
+		}
+		case TRANSPORT: //type of transport
+		{
+			collection->add(std::make_pair(createdDeliv->type_of_transport, createdDeliv->hash_code), createdDeliv);
+			break;
+		}
+	}
 	std::cout << std::endl << green << "Added new delivery:" << std::endl;
 	std::cout << *createdDeliv << std::endl;
 }
@@ -343,13 +425,18 @@ void DeliveryManager<TKey, TData>::addData()
 
 std::list<Delivery*> DeliveryManager<std::pair<float, unsigned int>, Delivery*>::findData() {
 	std::list<Delivery*> foundData;
-	std::cout << "FLOAT" << std::endl;
+	std::cout << blue << "You can search only by comparator type: " << yellow << comp_str << white << std::endl;
+	float search_param = getFloatInput(GET, comp_str);
+	foundData = collection->find(std::make_pair(search_param, 0));
 	return foundData;
 }
 
 std::list<Delivery*> DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::findData() {
 	std::list<Delivery*> foundData;
-	std::cout << "STRING" << std::endl;
+	std::cout << blue << "You can search only by comparator type: " << yellow << comp_str << white << std::endl << "> ";
+	std::string find_request = "";
+	std::cin >> find_request;
+	foundData = collection->find(std::make_pair(&find_request, 0));
 	return foundData;
 }
 #pragma endregion

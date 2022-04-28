@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 				getchar();
 				getchar();
 				manager.generateData(choice_number);
-				manager.PrintData(print_tree_for_deliv_pair_float);
+				//manager.PrintData(print_tree_for_deliv_pair_float);
 				while (true)
 				{
 					//todo find, add, remove or exit
@@ -50,7 +50,19 @@ int main(int argc, char* argv[])
 					else if (choice_number == 2)//FIND
 					{
 						std::cout << "find" << std::endl;
-						manager.findData();
+						std::list<Delivery*> found_data = manager.findData();
+						if (found_data.size() == 0)
+						{
+							std::cout << red << "Not found information by your search request." << white << std::endl;
+						}
+						else
+						{
+							std::cout << cyan << "Was found: " << green << found_data.size() << cyan << " deliveries." << white << std::endl;
+							for (auto it = found_data.begin(); it != found_data.end(); it++)
+							{
+								std::cout << **it << std::endl;
+							}
+						}
 					}
 					else if (choice_number == 3)//DELETE
 					{
@@ -77,7 +89,7 @@ int main(int argc, char* argv[])
 				getchar();
 							
 				manager.generateData(choice_number);
-				manager.PrintData(print_tree_for_deliv_pair_str);
+				//manager.PrintData(print_tree_for_deliv_pair_str);
 				while (true)
 				{
 					//todo find, add, remove
@@ -91,7 +103,19 @@ int main(int argc, char* argv[])
 					else if (choice_number == 2)//FIND
 					{
 						std::cout << "find" << std::endl;
-						manager.findData();
+						std::list<Delivery*> found_data = manager.findData();
+						if (found_data.size() == 0)
+						{
+							std::cout << red << "Not found information by your search request." << white << std::endl;
+						}
+						else
+						{
+							std::cout << cyan << "Was found: " << green << found_data.size() << cyan << " deliveries." << white << std::endl;
+							for (auto it = found_data.begin(); it != found_data.end(); it++)
+							{
+								std::cout << **it << std::endl;
+							}
+						}
 					}
 					else if (choice_number == 3)//DELETE
 					{
