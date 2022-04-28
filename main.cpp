@@ -47,108 +47,6 @@ void chooseCollection() {
 		<< yellow << "1. Red Black tree." << std::endl << "2. Queue" << white << std::endl << yellow << "> " << white;
 }
 
-//void generate_data_str_cmp(Container<std::string*, Delivery*>* container, const int cmp_choice, InterfaceGenerator* generator) {
-//	std::list<Delivery*>* deliveries;
-//	
-//
-//	auto begin = std::chrono::steady_clock::now();
-//
-//	for (int i = 0; i < 50; i++)
-//	{
-//		deliveries = &generator->generateData();
-//
-//		for (auto delivery : *deliveries) {
-//			
-//			switch (cmp_choice)
-//			{
-//				case 1: //name
-//				{
-//					container->add(delivery->name, delivery);
-//					break;
-//				}
-//				case 2: //content
-//				{
-//					container->add(delivery->content, delivery);
-//					break;
-//				}
-//				case 6: //sender
-//				{
-//					container->add(delivery->sender, delivery);
-//					break;
-//				}
-//				case 7: //departure point
-//				{
-//					container->add(delivery->departure_comp, delivery);
-//					break;
-//				}
-//				case 8: //reciever
-//				{
-//					container->add(delivery->reciever, delivery);
-//					break;
-//				}
-//				case 9: //destination point
-//				{
-//					container->add(delivery->destination_comp, delivery);
-//					break;
-//				}
-//				case 10: //type of transport
-//				{
-//					container->add(delivery->type_of_transport, delivery);
-//					break;
-//				}
-//			}
-//			
-//		}
-//		delete deliveries;
-//	}
-//
-//	auto end = std::chrono::steady_clock::now();
-//	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-//	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
-//
-//}
-//
-//void generate_data_float_cmp(Container<float, Delivery*>* container, const int cmp_choice, InterfaceGenerator* generator) {
-//	
-//	std::list<Delivery*>* deliveries;
-//
-//
-//	auto begin = std::chrono::steady_clock::now();
-//
-//	for (int i = 0; i < 50; i++)
-//	{
-//		deliveries = &generator->generateData();
-//
-//		for (auto delivery : *deliveries) {
-//
-//			switch (cmp_choice)
-//			{
-//				case 3: //weight
-//				{
-//					container->add(delivery->weight, delivery);
-//					break;
-//				}
-//				case 4: //price
-//				{
-//					container->add(delivery->price, delivery);
-//					break;
-//				}
-//				case 5: //delivery price
-//				{
-//					container->add(delivery->deliver_price, delivery);
-//					break;
-//				}
-//			}
-//
-//		}
-//		delete deliveries;
-//	}
-//
-//	auto end = std::chrono::steady_clock::now();
-//	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-//	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
-//
-//}
 
 int main(int argc, char* argv[])
 {
@@ -191,9 +89,7 @@ int main(int argc, char* argv[])
 							getchar();
 							getchar();
 							manager.generateData(choice_number);
-							
-							//generate_data_float_cmp(tree, choice_number, generator);
-							//tree->infix_stepover_tree(print_tree_for_deliv_pair_float);
+
 							while (true)
 							{
 								//todo find, add, remove
@@ -203,7 +99,7 @@ int main(int argc, char* argv[])
 							delete comparator;
 							return 0;
 						}
-						else //string comparator
+						else if(choice_number < 3 || choice_number > 5)//string comparator
 						{
 							Comparator<std::pair<std::string*, unsigned int>>* comparator = new ComparatorPairStr(INCREASE);
 							RedBlackTree<std::pair<std::string*, unsigned int>, Delivery*>* tree = new RedBlackTree<std::pair<std::string*, unsigned int>, Delivery*>(comparator);
@@ -214,8 +110,7 @@ int main(int argc, char* argv[])
 							getchar();
 							
 							manager.generateData(choice_number);
-							//generate_data_str_cmp(tree, choice_number, generator);
-							//tree->infix_stepover_tree(print_tree_for_deliv_pair_str);
+
 							while (true)
 							{
 								//todo find, add, remove
@@ -233,12 +128,13 @@ int main(int argc, char* argv[])
 			}
 			else if (choice_number == 2) //Queue case
 			{
-
+				std::cout << green << "Queue was chosen." << white << std::endl;
+				while (true)
+				{
+					return 0;
+				}
 			}
-			while (true)
-			{
-				return 0;
-			}
+			
 			
 		}
 		
