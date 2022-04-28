@@ -23,6 +23,7 @@ class InterfaceGenerator {
 public:
 	virtual std::list<Delivery*>& generateData() = 0;
 	virtual unsigned get_generated_value() const = 0;
+	virtual std::vector<std::string>& getDataVector(DELITYPES typeOfData) const = 0;
 	virtual ~InterfaceGenerator() = default;
 };
 
@@ -33,6 +34,7 @@ public:
 	unsigned get_generated_value() const override { return value_of_dels; };
 	DeliGenerator();
 	~DeliGenerator();
+	std::vector<std::string>& getDataVector(DELITYPES typeOfData) const override;
 private:
 	unsigned int value_of_dels = 0;
 	Delivery& startChain() const;
@@ -50,6 +52,30 @@ DeliGenerator::DeliGenerator()
 DeliGenerator::~DeliGenerator()
 {
 	delete data;
+}
+
+std::vector<std::string>& DeliGenerator::getDataVector(DELITYPES typeOfData) const
+{
+	if (typeOfData == NAME)
+	{
+		return data->names;
+	}
+	else if (typeOfData == CONTENT)
+	{
+		return data->contents;
+	}
+	else if (typeOfData == SENDER || typeOfData == RECIEVER)
+	{
+		return data->countries;
+	}
+	else if (typeOfData == DEPART || typeOfData == DESTINATION)
+	{
+		return data->companies;
+	}
+	else if (typeOfData == TRANSPORT)
+	{
+		return data->transport_types;
+	}
 }
 
 Delivery& DeliGenerator::startChain() const {

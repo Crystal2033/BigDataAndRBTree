@@ -121,13 +121,21 @@ int main(int argc, char* argv[])
 			
 		
 	}
-	catch (KeyNotFoundException<std::string>& err)
+	catch (KeyNotFoundException<std::pair<std::string*, unsigned int>>& err)
 	{
-		std::cout << red << err.what() << "Key value: " << yellow << err.get_error_key() << white << std::endl;
+		std::cout << red << err.what() << "Key value: " << yellow << *err.get_error_key().first << pink << " Hash: " << err.get_error_key().second << white << std::endl;
 	}
-	catch (KeyNotFoundException<float>& err)
+	catch (KeyNotFoundException<std::pair<float, unsigned int>>& err)
 	{
-		std::cout << red << err.what() << "Key value: " << yellow << err.get_error_key() << white << std::endl;
+		std::cout << red << err.what() << "Key value: " << yellow << err.get_error_key().first << pink << " Hash: " << err.get_error_key().second << white << std::endl;
+	}
+	catch (KeyAlreadyExistsException<std::pair<float, unsigned int>>& err)
+	{
+		std::cout << red << err.what() << "Key value: " << yellow << err.get_error_key().first << pink << " Hash: " << err.get_error_key().second << white << std::endl;
+	}
+	catch (KeyAlreadyExistsException<std::pair<std::string*, unsigned int>>& err)
+	{
+		std::cout << red << err.what() << "Key value: " << yellow << *err.get_error_key().first << pink << " Hash: " << err.get_error_key().second << white << std::endl;
 	}
 	catch (std::bad_alloc)
 	{
@@ -141,9 +149,9 @@ int main(int argc, char* argv[])
 	{
 		std::cout << red << err.what() << white << std::endl;
 	}
-	catch (KeyAlreadyExistsException<std::string>& err)
+	catch (NullException& err)
 	{
-		std::cout << red << err.what() << "Key value: " << yellow << err.get_error_key() << white << std::endl;
+		std::cout << red << err.what() <<  white << std::endl;
 	}
 	catch (...)
 	{

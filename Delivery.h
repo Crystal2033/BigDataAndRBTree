@@ -1,5 +1,6 @@
 #pragma once
 #include "Colours.h"
+typedef enum {NAME, CONTENT, WEIGHT, PRICE, DELI_PRICE, SENDER, DEPART, RECIEVER, DESTINATION, TRANSPORT} DELITYPES;
 class Delivery {
 public:
 	Delivery();

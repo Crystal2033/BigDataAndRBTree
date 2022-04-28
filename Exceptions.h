@@ -91,4 +91,17 @@ ComparatorNullException::ComparatorNullException(const std::string& str)
 {
 	error_msg = str;
 }
+
+class NullException : public Exception
+{
+private:
+
+public:
+	NullException(const std::string&);
+	const char* what() const override { return error_msg.c_str(); }
+};
+NullException::NullException(const std::string& str)
+{
+	error_msg = str;
+}
 #pragma endregion

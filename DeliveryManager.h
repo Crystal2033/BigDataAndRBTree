@@ -2,6 +2,8 @@
 #include "Generator.h"
 #include "Container.h"
 #include <chrono>
+#include <string>
+
 template <typename TKey, typename TData>
 class DeliveryManager {
 private:
@@ -9,15 +11,20 @@ private:
 	InterfaceGenerator* generator;
 	std::string choice_str;
 	void set_choice_str(const int choice_num);
+	std::string* getStringInput(DELITYPES type, const std::string& request_str);
+	std::string* addToDataPool(DELITYPES type, const std::string& str);
 
-public:
+	float getFloatInput(DELITYPES type, const std::string& request_str);
+
+
+	public:
 	void generateData(const int user_choice);
 	const std::string& getStringChoice() const { return choice_str; };
 
 	void addData();
 	std::list<TData*> findData();
 	void removeData();
-	Delivery* createUserDelivery() const;
+	Delivery* createUserDelivery() ;
 	
 	DeliveryManager(Container<TKey, TData>* col, InterfaceGenerator* gen)
 	{
@@ -100,6 +107,106 @@ void DeliveryManager<TKey, TData>::set_choice_str(const int choice_num)
 	}
 }
 
+template<typename TKey, typename TData>
+std::string* DeliveryManager<TKey, TData>::getStringInput(DELITYPES type, const std::string& request_str) 
+{
+	std::string input_data;
+	std::string* dataField;
+
+	input_data.clear();
+	std::cout << blue << "Please, input data in " << yellow << request_str << blue << " field:" << white << std::endl << "> ";
+	std::cin >> input_data;
+	dataField = addToDataPool(type, input_data);
+	if (dataField == nullptr)
+	{
+		throw NullException("There is an error with nullptr, which shouldn`t be.");
+	}
+	return dataField;
+}
+
+template<typename TKey, typename TData>
+std::string* DeliveryManager<TKey, TData>::addToDataPool(DELITYPES type, const std::string& str)
+{
+	std::vector<std::string>* data_vector;
+	data_vector = &generator->getDataVector(type);
+	for (auto iter = data_vector->begin(); iter != data_vector->end(); iter++)
+	{
+		if (*iter == str)
+		{
+			return &(*iter);
+		}
+	}
+
+	data_vector->push_back(str);
+	return &data_vector->back();
+}
+
+template<typename TKey, typename TData>
+float DeliveryManager<TKey, TData>::getFloatInput(DELITYPES type, const std::string& request_str)
+{
+	std::string number_str = "";
+	float number = 0.0;
+	char curr_char;
+	int dot_counter = 0;
+	bool number_err = false;
+	while (true)
+	{
+		dot_counter = 0;
+		number_err = false;
+		number_str.clear();
+		std::cout << blue << "Please, input data in " << yellow << request_str << blue << " field: (example: 123.45)" << white << std::endl << "> ";
+		std::cin >> number_str;
+		for (int i = 0; i < number_str.size(); i++)
+		{
+
+			curr_char = number_str[i];
+			if (isdigit(curr_char) || curr_char == '.')
+			{
+				if (curr_char == '.')
+				{
+					dot_counter++;
+				}
+			}
+			else
+			{
+				number_err = true;
+				break;
+			}
+		}
+		if (dot_counter > 1 || number_err)
+		{
+			std::cout << red << "You have to input float number (example 123.45). Please try again." << white << std::endl;
+			continue;
+		}
+		try
+		{
+			number = std::stof(number_str.c_str());
+		}
+		catch (std::invalid_argument)
+		{
+			std::cout << red << "You have to input float number (example 123.45). Please try again." << white << std::endl;
+			continue;
+		}
+		catch (std::out_of_range)
+		{
+			std::cout << red << "You have to input not big float number (example 123.45). Please try again." << white << std::endl;
+			continue;
+		}
+		break;
+
+	}
+	return number;
+}
+
+template <typename TKey, typename TData>
+Delivery* DeliveryManager<TKey, TData>::createUserDelivery()
+{
+	Delivery* delivery = new Delivery;
+	delivery->name = getStringInput(NAME, "name");
+	delivery->content = getStringInput(CONTENT, "content");
+	delivery->weight = getFloatInput(WEIGHT, "weight");
+	return delivery;
+}
 //Specialization
 void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::generateData(const int cmp_choice)
 {
@@ -214,7 +321,7 @@ void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::generateData(co
 template <typename TKey, typename TData>
 void DeliveryManager<TKey, TData>::addData()
 {
-
+	Delivery* createdDeliv = createUserDelivery();
 }
 #pragma endregion
 
