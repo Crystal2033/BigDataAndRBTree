@@ -36,33 +36,33 @@ Delivery::Delivery() {
 }
 
 std::ostream& operator<<(std::ostream& out, const Delivery& delivery) {
-	out << yellow << "HashCode: " << pink << delivery.hash_code << white << std::endl;
+	out << blue << "HashCode: " << pink << delivery.hash_code << white << std::endl;
 	if (delivery.name != nullptr) {
-		out << yellow << "name: " << cyan << *delivery.name << white << std::endl;
+		out << blue << "name: " << cyan << *delivery.name << white << std::endl;
 	}
 	else {
 		throw DeliveryNullException("Name is nullptr.");
 	}
 
 	if (delivery.content != nullptr) {
-		out << yellow << "content: " << cyan << *delivery.content << white << std::endl;
+		out << blue << "content: " << cyan << *delivery.content << white << std::endl;
 	}
 	else {
 		throw DeliveryNullException("Content is nullptr.");
 	}
 
 	if (delivery.weight != 0.0) {
-		out << yellow << "weight: " << cyan << delivery.weight << " kg" << white << std::endl;
+		out << blue << "weight: " << cyan << delivery.weight << " kg" << white << std::endl;
 	}
 	else {
 		throw DeliveryNullException("Weight is 0.0");
 	}
 
-	out << yellow << "price: " << green << delivery.price << " $" << white << std::endl;
-	out << yellow << "delivery price: " << green << delivery.deliver_price << " $" << white << std::endl;
+	out << blue << "price: " << green << delivery.price << " $" << white << std::endl;
+	out << blue << "delivery price: " << green << delivery.deliver_price << " $" << white << std::endl;
 
 	if (delivery.sender != nullptr) {
-		out << yellow << "from (country): " << cyan << *delivery.sender << white << std::endl;
+		out << blue << "from (country): " << cyan << *delivery.sender << white << std::endl;
 	}
 	else {
 		throw DeliveryNullException("Sender is nullptr");
@@ -70,28 +70,28 @@ std::ostream& operator<<(std::ostream& out, const Delivery& delivery) {
 
 
 	if (delivery.departure_comp != nullptr) {
-		out << yellow << "by (company): " << cyan << *delivery.departure_comp << white << std::endl;
+		out << blue << "by (company): " << cyan << *delivery.departure_comp << white << std::endl;
 	}
 	else {
 		throw DeliveryNullException("Departure company is nullptr");
 	}
 
 	if (delivery.reciever != nullptr) {
-		out << yellow << "to (country): " << cyan << *delivery.reciever << white << std::endl;
+		out << blue << "to (country): " << cyan << *delivery.reciever << white << std::endl;
 	}
 	else {
 		throw DeliveryNullException("Reciever is nullptr");
 	}
 
 	if (delivery.destination_comp != nullptr) {
-		out << yellow << "for (company): " << cyan << *delivery.destination_comp << white << std::endl;
+		out << blue << "for (company): " << cyan << *delivery.destination_comp << white << std::endl;
 	}
 	else {
 		throw DeliveryNullException("Destination company is nullptr");
 	}
 
 	if (delivery.type_of_transport != nullptr) {
-		out << yellow << "transport type: " << cyan << *delivery.type_of_transport << white << std::endl;
+		out << blue << "transport type: " << cyan << *delivery.type_of_transport << white << std::endl;
 	}
 	else {
 		throw DeliveryNullException("Type of transport is nullptr");

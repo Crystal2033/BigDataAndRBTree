@@ -5,6 +5,7 @@
 #include <string>
 #include <math.h>
 #include <boost/functional/hash.hpp>
+#include "DataPool.h"
 #define WEIGHT_FREE_LIMIT 1000
 #define WEIGHT_FINE 0.1
 
@@ -28,43 +29,30 @@ public:
 class DeliGenerator : public InterfaceGenerator {
 public:
 	std::list<Delivery*>& generateData() override;
+	DataPool* data;
 	unsigned get_generated_value() const override { return value_of_dels; };
-	std::vector<std::string> names {"Cyber", "Java", "C++", "Python", "Pascal", "Ruby", "Scratch",
-	"D", "R", "SQL", "MicrosoftAccept", "Joy", "Haskel", "Prolog", "ML", "Lisp", "Mercury", "Unlambda",
-	"Agba", "Forth", "Coq", "Refile", "Parsec", "LL", "JavaScript", "HTML", "Basic", "C", 
-	"PHP", "Matcad", "Coomir", "Kotlin", "Bash", "Lua", "PowerShell", "Rust", "TypeScript", "Scilab",
-	"Sed", "Maple", "Groovy", "Dart", "Haskell", "Perl", "Autolt", "Make", "Pawn", "Julia", "Elixir", "Maxima"};
-	std::vector<std::string> countries {"Moldovia", "Russia", "USA", "Canada", "Baku", "Albania",
-	"Angola", "Argentina", "Belgia", "Brazilia", "Bahrain", "Denmark", "Finland", "Germany", "Ghana", 
-	"Egypt", "Haity", "Iran", "Iraq", "Japan", "Kenya", "Lybia", "Oman", "Ukraine", "Malta", "Romania", 
-	"Uganda", "India", "Iceland", "France", "Italy", "Estonia", "Greece", "Chile", "Andora", "Armenia"
-	"Fiji", "Laos", "Netherlands", "Nepal", "Kuwait", "Kazakhstan", "Palau", "Peru", "Portugal", "Poland", 
-	"Togo", "Tongo", "Tuvalu", "Uruguay", "Yemen"};
-	std::vector<std::string> contents { "Adobe", "Flash", "Develop", "IntelliJ", "PowerFlasher", "Eclipse",
-	"GNATStudio", "SlickEdit", "Fresh", "SASM", "BasicAndroid", "Gambas", "SmallBasic", "Xojo", "MonoDevelop",
-	"SharpDevelop", "AqulaSoft", "Anjuta", "Bulder", "AbstractFactory", "FactoryMethod", "CodeBlocks", "CodeLite",
-	"Geany", "CLion", "LabWindows", "Oracle", "XCode", "OpenWatcom", "NetBeans", "VSCode", "DevC++", "QTcreator", 
-	"SLIME", "Eiffel", "Plato", "BlueJ", "DrJava", "Servoy", "JCreator", "Atom", "Emacs", "Delphi", "MSEide", 
-	"Padre", "Eric", "PyCharm", "PIDA", "Spyder", "Thorny"};
-	std::vector<std::string> companies { "Calera", "Chrysler", "Cigna", "CNN", "Tomcat", "Ford", "Peugeot",
-	"Mercedes", "Opel", "Nissan", "Porsche", "Clarion", "Coleco", "Fanta", "CocaCola", "Colt", "Deagle",
-	"Daewoo", "Datsun", "Dell", "NASA", "EMI", "Lada", "Zeus", "Fiat", "Glaxo", "Google", "Haribo", "SecretServices",
-	"Hitachi", "HTC", "Apple", "Samsung", "Intel", "Kesko", "Lukoil", "MineralWater", "Mazda", "Haval", "BMW", 
-	"Toyota", "LandRover", "Honda", "Lexus", "Fiat", "Suzuki", "KIA", "SsangYong", "Maserati", "Gaz"};
-	std::vector<std::string> transport_types {"Car", "Plane", "Helicopter", "Rocket", "Van", "Lorry", 
-	"Boat", "Tractor", "MotorBike", "Ship"};
-	DeliGenerator() = default;
-	~DeliGenerator() = default;
+	DeliGenerator();
+	~DeliGenerator();
 private:
 	unsigned int value_of_dels = 0;
-	Delivery& startChain();
-	Delivery& continueChain(std::string* const& last_dep_point);
-	void createData(Delivery& delivery, std::string* const& last_dep_point =nullptr) ;
+	Delivery& startChain() const;
+	Delivery& continueChain(std::string* const& last_dep_point) const;
+	void createData(Delivery& delivery, std::string* const& last_dep_point =nullptr) const;
 	float get_delivery_price(Delivery& delivery) const;
 };
 
 
-Delivery& DeliGenerator::startChain() {
+DeliGenerator::DeliGenerator()
+{
+	data = new DataPool;
+}
+
+DeliGenerator::~DeliGenerator()
+{
+	delete data;
+}
+
+Delivery& DeliGenerator::startChain() const {
 	Delivery* delivery = new Delivery;
 	createData(*delivery);
 
@@ -112,7 +100,7 @@ float DeliGenerator::get_delivery_price(Delivery& delivery) const {
 	return total_delivery_price;
 }
 
-Delivery& DeliGenerator::continueChain(std::string* const& last_dep_point) {
+Delivery& DeliGenerator::continueChain(std::string* const& last_dep_point) const {
 
 	Delivery* delivery = new Delivery;
 	createData(*delivery, last_dep_point);
@@ -120,7 +108,7 @@ Delivery& DeliGenerator::continueChain(std::string* const& last_dep_point) {
 	return *delivery;
 }
 
-void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_point) {
+void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_point) const {
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	float random_float = 0.0;
@@ -128,12 +116,12 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 	
 
 	//////////////////////////////////////NAME///////////////////////////////////////
-	random_number = gen() % names.size();
-	delivery.name = &names[random_number];
+	random_number = gen() % data->names.size();
+	delivery.name = &(data->names[random_number]);
 
 	//////////////////////////////////////CONTENT///////////////////////////////////////
-	random_number = gen() % contents.size();
-	delivery.content = &contents[random_number];
+	random_number = gen() % data->contents.size();
+	delivery.content = &(data->contents[random_number]);
 
 	//////////////////////////////////////WEIGHT///////////////////////////////////////
 	random_float = float(gen()) / float(rand() + 1.0) / 10000;
@@ -145,33 +133,33 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 
 	//////////////////////////////////////SENDER///////////////////////////////////////
 	if (last_dep_point == nullptr) { 
-		random_number = gen() % countries.size();
-		delivery.sender = &countries[random_number];
+		random_number = gen() % data->countries.size();
+		delivery.sender = &(data->countries[random_number]);
 	}
 	else { //Start chain case. Condition that n end point has to be equal n+1 start point in chain
 		delivery.sender = last_dep_point;
 	}
 
 	//////////////////////////////////////DEPARTURE_COMP///////////////////////////////////////
-	random_number = gen() % companies.size();
-	delivery.departure_comp = &companies[random_number];
+	random_number = gen() % data->companies.size();
+	delivery.departure_comp = &(data->companies[random_number]);
 	
 	//////////////////////////////////////RECEIVER///////////////////////////////////////
 	while (1) {
-		random_number = gen() % countries.size();
-		delivery.reciever = &countries[random_number];
+		random_number = gen() % data->countries.size();
+		delivery.reciever = &(data->countries[random_number]);
 		if (delivery.reciever != delivery.sender) {
 			break;
 		}
 	}
 
 	//////////////////////////////////////DESTINATION///////////////////////////////////////
-	random_number = gen() % companies.size();
-	delivery.destination_comp = &companies[random_number];
+	random_number = gen() % data->companies.size();
+	delivery.destination_comp = &(data->companies[random_number]);
 
 	//////////////////////////////////////TRANSPORT_TYPE///////////////////////////////////////
-	random_number = gen() % transport_types.size();
-	delivery.type_of_transport = &transport_types[random_number];
+	random_number = gen() % data->transport_types.size();
+	delivery.type_of_transport = &(data->transport_types[random_number]);
 
 	//////////////////////////////////////DEPARTURE_PRICE///////////////////////////////////////
 	

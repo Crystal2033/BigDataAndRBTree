@@ -145,6 +145,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DataPool.h" />
     <ClInclude Include="UserFuncsAndCallbacks.h" />
     <ClInclude Include="Colours.h" />
     <ClInclude Include="Comparator.h" />

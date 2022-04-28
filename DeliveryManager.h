@@ -13,9 +13,11 @@ private:
 public:
 	void generateData(const int user_choice);
 	const std::string& getStringChoice() const { return choice_str; };
-	void addData(Delivery*& delivery_ptr);
-	std::list<TData*> findData(const std::string& request_key);
-	void removeData(const std::string& request_key);
+
+	void addData();
+	std::list<TData*> findData();
+	void removeData();
+	Delivery* createUserDelivery() const;
 	
 	DeliveryManager(Container<TKey, TData>* col, InterfaceGenerator* gen)
 	{
@@ -210,19 +212,24 @@ void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::generateData(co
 
 #pragma region AddRequest
 template <typename TKey, typename TData>
-void DeliveryManager<TKey, TData>::addData(Delivery*& delivery_ptr)
+void DeliveryManager<TKey, TData>::addData()
 {
 
 }
 #pragma endregion
 
 #pragma region FindRequest
+template <typename TKey, typename TData>
+std::list<TData*> DeliveryManager<TKey, TData>::findData() {
+	std::list<TData*> foundData;
 
+	return foundData;
+}
 #pragma endregion
 
 #pragma region RemoveRequest
 template <typename TKey, typename TData>
-void DeliveryManager<TKey, TData>::removeData(const std::string& request_key)
+void DeliveryManager<TKey, TData>::removeData()
 {
 
 }
