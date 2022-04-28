@@ -10,8 +10,8 @@
 
 int main(int argc, char* argv[])
 {
-	InterfaceFactory* factory = new DeliGeneratorFactory;
-	InterfaceGenerator* generator = factory->createGenerator();
+	InterfaceFactory<Delivery>* factory = new DeliGeneratorFactory;
+	InterfaceGenerator<Delivery>* generator = factory->createGenerator();
 	int choice_number;
 	try
 	{

@@ -1,14 +1,15 @@
 #pragma once
 #include "Generator.h"
+template <typename GenerType>
 class InterfaceFactory {
 public:
-	virtual InterfaceGenerator* createGenerator() const = 0;
+	virtual InterfaceGenerator<GenerType>* createGenerator() const = 0;
 	virtual ~InterfaceFactory() = default;
 };
 
-class DeliGeneratorFactory : public InterfaceFactory {
+class DeliGeneratorFactory : public InterfaceFactory<Delivery> {
 public:
-	InterfaceGenerator* createGenerator() const override {
+	InterfaceGenerator<Delivery>* createGenerator() const override {
 		return new DeliGenerator;
 	}
 };

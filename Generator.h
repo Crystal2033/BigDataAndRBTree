@@ -19,28 +19,32 @@
 #define TRACTOR_FINE 0
 #define MOTORBIKE_FINE 1
 #define SHIP_FINE 3
+template<typename GenerType>
 class InterfaceGenerator {
 public:
-	virtual std::list<Delivery*>& generateData() = 0;
-	virtual unsigned get_generated_value() const = 0;
+	virtual std::list<GenerType*>& generateData() = 0;
+	virtual unsigned getGeneratedCount() const = 0;
 	virtual std::vector<std::string>& getDataVector(DELITYPES typeOfData) const = 0;
+	virtual void generateHash(GenerType&, std::mt19937& gen) const = 0;
 	virtual ~InterfaceGenerator() = default;
 };
 
-class DeliGenerator : public InterfaceGenerator {
+class DeliGenerator : public InterfaceGenerator<Delivery> {
 public:
 	std::list<Delivery*>& generateData() override;
 	DataPool* data;
-	unsigned get_generated_value() const override { return value_of_dels; };
+	unsigned getGeneratedCount() const override { return value_of_dels; };
 	DeliGenerator();
 	~DeliGenerator();
 	std::vector<std::string>& getDataVector(DELITYPES typeOfData) const override;
+	void generateHash(Delivery& delivery, std::mt19937& gen) const override;
+	float get_delivery_price(const Delivery& delivery) const;
 private:
 	unsigned int value_of_dels = 0;
 	Delivery& startChain() const;
 	Delivery& continueChain(std::string* const& last_dep_point) const;
 	void createData(Delivery& delivery, std::string* const& last_dep_point =nullptr) const;
-	float get_delivery_price(Delivery& delivery) const;
+	
 };
 
 
@@ -78,6 +82,14 @@ std::vector<std::string>& DeliGenerator::getDataVector(DELITYPES typeOfData) con
 	}
 }
 
+void DeliGenerator::generateHash(Delivery& delivery, std::mt19937& gen) const
+{
+	boost::hash<std::string> hash_str;
+	char random_char1 = char(' ' + (gen() % '['));
+	char random_char2 = char(' ' + (gen() % '['));
+	delivery.hash_code = hash_str(*delivery.content + *delivery.name + random_char1 + random_char2);
+}
+
 Delivery& DeliGenerator::startChain() const {
 	Delivery* delivery = new Delivery;
 	createData(*delivery);
@@ -85,7 +97,7 @@ Delivery& DeliGenerator::startChain() const {
 	return *delivery;
 }
 
-float DeliGenerator::get_delivery_price(Delivery& delivery) const {
+float DeliGenerator::get_delivery_price(const Delivery& delivery) const {
 	const float start_delivery_price = 200.0;
 	float total_delivery_price = start_delivery_price;
 	if (delivery.weight > WEIGHT_FREE_LIMIT) {
@@ -191,12 +203,11 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 	
 	delivery.deliver_price = get_delivery_price(delivery);
 	
-	boost::hash<std::string> hash_str;
+	generateHash(delivery, gen);
+	/*boost::hash<std::string> hash_str;
 	char random_char1 = char(' ' + (gen() % '['));
 	char random_char2 = char(' ' + (gen() % '['));
-	//std::cout << azure << "char= " << random_char << white << std::endl;
-	delivery.hash_code = hash_str(*delivery.content + *delivery.name + random_char1 + random_char2);
-	//std::cout << purple << "hash= " << delivery.hash_code << white << std::endl;
+	delivery.hash_code = hash_str(*delivery.content + *delivery.name + random_char1 + random_char2);*/
 }
 
 std::list<Delivery*>& DeliGenerator::generateData()

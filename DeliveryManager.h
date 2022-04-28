@@ -8,7 +8,7 @@ template <typename TKey, typename TData>
 class DeliveryManager {
 private:
 	Container<TKey, TData>* collection;
-	InterfaceGenerator* generator;
+	InterfaceGenerator<Delivery>* generator;
 	std::string choice_str;
 	void set_choice_str(const int choice_num);
 	std::string* getStringInput(DELITYPES type, const std::string& request_str);
@@ -26,7 +26,7 @@ private:
 	void removeData();
 	Delivery* createUserDelivery() ;
 	
-	DeliveryManager(Container<TKey, TData>* col, InterfaceGenerator* gen)
+	DeliveryManager(Container<TKey, TData>* col, InterfaceGenerator<Delivery>* gen)
 	{
 		collection = col;
 		generator = gen;
@@ -201,10 +201,22 @@ float DeliveryManager<TKey, TData>::getFloatInput(DELITYPES type, const std::str
 template <typename TKey, typename TData>
 Delivery* DeliveryManager<TKey, TData>::createUserDelivery()
 {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	DeliGenerator* delivery_gen = reinterpret_cast<DeliGenerator*>(generator);
 	Delivery* delivery = new Delivery;
 	delivery->name = getStringInput(NAME, "name");
 	delivery->content = getStringInput(CONTENT, "content");
 	delivery->weight = getFloatInput(WEIGHT, "weight");
+	delivery->price = getFloatInput(PRICE, "price");
+	delivery->sender = getStringInput(SENDER, "sender (from country)");
+	delivery->departure_comp = getStringInput(DEPART, "departure point (by company)");
+	delivery->reciever = getStringInput(RECIEVER, "reciever (to country)");
+	delivery->destination_comp = getStringInput(DESTINATION, "destination (for company)");
+	delivery->type_of_transport = getStringInput(TRANSPORT, "type of transport");
+
+	delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
+	generator->generateHash(*delivery, gen);
 	return delivery;
 }
 //Specialization
@@ -265,7 +277,7 @@ void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::generate
 	}
 
 	auto end = std::chrono::steady_clock::now();
-	std::cout << azure << "Generated value: " << cyan << generator->get_generated_value() << white << std::endl;
+	std::cout << azure << "Generated value: " << cyan << generator->getGeneratedCount() << white << std::endl;
 	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
 
@@ -310,7 +322,7 @@ void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::generateData(co
 	}
 	
 	auto end = std::chrono::steady_clock::now();
-	std::cout << azure << "Generated value: " << cyan << generator->get_generated_value() << white << std::endl;
+	std::cout << azure << "Generated value: " << cyan << generator->getGeneratedCount() << white << std::endl;
 	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
 }
@@ -322,6 +334,7 @@ template <typename TKey, typename TData>
 void DeliveryManager<TKey, TData>::addData()
 {
 	Delivery* createdDeliv = createUserDelivery();
+	std::cout << *createdDeliv << std::endl;
 }
 #pragma endregion
 
