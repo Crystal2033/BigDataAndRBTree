@@ -8,21 +8,36 @@ private:
 	Container<TKey, TData>* collection;
 	InterfaceGenerator* generator;
 	std::string choice_str;
-
 	void set_choice_str(const int choice_num);
 
 public:
 	void generateData(const int user_choice);
 	const std::string& getStringChoice() const { return choice_str; };
+	void addData(Delivery*& delivery_ptr);
+	std::list<TData*> findData(const std::string& request_key);
+	void removeData(const std::string& request_key);
+	
 	DeliveryManager(Container<TKey, TData>* col, InterfaceGenerator* gen)
 	{
 		collection = col;
 		generator = gen;
 	}
+
+	void PrintData(void (*callback)(const TKey&,const TData&, int));
 	//DeliveryManager() = default;
 
 };
 
+#pragma region PrintData
+template <typename TKey, typename TData>
+void DeliveryManager<TKey, TData>::PrintData(void (*callback)(const TKey&, const TData&, int))
+{
+	collection->stepover(callback);
+}
+#pragma endregion
+
+
+#pragma region Generation
 template <typename TKey, typename TData>
 void DeliveryManager<TKey, TData>::set_choice_str(const int choice_num)
 {
@@ -190,3 +205,26 @@ void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::generateData(co
 	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
 }
+#pragma endregion
+
+
+#pragma region AddRequest
+template <typename TKey, typename TData>
+void DeliveryManager<TKey, TData>::addData(Delivery*& delivery_ptr)
+{
+
+}
+#pragma endregion
+
+#pragma region FindRequest
+
+#pragma endregion
+
+#pragma region RemoveRequest
+template <typename TKey, typename TData>
+void DeliveryManager<TKey, TData>::removeData(const std::string& request_key)
+{
+
+}
+#pragma endregion
+

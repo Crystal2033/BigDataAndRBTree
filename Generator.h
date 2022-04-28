@@ -178,9 +178,10 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 	delivery.deliver_price = get_delivery_price(delivery);
 	
 	boost::hash<std::string> hash_str;
-	char random_char = char(' ' + (gen() % '['));
+	char random_char1 = char(' ' + (gen() % '['));
+	char random_char2 = char(' ' + (gen() % '['));
 	//std::cout << azure << "char= " << random_char << white << std::endl;
-	delivery.hash_code = hash_str(*delivery.content + *delivery.name + random_char);
+	delivery.hash_code = hash_str(*delivery.content + *delivery.name + random_char1 + random_char2);
 	//std::cout << purple << "hash= " << delivery.hash_code << white << std::endl;
 }
 
