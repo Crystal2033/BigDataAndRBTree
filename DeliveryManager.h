@@ -22,7 +22,7 @@ private:
 	const std::string& getStringChoice() const { return choice_str; };
 
 	void addData();
-	std::list<TData*> findData();
+	std::list<Delivery*> findData();
 	void removeData();
 	Delivery* createUserDelivery() ;
 	
@@ -334,22 +334,35 @@ template <typename TKey, typename TData>
 void DeliveryManager<TKey, TData>::addData()
 {
 	Delivery* createdDeliv = createUserDelivery();
+	std::cout << std::endl << green << "Added new delivery:" << std::endl;
 	std::cout << *createdDeliv << std::endl;
 }
 #pragma endregion
 
 #pragma region FindRequest
-template <typename TKey, typename TData>
-std::list<TData*> DeliveryManager<TKey, TData>::findData() {
-	std::list<TData*> foundData;
 
+std::list<Delivery*> DeliveryManager<std::pair<float, unsigned int>, Delivery*>::findData() {
+	std::list<Delivery*> foundData;
+	std::cout << "FLOAT" << std::endl;
+	return foundData;
+}
+
+std::list<Delivery*> DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::findData() {
+	std::list<Delivery*> foundData;
+	std::cout << "STRING" << std::endl;
 	return foundData;
 }
 #pragma endregion
 
 #pragma region RemoveRequest
-template <typename TKey, typename TData>
-void DeliveryManager<TKey, TData>::removeData()
+
+void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::removeData()
+{
+
+}
+
+
+void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::removeData()
 {
 
 }
