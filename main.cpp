@@ -5,6 +5,10 @@
 #include <cctype>
 #include "DeliveryManager.h"
 #include "Factory.h"
+#define FLOAT_DATA_START 2
+#define FLOAT_DATA_END 6
+#define FIRST_STR_DATA_END 3
+#define SECOND_STR_DATA_START 5
 
 int main(int argc, char* argv[])
 {
@@ -13,19 +17,19 @@ int main(int argc, char* argv[])
 	int choice_number;
 	try
 	{
-		greetings();
+		greetingsPrint();
 		
-		chooseCollection();
+		chooseCollectionPrint(); //TODO добавить возможность отказаться от генерации данных.
 		choice_number = userChoice(1, 2);
 
 		if (choice_number == 1) //Tree case
 		{
 			std::cout << green << "Red Black tree was chosen." << white << std::endl;
-
-			chooseComparator();
+			std::cout << cyan << "You have to choose the comparator by field for your tree (input 1-10):" << white <<  std::endl;
+			chooseFieldPrint();
 			choice_number = userChoice(1, 10);
 
-			if (choice_number > 2 && choice_number < 6) //float comparator
+			if (choice_number > FLOAT_DATA_START && choice_number < FLOAT_DATA_END) //float comparator
 			{
 				Comparator<std::pair<float, unsigned int>>* comparator = new ComparatorPairFloat(INCREASE);
 				RedBlackTree<std::pair<float, unsigned int>, Delivery*>* tree = new RedBlackTree<std::pair<float, unsigned int>, Delivery*>(comparator);
@@ -34,73 +38,29 @@ int main(int argc, char* argv[])
 				delete tree;
 				delete comparator;
 			}
-			else if(choice_number < 3 || choice_number > 5) //string comparator
+			else if(choice_number < FIRST_STR_DATA_END || choice_number > SECOND_STR_DATA_START) //string comparator
 			{
 				Comparator<std::pair<std::string*, unsigned int>>* comparator = new ComparatorPairStr(INCREASE);
 				RedBlackTree<std::pair<std::string*, unsigned int>, Delivery*>* tree = new RedBlackTree<std::pair<std::string*, unsigned int>, Delivery*>(comparator);
 				DeliveryManager< std::pair<std::string*, unsigned int>, Delivery*> manager(tree, generator);
 				manager.workWithUser(choice_number);
-				//std::cout << cyan << "To start " << blue << "generating " << cyan << "data press any keyboard button." << white << std::endl;
-				//getchar();
-				//getchar();
-				//			
-				//manager.generateData(choice_number);
-				////manager.PrintData(print_tree_for_deliv_pair_str);
-				//while (true)
-				//{
-				//	//todo find, add, remove
-				//	chooseOperation();
-				//	choice_number = userChoice(1, 4);
-				//	if (choice_number == 1)//ADD
-				//	{
-				//		std::cout << "add" << std::endl;
-				//		manager.addData();
-				//	}
-				//	else if (choice_number == 2)//FIND
-				//	{
-				//		std::cout << "find" << std::endl;
-				//		std::list<Delivery*> found_data = manager.findData();
-				//		if (found_data.size() == 0)
-				//		{
-				//			std::cout << red << "Not found information by your search request." << white << std::endl;
-				//		}
-				//		else
-				//		{
-				//			std::cout << cyan << "Was found: " << green << found_data.size() << cyan << " deliveries." << white << std::endl;
-				//			for (auto it = found_data.begin(); it != found_data.end(); it++)
-				//			{
-				//				std::cout << **it << std::endl;
-				//			}
-				//		}
-				//	}
-				//	else if (choice_number == 3)//DELETE
-				//	{
-				//		std::cout << "delete" << std::endl;
-				//		manager.removeData();
-				//	}
-				//	else if (choice_number == 4) //exit
-				//	{
-				//		break;
-				//	}
-				//				
-				//}
 				delete tree;
 				delete comparator;
-				return 0;
+				
 			}
 				
 		}
 		else if (choice_number == 2) //Queue case
 		{
 			std::cout << green << "Queue was chosen." << white << std::endl;
-			chooseComparator();
+			chooseFieldPrint();
 			choice_number = userChoice(1, 10);
 
 		}
 			
-		
+		delete factory;
+		delete generator;
 	}
-
 
 	catch (KeyNotFoundException<std::pair<std::string*, unsigned int>>& err)
 	{

@@ -14,7 +14,7 @@ public:
 	Queue(Comparator<TKey>*);
 	void add(const TKey&, const TData&) override;
 	void remove(const TKey&) override;
-	std::list<TData> find(const TKey&) override;
+	std::list<TData>* find(const TKey&) override;
 	void stepover(void(*call_back)(const TKey&, const TData&, int)) override; //const override;
 	~Queue() = default;
 };
@@ -63,10 +63,10 @@ void Queue<TKey, TData>::remove(const TKey& key_pair){
 
 #pragma region FIND
 template <typename TKey, typename TData>
-std::list<TData> Queue<TKey, TData>::find(const TKey& key_pair)
+std::list<TData>* Queue<TKey, TData>::find(const TKey& key_pair)
 {
 	std::queue<TKey> *new_queue = new std::queue<TKey>;
-	std::list<TData*> found_data_list;
+	std::list<TData*>* found_data_list = new std::list<TData*>;
 	TKey* check_data_ptr;
 	int compare_result;
 	while (!queue->empty())
@@ -76,7 +76,7 @@ std::list<TData> Queue<TKey, TData>::find(const TKey& key_pair)
 		compare_result = comparator(new_queue->back(), key_pair);
 		if (compare_result == 0)
 		{
-			found_data_list.push_back(&(new_queue->back()));
+			found_data_list->push_back(&(new_queue->back()));
 		}
 		queue->pop();
 	}

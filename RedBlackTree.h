@@ -3,6 +3,7 @@
 #include "Comparator.h"
 #include "Exceptions.h"
 #include <stack>
+#include<list>
 typedef enum {RED, BLACK} COLOR;
 
 
@@ -19,10 +20,10 @@ private:
 		TKey key;
 		TData data;
 		std::list<RBNode*>* repeat_keys_nodes;
-
 		RBNode() = default;
 		RBNode(const TKey&, const TData&);
 		RBNode(const TKey&, const TData&, COLOR);
+		~RBNode();
 	};
 	RBNode* root;
 	Comparator<TKey>* comparator;
@@ -43,12 +44,12 @@ private:
 	void infix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
 	void postfix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
 
-	void clean_tree(RBNode* node_ptr);
+	void clean_tree(typename RedBlackTree<TKey, TData>::RBNode* node_ptr);
 public:
 	RedBlackTree(Comparator<TKey>* const &);
 	void add(const TKey&, const TData&) override;
 	void remove(const TKey&) override;
-	std::list<TData> find(const TKey&) override;
+	std::list<TData>* find(const TKey&) override;
 	void stepover(void(*call_back)(const TKey&, const TData&, int)) override; //const override;
 	
 
@@ -67,13 +68,32 @@ RedBlackTree<TKey, TData>::~RedBlackTree() {
 }
 
 template <typename TKey, typename TData>
-void RedBlackTree<TKey, TData>::clean_tree(RBNode* node_ptr) {
+void RedBlackTree<TKey, TData>::clean_tree(RedBlackTree<TKey, TData>::RBNode* node_ptr) {
 	if (node_ptr != nullptr) {
 		clean_tree(node_ptr->right);
 		clean_tree(node_ptr->left);
+		/*if (node_ptr->repeat_keys_nodes != nullptr)
+		{
+			for (auto iter : node_ptr->repeat_keys_nodes->begin())
+			{
+				delete *iter;
+			}
+		}*/
 		delete node_ptr;
 	}
 }
+
+template <typename TKey, typename TData>
+RedBlackTree<TKey, TData>::RBNode::~RBNode()
+{
+	if (repeat_keys_nodes != nullptr)
+	{
+		repeat_keys_nodes->clear();
+		delete repeat_keys_nodes;
+	}
+}
+
+
 #pragma endregion
 
 #pragma region Constructor Node and RedBlackTree
@@ -363,7 +383,7 @@ void RedBlackTree<TKey, TData>::insertFixUp(std::stack<RBNode**>& way)
 
 #pragma region FIND
 template <typename TKey, typename TData>
-std::list<TData> RedBlackTree<TKey, TData>::find(const TKey& key)
+std::list<TData>* RedBlackTree<TKey, TData>::find(const TKey& key)
 {
 	if (root == nullptr){
 		throw KeyNotFoundException<TKey>("Key doesn`t exist", key);
@@ -389,10 +409,10 @@ std::list<TData> RedBlackTree<TKey, TData>::find(const TKey& key)
 				}
 				found_data->push_back(iterator->data);
 			}
-			return *found_data;
+			return found_data;
 		}
 	}
-	return *found_data;
+	return found_data;
 	//throw KeyNotFoundException<TKey>("Key doesn`t exist", key);
 }
 #pragma endregion

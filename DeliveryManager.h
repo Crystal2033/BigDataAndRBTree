@@ -24,7 +24,7 @@ private:
 	const std::string& getStringChoice() const { return comp_str; };
 	int workWithUser(int choice_user);
 	void addData();
-	std::list<Delivery*> findData();
+	std::list<Delivery*>* findData();
 	void removeData();
 	Delivery* createUserDelivery(std::string* const& sender_chain=nullptr) ;
 	
@@ -127,30 +127,15 @@ std::string* DeliveryManager<TKey, TData>::getStringInput(DELITYPES type, const 
 
 	input_data.clear();
 	std::cout << blue << "Please, input data in " << yellow << request_str << blue << " field:" << white << std::endl << "> ";
-	std::cin >> input_data;
+	std::cin.clear();
+	std::getline(std::cin, input_data);
+	std::cin.clear();
 	dataField = addToDataPool(type, input_data);
 	if (dataField == nullptr)
 	{
 		throw NullException("There is an error with nullptr, which shouldn`t be.");
 	}
 	return dataField;
-}
-
-template<typename TKey, typename TData>
-std::string* DeliveryManager<TKey, TData>::addToDataPool(DELITYPES type, const std::string& str)
-{
-	std::list<std::string>* data_list;
-	data_list = generator->getPoolCollection(type);
-	for (auto iter = data_list->begin(); iter != data_list->end(); iter++)
-	{
-		if (*iter == str)
-		{
-			return &(*iter);
-		}
-	}
-
-	data_list->push_back(str);
-	return &data_list->back();
 }
 
 template<typename TKey, typename TData>
@@ -172,9 +157,11 @@ float DeliveryManager<TKey, TData>::getFloatInput(REQ_TYPE req_type, const std::
 		}
 		else if (req_type == GET)
 		{
-			std::cout << blue << "Please, input data which you want to find, comparator is a" << yellow << request_str << blue << " field: (example: 123.45)" << white << std::endl << "> ";
+			std::cout << blue << "Please, input data which you want to find, comparator is a " << yellow << request_str << blue << " field: (example: 123.45)" << white << std::endl << "> ";
 		}
-		std::cin >> number_str;
+		std::cin.clear();
+		std::getline(std::cin, number_str);
+		std::cin.clear();
 		for (int i = 0; i < number_str.size(); i++)
 		{
 
@@ -216,6 +203,25 @@ float DeliveryManager<TKey, TData>::getFloatInput(REQ_TYPE req_type, const std::
 	}
 	return number;
 }
+
+template<typename TKey, typename TData>
+std::string* DeliveryManager<TKey, TData>::addToDataPool(DELITYPES type, const std::string& str)
+{
+	std::list<std::string>* data_list;
+	data_list = generator->getPoolCollection(type);
+	for (auto iter = data_list->begin(); iter != data_list->end(); iter++)
+	{
+		if (*iter == str)
+		{
+			return &(*iter);
+		}
+	}
+
+	data_list->push_back(str);
+	return &data_list->back();
+}
+
+
 
 
 void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::addDeliveryInCollection(Delivery*& delivery)
@@ -283,7 +289,7 @@ void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::addDeliveryInCo
 }
 
 template <typename TKey, typename TData>
-Delivery* DeliveryManager<TKey, TData>::createUserDelivery(std::string* const& sender_chain)
+Delivery* DeliveryManager<TKey, TData>::createUserDelivery(std::string* const& last_reciever)
 {
 	std::random_device rd;
 	std::mt19937 gen(rd());
@@ -293,13 +299,13 @@ Delivery* DeliveryManager<TKey, TData>::createUserDelivery(std::string* const& s
 	delivery->content = getStringInput(CONTENT, "content");
 	delivery->weight = getFloatInput(POST, "weight");
 	delivery->price = getFloatInput(POST, "price");
-	if (sender_chain == nullptr)
+	if (last_reciever == nullptr)
 	{
 		delivery->sender = getStringInput(SENDER, "sender (from country)");
 	}
 	else
 	{
-		delivery->sender = sender_chain;
+		delivery->sender = last_reciever;
 	}
 	delivery->departure_comp = getStringInput(DEPART, "departure point (by company)");
 	delivery->reciever = getStringInput(RECIEVER, "reciever (to country)");
@@ -365,139 +371,128 @@ void DeliveryManager<TKey, TData>::generateData(const int cmp_choice)
 }
 #pragma endregion
 
-
-#pragma region AddRequest
-
-void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::addData()
-{
-	Delivery* createdDeliv = createUserDelivery();
-	addDeliveryInCollection(createdDeliv);
-	std::cout << std::endl << green << "Added new delivery:" << std::endl;
-	std::cout << *createdDeliv << std::endl;
-}
-
-
+#pragma region Work with user
 template<typename TKey, typename TData>
 int DeliveryManager<TKey, TData>::workWithUser(int choice_number)
 {
 	std::cout << cyan << "To start " << blue << "generating " << cyan << "data press any keyboard button." << white << std::endl;
 	getchar();
-	getchar();
+	//getchar();
 	generateData(choice_number);
 	//manager.PrintData(print_tree_for_deliv_pair_float);
 	while (true)
 	{
-		chooseOperation();
+		chooseOperationPrint();
 		choice_number = userChoice(1, 4);
-		if (choice_number == 1)//ADD
+		if (choice_number == 1) //ADD
 		{
-			std::cout << "add" << std::endl;
 			addData();
 		}
-		else if (choice_number == 2)//FIND
+		else if (choice_number == 2) //FIND
 		{
 			std::cout << "find" << std::endl;
-			std::list<Delivery*> found_data = findData();
-			if (found_data.size() == 0)
+
+			std::list<Delivery*>* found_data = findData();
+			if (found_data->size() == 0)
 			{
 				std::cout << red << "Not found information by your search request." << white << std::endl;
 			}
 			else
 			{
-				std::cout << cyan << "Was found: " << green << found_data.size() << cyan << " deliveries." << white << std::endl;
-				for (auto it = found_data.begin(); it != found_data.end(); it++)
+				std::cout << cyan << "Was found: " << green << found_data->size() << cyan << " deliveries." << white << std::endl;
+				for (auto it = found_data->begin(); it != found_data->end(); it++)
 				{
 					std::cout << **it << std::endl;
 				}
+				while (true)
+				{
+					int choice_number;
+					std::cout << cyan << "Choose field to change data:" << white << std::endl;
+					chooseFieldPrint();
+					choice_number = userChoice(1, 10);
+					if (found_data->size() == 1)
+					{
+
+					}
+					else //find by HASH
+					{
+
+					}
+
+
+				}
+
 			}
+			delete found_data;
+
 		}
-		else if (choice_number == 3)//DELETE
+		else if (choice_number == 3) //DELETE
 		{
 			std::cout << "delete" << std::endl;
 			removeData();
 		}
 		else if (choice_number == 4) //exit
 		{
-			break;
+			return 0;
 		}
 
 	}
-	return 0;
 }
+#pragma endregion
 
-void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::addData()
+#pragma region AddRequest
+
+template<typename TKey, typename TData>
+void DeliveryManager<TKey, TData>::addData()
 {
 	std::cout << cyan << "Choose one of" << green << " add " << cyan << "operation:" << white << std::endl;
-	std::cout << blue << "1. Add independent (no chained) delivery." << std::endl << "2. Add chain of deliveries." << white << std::endl << "> ";
+	std::cout << blue << "1. Add independent (no chained) delivery." << std::endl << "2. Add chain of deliveries." << white << std::endl;
 	int user_number = userChoice(1, 2);
+	int value_of_deliveries = 0;
+	std::list<Delivery*> created_deliveries;
 	if (user_number == 1)
 	{
-
+		value_of_deliveries = 1;
 	}
 	else
 	{
-		
+		std::cout << cyan << "You have to set the length of your delivery`s chain." << white << std::endl;
+		value_of_deliveries = userChoice(2);
 	}
-	Delivery* createdDeliv = createUserDelivery();
-	addDeliveryInCollection(createdDeliv);
-	//switch (comp_type)
-	//{
-	//	case NAME: //name
-	//	{
-	//		collection->add(std::make_pair(createdDeliv->name, createdDeliv->hash_code), createdDeliv);
-	//		break;
-	//	}
-	//	case CONTENT: //content
-	//	{
-	//		collection->add(std::make_pair(createdDeliv->content, createdDeliv->hash_code), createdDeliv);
-	//		break;
-	//	}
-	//	case SENDER: //sender
-	//	{
-	//		collection->add(std::make_pair(createdDeliv->sender, createdDeliv->hash_code), createdDeliv);
-	//		break;
-	//	}
-	//	case DEPART: //departure point
-	//	{
-	//		collection->add(std::make_pair(createdDeliv->departure_comp, createdDeliv->hash_code), createdDeliv);
-	//		break;
-	//	}
-	//	case RECIEVER: //reciever
-	//	{
-	//		collection->add(std::make_pair(createdDeliv->reciever, createdDeliv->hash_code), createdDeliv);
-	//		break;
-	//	}
-	//	case DESTINATION: //destination point
-	//	{
-	//		collection->add(std::make_pair(createdDeliv->destination_comp, createdDeliv->hash_code), createdDeliv);
-	//		break;
-	//	}
-	//	case TRANSPORT: //type of transport
-	//	{
-	//		collection->add(std::make_pair(createdDeliv->type_of_transport, createdDeliv->hash_code), createdDeliv);
-	//		break;
-	//	}
-	//}
+
+	created_deliveries.push_back(createUserDelivery());
+	addDeliveryInCollection(created_deliveries.back());
 	std::cout << std::endl << green << "Added new delivery:" << std::endl;
-	std::cout << *createdDeliv << std::endl;
+	std::cout << std::endl << green << "Added " << yellow << 1 << green << "/" << value_of_deliveries << white << std::endl;
+	for (int i = 1; i < value_of_deliveries; i++)
+	{
+		created_deliveries.push_back(createUserDelivery(created_deliveries.back()->reciever));
+		addDeliveryInCollection(created_deliveries.back());
+		std::cout << std::endl << green << "Added new delivery:" << std::endl;
+		std::cout << *created_deliveries.back() << std::endl;
+		std::cout << std::endl << green << "Added " << yellow << i + 1 << green << "/" << value_of_deliveries << white << std::endl;
+	}
+	
 }
 #pragma endregion
 
 #pragma region FindRequest
 
-std::list<Delivery*> DeliveryManager<std::pair<float, unsigned int>, Delivery*>::findData() {
-	std::list<Delivery*> foundData;
+std::list<Delivery*>* DeliveryManager<std::pair<float, unsigned int>, Delivery*>::findData() {
+	std::list<Delivery*>* foundData;
 	std::cout << blue << "You can search only by comparator type: " << yellow << comp_str << white << std::endl;
 	float search_param = getFloatInput(GET, comp_str);
 	foundData = collection->find(std::make_pair(search_param, 0));
 	return foundData;
 }
 
-std::list<Delivery*> DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::findData() {
-	std::list<Delivery*> foundData;
+std::list<Delivery*>* DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::findData() {
+	std::list<Delivery*>* foundData;
 	std::cout << blue << "You can search only by comparator type: " << yellow << comp_str << white << std::endl << "> ";
 	std::string find_request = "";
-	std::cin >> find_request;
+	std::cin.clear();
+	std::getline(std::cin, find_request);
+	std::cin.clear();
 	foundData = collection->find(std::make_pair(&find_request, 0));
 	return foundData;
 }
