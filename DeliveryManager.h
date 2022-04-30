@@ -3,6 +3,7 @@
 #include "Container.h"
 #include <chrono>
 #include <string>
+#include "UserFuncsAndCallbacks.h"
 typedef enum RequestType {POST, GET} REQ_TYPE;
 template <typename TKey, typename TData>
 class DeliveryManager {
@@ -16,16 +17,16 @@ private:
 	std::string* addToDataPool(DELITYPES type, const std::string& str);
 
 	float getFloatInput(REQ_TYPE type, const std::string& request_str);
-
+	void addDeliveryInCollection(Delivery*& delivery);
 
 	public:
 	void generateData(const int user_choice);
 	const std::string& getStringChoice() const { return comp_str; };
-
+	int workWithUser(int choice_user);
 	void addData();
 	std::list<Delivery*> findData();
 	void removeData();
-	Delivery* createUserDelivery() ;
+	Delivery* createUserDelivery(std::string* const& sender_chain=nullptr) ;
 	
 	DeliveryManager(Container<TKey, TData>* col, InterfaceGenerator<Delivery>* gen)
 	{
@@ -138,9 +139,9 @@ std::string* DeliveryManager<TKey, TData>::getStringInput(DELITYPES type, const 
 template<typename TKey, typename TData>
 std::string* DeliveryManager<TKey, TData>::addToDataPool(DELITYPES type, const std::string& str)
 {
-	std::vector<std::string>* data_vector;
-	data_vector = &generator->getDataVector(type);
-	for (auto iter = data_vector->begin(); iter != data_vector->end(); iter++)
+	std::list<std::string>* data_list;
+	data_list = generator->getPoolCollection(type);
+	for (auto iter = data_list->begin(); iter != data_list->end(); iter++)
 	{
 		if (*iter == str)
 		{
@@ -148,8 +149,8 @@ std::string* DeliveryManager<TKey, TData>::addToDataPool(DELITYPES type, const s
 		}
 	}
 
-	data_vector->push_back(str);
-	return &data_vector->back();
+	data_list->push_back(str);
+	return &data_list->back();
 }
 
 template<typename TKey, typename TData>
@@ -216,125 +217,143 @@ float DeliveryManager<TKey, TData>::getFloatInput(REQ_TYPE req_type, const std::
 	return number;
 }
 
+
+void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::addDeliveryInCollection(Delivery*& delivery)
+{
+	switch (comp_type)
+	{
+		case NAME: //name
+		{
+			collection->add(std::make_pair(delivery->name, delivery->hash_code), delivery);
+			break;
+		}
+		case CONTENT: //content
+		{
+			collection->add(std::make_pair(delivery->content, delivery->hash_code), delivery);
+			break;
+		}
+		case SENDER: //sender
+		{
+			collection->add(std::make_pair(delivery->sender, delivery->hash_code), delivery);
+			break;
+		}
+		case DEPART: //departure point
+		{
+			collection->add(std::make_pair(delivery->departure_comp, delivery->hash_code), delivery);
+			break;
+		}
+		case RECIEVER: //reciever
+		{
+			collection->add(std::make_pair(delivery->reciever, delivery->hash_code), delivery);
+			break;
+		}
+		case DESTINATION: //destination point
+		{
+			collection->add(std::make_pair(delivery->destination_comp, delivery->hash_code), delivery);
+			break;
+		}
+		case TRANSPORT: //type of transport
+		{
+			collection->add(std::make_pair(delivery->type_of_transport, delivery->hash_code), delivery);
+			break;
+		}
+	}
+}
+
+void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::addDeliveryInCollection(Delivery*& delivery)
+{
+	switch (comp_type)
+	{
+		case WEIGHT: //weight
+		{
+			collection->add(std::make_pair(delivery->weight, delivery->hash_code), delivery);
+			break;
+		}
+		case PRICE: //price
+		{
+			collection->add(std::make_pair(delivery->price, delivery->hash_code), delivery);
+			break;
+		}
+		case DELI_PRICE: //delivery price
+		{
+			collection->add(std::make_pair(delivery->deliver_price, delivery->hash_code), delivery);
+			break;
+		}
+	}
+}
+
 template <typename TKey, typename TData>
-Delivery* DeliveryManager<TKey, TData>::createUserDelivery()
+Delivery* DeliveryManager<TKey, TData>::createUserDelivery(std::string* const& sender_chain)
 {
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	DeliGenerator* delivery_gen = reinterpret_cast<DeliGenerator*>(generator);
+	
 	Delivery* delivery = new Delivery;
 	delivery->name = getStringInput(NAME, "name");
 	delivery->content = getStringInput(CONTENT, "content");
 	delivery->weight = getFloatInput(POST, "weight");
 	delivery->price = getFloatInput(POST, "price");
-	delivery->sender = getStringInput(SENDER, "sender (from country)");
+	if (sender_chain == nullptr)
+	{
+		delivery->sender = getStringInput(SENDER, "sender (from country)");
+	}
+	else
+	{
+		delivery->sender = sender_chain;
+	}
 	delivery->departure_comp = getStringInput(DEPART, "departure point (by company)");
 	delivery->reciever = getStringInput(RECIEVER, "reciever (to country)");
 	delivery->destination_comp = getStringInput(DESTINATION, "destination (for company)");
 	delivery->type_of_transport = getStringInput(TRANSPORT, "type of transport");
 
+	DeliGenerator* delivery_gen = reinterpret_cast<DeliGenerator*>(generator);
 	delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
 	generator->generateHash(*delivery, gen);
 	return delivery;
 }
 //Specialization
-void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::generateData(const int cmp_choice)
-{
-	std::list<Delivery*>* deliveries;
-
-	setChoice(cmp_choice);
-	auto begin = std::chrono::steady_clock::now();
-
-	for (int i = 0; i < 1000000; i++)
-	{
-		deliveries = &generator->generateData();
-
-		for (auto delivery : *deliveries) {
-
-			switch (comp_type)
-			{
-				case NAME: //name
-				{
-					collection->add(std::make_pair(delivery->name, delivery->hash_code), delivery);
-					break;
-				}
-				case CONTENT: //content
-				{
-					collection->add(std::make_pair(delivery->content, delivery->hash_code), delivery);
-					break;
-				}
-				case SENDER: //sender
-				{
-					collection->add(std::make_pair(delivery->sender, delivery->hash_code), delivery);
-					break;
-				}
-				case DEPART: //departure point
-				{
-					collection->add(std::make_pair(delivery->departure_comp, delivery->hash_code), delivery);
-					break;
-				}
-				case RECIEVER: //reciever
-				{
-					collection->add(std::make_pair(delivery->reciever, delivery->hash_code), delivery);
-					break;
-				}
-				case DESTINATION: //destination point
-				{
-					collection->add(std::make_pair(delivery->destination_comp, delivery->hash_code), delivery);
-					break;
-				}
-				case TRANSPORT: //type of transport
-				{
-					collection->add(std::make_pair(delivery->type_of_transport, delivery->hash_code), delivery);
-					break;
-				}
-			}
-
-		}
-		delete deliveries;
-	}
-
-	auto end = std::chrono::steady_clock::now();
-	std::cout << azure << "Generated value: " << cyan << generator->getGeneratedCount() << white << std::endl;
-	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
-
-}
+//void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::generateData(const int cmp_choice)
+//{
+//	std::list<Delivery*>* deliveries;
+//
+//	setChoice(cmp_choice);
+//	auto begin = std::chrono::steady_clock::now();
+//
+//	for (int i = 0; i < 100; i++)
+//	{
+//		deliveries = &generator->generateData();
+//
+//		for (auto delivery : *deliveries) {
+//
+//			addDeliveryInCollection(delivery);
+//		}
+//		delete deliveries;
+//	}
+//
+//	auto end = std::chrono::steady_clock::now();
+//	std::cout << azure << "Generated value: " << cyan << generator->getGeneratedCount() << white << std::endl;
+//	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+//	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
+//
+//}
 
 
 //Specialization
-void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::generateData(const int cmp_choice)
+template <typename TKey, typename TData>
+void DeliveryManager<TKey, TData>::generateData(const int cmp_choice)
 {
 	std::list<Delivery*>* deliveries;
 
 	setChoice(cmp_choice);
 	auto begin = std::chrono::steady_clock::now();
 
-	for (int i = 0; i < 1000000; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		deliveries = &generator->generateData();
 
-		for (auto delivery : *deliveries) {
-
-			switch (comp_type)
-			{
-				case WEIGHT: //weight
-				{
-					collection->add(std::make_pair(delivery->weight, delivery->hash_code), delivery);
-					break;
-				}
-				case PRICE: //price
-				{
-					collection->add(std::make_pair(delivery->price, delivery->hash_code), delivery);
-					break;
-				}
-				case DELI_PRICE: //delivery price
-				{
-					collection->add(std::make_pair(delivery->deliver_price, delivery->hash_code), delivery);
-					break;
-				}
-			}
-
+		for (auto delivery : *deliveries)
+		{
+			addDeliveryInCollection(delivery);
 		}
 		delete deliveries;
 	}
@@ -352,70 +371,113 @@ void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::generateData(co
 void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::addData()
 {
 	Delivery* createdDeliv = createUserDelivery();
-	switch (comp_type)
-	{
-		case WEIGHT: //weight
-		{
-			collection->add(std::make_pair(createdDeliv->weight, createdDeliv->hash_code), createdDeliv);
-			break;
-		}
-		case PRICE: //price
-		{
-			collection->add(std::make_pair(createdDeliv->price, createdDeliv->hash_code), createdDeliv);
-			break;
-		}
-		case DELI_PRICE: //delivery price
-		{
-			collection->add(std::make_pair(createdDeliv->deliver_price, createdDeliv->hash_code), createdDeliv);
-			break;
-		}
-	}
+	addDeliveryInCollection(createdDeliv);
 	std::cout << std::endl << green << "Added new delivery:" << std::endl;
 	std::cout << *createdDeliv << std::endl;
 }
 
 
+template<typename TKey, typename TData>
+int DeliveryManager<TKey, TData>::workWithUser(int choice_number)
+{
+	std::cout << cyan << "To start " << blue << "generating " << cyan << "data press any keyboard button." << white << std::endl;
+	getchar();
+	getchar();
+	generateData(choice_number);
+	//manager.PrintData(print_tree_for_deliv_pair_float);
+	while (true)
+	{
+		chooseOperation();
+		choice_number = userChoice(1, 4);
+		if (choice_number == 1)//ADD
+		{
+			std::cout << "add" << std::endl;
+			addData();
+		}
+		else if (choice_number == 2)//FIND
+		{
+			std::cout << "find" << std::endl;
+			std::list<Delivery*> found_data = findData();
+			if (found_data.size() == 0)
+			{
+				std::cout << red << "Not found information by your search request." << white << std::endl;
+			}
+			else
+			{
+				std::cout << cyan << "Was found: " << green << found_data.size() << cyan << " deliveries." << white << std::endl;
+				for (auto it = found_data.begin(); it != found_data.end(); it++)
+				{
+					std::cout << **it << std::endl;
+				}
+			}
+		}
+		else if (choice_number == 3)//DELETE
+		{
+			std::cout << "delete" << std::endl;
+			removeData();
+		}
+		else if (choice_number == 4) //exit
+		{
+			break;
+		}
+
+	}
+	return 0;
+}
+
 void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::addData()
 {
-	Delivery* createdDeliv = createUserDelivery();
-	switch (comp_type)
+	std::cout << cyan << "Choose one of" << green << " add " << cyan << "operation:" << white << std::endl;
+	std::cout << blue << "1. Add independent (no chained) delivery." << std::endl << "2. Add chain of deliveries." << white << std::endl << "> ";
+	int user_number = userChoice(1, 2);
+	if (user_number == 1)
 	{
-		case NAME: //name
-		{
-			collection->add(std::make_pair(createdDeliv->name, createdDeliv->hash_code), createdDeliv);
-			break;
-		}
-		case CONTENT: //content
-		{
-			collection->add(std::make_pair(createdDeliv->content, createdDeliv->hash_code), createdDeliv);
-			break;
-		}
-		case SENDER: //sender
-		{
-			collection->add(std::make_pair(createdDeliv->sender, createdDeliv->hash_code), createdDeliv);
-			break;
-		}
-		case DEPART: //departure point
-		{
-			collection->add(std::make_pair(createdDeliv->departure_comp, createdDeliv->hash_code), createdDeliv);
-			break;
-		}
-		case RECIEVER: //reciever
-		{
-			collection->add(std::make_pair(createdDeliv->reciever, createdDeliv->hash_code), createdDeliv);
-			break;
-		}
-		case DESTINATION: //destination point
-		{
-			collection->add(std::make_pair(createdDeliv->destination_comp, createdDeliv->hash_code), createdDeliv);
-			break;
-		}
-		case TRANSPORT: //type of transport
-		{
-			collection->add(std::make_pair(createdDeliv->type_of_transport, createdDeliv->hash_code), createdDeliv);
-			break;
-		}
+
 	}
+	else
+	{
+		
+	}
+	Delivery* createdDeliv = createUserDelivery();
+	addDeliveryInCollection(createdDeliv);
+	//switch (comp_type)
+	//{
+	//	case NAME: //name
+	//	{
+	//		collection->add(std::make_pair(createdDeliv->name, createdDeliv->hash_code), createdDeliv);
+	//		break;
+	//	}
+	//	case CONTENT: //content
+	//	{
+	//		collection->add(std::make_pair(createdDeliv->content, createdDeliv->hash_code), createdDeliv);
+	//		break;
+	//	}
+	//	case SENDER: //sender
+	//	{
+	//		collection->add(std::make_pair(createdDeliv->sender, createdDeliv->hash_code), createdDeliv);
+	//		break;
+	//	}
+	//	case DEPART: //departure point
+	//	{
+	//		collection->add(std::make_pair(createdDeliv->departure_comp, createdDeliv->hash_code), createdDeliv);
+	//		break;
+	//	}
+	//	case RECIEVER: //reciever
+	//	{
+	//		collection->add(std::make_pair(createdDeliv->reciever, createdDeliv->hash_code), createdDeliv);
+	//		break;
+	//	}
+	//	case DESTINATION: //destination point
+	//	{
+	//		collection->add(std::make_pair(createdDeliv->destination_comp, createdDeliv->hash_code), createdDeliv);
+	//		break;
+	//	}
+	//	case TRANSPORT: //type of transport
+	//	{
+	//		collection->add(std::make_pair(createdDeliv->type_of_transport, createdDeliv->hash_code), createdDeliv);
+	//		break;
+	//	}
+	//}
 	std::cout << std::endl << green << "Added new delivery:" << std::endl;
 	std::cout << *createdDeliv << std::endl;
 }

@@ -34,7 +34,7 @@ void print_tree_for_deliv_pair_float(const std::pair<float, unsigned int>& key, 
 #pragma endregion
 
 #pragma region CIN operation choice
-int user_choice(const int left_edge, const int right_edge)
+int userChoice(const int left_edge, const int right_edge)
 {
 	std::string choice_str;
 	int choice_number;
@@ -43,7 +43,7 @@ int user_choice(const int left_edge, const int right_edge)
 		choice_str.clear();
 		std::cout << blue << "Input a number:" << white <<std::endl <<  "> ";
 		std::cin >> choice_str;
-		choice_number = atoi(choice_str.c_str());
+		choice_number = atoi(choice_str.c_str()); //return 0 in bad case. So i don`t need 0 in any case.
 
 		if (choice_number < left_edge || choice_number > right_edge) {
 			std::cout << red << "InputValueError: You have to choose value from <" << yellow << left_edge << red << "> to <" << yellow << right_edge

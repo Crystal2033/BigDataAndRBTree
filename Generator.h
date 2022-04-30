@@ -24,7 +24,7 @@ class InterfaceGenerator {
 public:
 	virtual std::list<GenerType*>& generateData() = 0;
 	virtual unsigned getGeneratedCount() const = 0;
-	virtual std::vector<std::string>& getDataVector(DELITYPES typeOfData) const = 0;
+	virtual std::list<std::string>* getPoolCollection(DELITYPES typeOfData) const = 0;
 	virtual void generateHash(GenerType&, std::mt19937& gen) const = 0;
 	virtual ~InterfaceGenerator() = default;
 };
@@ -36,7 +36,7 @@ public:
 	unsigned getGeneratedCount() const override { return value_of_dels; };
 	DeliGenerator();
 	~DeliGenerator();
-	std::vector<std::string>& getDataVector(DELITYPES typeOfData) const override;
+	std::list<std::string>* getPoolCollection(DELITYPES typeOfData) const override;
 	void generateHash(Delivery& delivery, std::mt19937& gen) const override;
 	float get_delivery_price(const Delivery& delivery) const;
 private:
@@ -44,7 +44,6 @@ private:
 	Delivery& startChain() const;
 	Delivery& continueChain(std::string* const& last_dep_point) const;
 	void createData(Delivery& delivery, std::string* const& last_dep_point =nullptr) const;
-	
 };
 
 
@@ -58,27 +57,27 @@ DeliGenerator::~DeliGenerator()
 	delete data;
 }
 
-std::vector<std::string>& DeliGenerator::getDataVector(DELITYPES typeOfData) const
+std::list<std::string>* DeliGenerator::getPoolCollection(DELITYPES typeOfData) const
 {
 	if (typeOfData == NAME)
 	{
-		return data->names;
+		return &data->names;
 	}
 	else if (typeOfData == CONTENT)
 	{
-		return data->contents;
+		return &data->contents;
 	}
 	else if (typeOfData == SENDER || typeOfData == RECIEVER)
 	{
-		return data->countries;
+		return &data->countries;
 	}
 	else if (typeOfData == DEPART || typeOfData == DESTINATION)
 	{
-		return data->companies;
+		return &data->companies;
 	}
 	else if (typeOfData == TRANSPORT)
 	{
-		return data->transport_types;
+		return &data->transport_types;
 	}
 }
 
@@ -146,20 +145,34 @@ Delivery& DeliGenerator::continueChain(std::string* const& last_dep_point) const
 	return *delivery;
 }
 
+void getListNode(std::list<std::string>::iterator* it, std::list<std::string>* const& list, std::string*& destin, const int offset)
+{
+	std::advance(*it, offset);
+	destin = &(**it);
+	*it = list->begin();
+}
+
 void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_point) const {
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	float random_float = 0.0;
 	unsigned int random_number = 0;
 	
+	auto names_front = data->names.begin();
+	auto contents_front = data->contents.begin();
+	auto countries_front = data->countries.begin();
+	auto companies_front = data->companies.begin();
+	auto transports_front = data->transport_types.begin();
 
 	//////////////////////////////////////NAME///////////////////////////////////////
 	random_number = gen() % data->names.size();
-	delivery.name = &(data->names[random_number]);
+	getListNode(&names_front, &data->names, delivery.name, random_number);
+	//delivery.name = &(data->names[random_number]);
 
 	//////////////////////////////////////CONTENT///////////////////////////////////////
 	random_number = gen() % data->contents.size();
-	delivery.content = &(data->contents[random_number]);
+	getListNode(&contents_front, &data->contents, delivery.content, random_number);
+	//delivery.content = &(data->contents[random_number]);
 
 	//////////////////////////////////////WEIGHT///////////////////////////////////////
 	random_float = float(gen()) / float(rand() + 1.0) / 10000;
@@ -172,7 +185,8 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 	//////////////////////////////////////SENDER///////////////////////////////////////
 	if (last_dep_point == nullptr) { 
 		random_number = gen() % data->countries.size();
-		delivery.sender = &(data->countries[random_number]);
+		getListNode(&countries_front, &data->countries, delivery.sender, random_number);
+		//delivery.sender = &(data->countries[random_number]);
 	}
 	else { //Start chain case. Condition that n end point has to be equal n+1 start point in chain
 		delivery.sender = last_dep_point;
@@ -180,12 +194,14 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 
 	//////////////////////////////////////DEPARTURE_COMP///////////////////////////////////////
 	random_number = gen() % data->companies.size();
-	delivery.departure_comp = &(data->companies[random_number]);
+	getListNode(&companies_front, &data->companies, delivery.departure_comp, random_number);
+	//delivery.departure_comp = &(data->companies[random_number]);
 	
 	//////////////////////////////////////RECEIVER///////////////////////////////////////
-	while (1) {
+	while (true) {
 		random_number = gen() % data->countries.size();
-		delivery.reciever = &(data->countries[random_number]);
+		getListNode(&countries_front, &data->countries, delivery.reciever, random_number);
+		//delivery.reciever = &(data->countries[random_number]);
 		if (delivery.reciever != delivery.sender) {
 			break;
 		}
@@ -193,21 +209,19 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 
 	//////////////////////////////////////DESTINATION///////////////////////////////////////
 	random_number = gen() % data->companies.size();
-	delivery.destination_comp = &(data->companies[random_number]);
+	getListNode(&companies_front, &data->companies, delivery.destination_comp, random_number);
+	//delivery.destination_comp = &(data->companies[random_number]);
 
 	//////////////////////////////////////TRANSPORT_TYPE///////////////////////////////////////
 	random_number = gen() % data->transport_types.size();
-	delivery.type_of_transport = &(data->transport_types[random_number]);
+	getListNode(&transports_front, &data->transport_types, delivery.type_of_transport, random_number);
+	//delivery.type_of_transport = &(data->transport_types[random_number]);
 
 	//////////////////////////////////////DEPARTURE_PRICE///////////////////////////////////////
-	
 	delivery.deliver_price = get_delivery_price(delivery);
 	
 	generateHash(delivery, gen);
-	/*boost::hash<std::string> hash_str;
-	char random_char1 = char(' ' + (gen() % '['));
-	char random_char2 = char(' ' + (gen() % '['));
-	delivery.hash_code = hash_str(*delivery.content + *delivery.name + random_char1 + random_char2);*/
+	
 }
 
 std::list<Delivery*>& DeliGenerator::generateData()
