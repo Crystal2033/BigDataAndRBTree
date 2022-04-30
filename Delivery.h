@@ -1,22 +1,24 @@
 #pragma once
 #include "Colours.h"
-typedef enum {NAME, CONTENT, WEIGHT, PRICE, DELI_PRICE, SENDER, DEPART, RECIEVER, DESTINATION, TRANSPORT} DELITYPES;
+typedef enum {NAME, CONTENT, WEIGHT, PRICE, DELI_PRICE, SENDER, DEPART, RECIEVER, DESTINATION, TRANSPORT, SEND_TIME, RECI_TIME} DELITYPES;
 class Delivery {
 public:
 	Delivery();
 	unsigned int hash_code;
-	std::string* name;             // Название груза. names DONE
-	std::string* content;          // Содержимое  contents  DONE
-	float weight;                    // Вес
-	float price;                     // Цена содержимого
-	float deliver_price;             // Цена доставки
-	std::string* sender;           // Отправитель contries  DONE
-	std::string* departure_comp;   // Пункт отсылки    companies DONE
+	std::string* name;					// Название груза. names DONE
+	std::string* content;				// Содержимое  contents  DONE
+	float weight;						 // Вес
+	float price;						 // Цена содержимого
+	float deliver_price;				// Цена доставки
+	std::string* sender;				// Отправитель contries  DONE
+	std::string* departure_comp;		 // Пункт отсылки    companies DONE
 	//Time depart_time;
-	std::string* reciever;     // Получатель  contries  DONE
+	std::string* reciever;				// Получатель  contries  DONE
 	std::string* destination_comp;       // Пункт назначения companies DONE 
 	//Time dest_time;
-	std::string* type_of_transport; // Тип транспорта. transport_types DONE
+	std::string* type_of_transport;		// Тип транспорта. transport_types DONE
+	//std::string* send_time;			// Время отправки
+	//std::string* recieve_time;		//Время получения
 	friend std::ostream& operator<<(std::ostream& out, const Delivery& delivery);
 };
 

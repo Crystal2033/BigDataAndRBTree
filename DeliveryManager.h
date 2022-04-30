@@ -4,7 +4,7 @@
 #include <chrono>
 #include <string>
 #include "UserFuncsAndCallbacks.h"
-typedef enum RequestType {POST, GET} REQ_TYPE;
+typedef enum RequestType {POST, GET, PATCH} REQ_TYPE;
 template <typename TKey, typename TData>
 class DeliveryManager {
 private:
@@ -12,18 +12,24 @@ private:
 	InterfaceGenerator<Delivery>* generator;
 	std::string comp_str;
 	DELITYPES comp_type;
-	void setChoice(const int choice_num);
+	DELITYPES setChoiceGetType(const int choice_num, RequestType req_type=POST);
 	std::string* getStringInput(DELITYPES type, const std::string& request_str);
+	unsigned int getHashInput();
 	std::string* addToDataPool(DELITYPES type, const std::string& str);
 
 	float getFloatInput(REQ_TYPE type, const std::string& request_str);
 	void addDeliveryInCollection(Delivery*& delivery);
 
+	/////////////////////////////////PUBLIC////////////////////////////////////
 	public:
 	void generateData(const int user_choice);
 	const std::string& getStringChoice() const { return comp_str; };
 	int workWithUser(int choice_user);
 	void addData();
+	void getUserData();
+	bool wantToChangeData();
+	void makeChanging(Delivery* delivery);
+	void changeByField(const DELITYPES type, Delivery* delivery);
 	std::list<Delivery*>* findData();
 	void removeData();
 	Delivery* createUserDelivery(std::string* const& sender_chain=nullptr) ;
@@ -50,70 +56,117 @@ void DeliveryManager<TKey, TData>::PrintData(void (*callback)(const TKey&, const
 
 #pragma region Generation
 template <typename TKey, typename TData>
-void DeliveryManager<TKey, TData>::setChoice(const int choice_num)
+DELITYPES DeliveryManager<TKey, TData>::setChoiceGetType(const int choice_num, RequestType req_type)
 {
 	switch (choice_num)
 	{
 		case 1:
 		{
-			comp_str = "Name";
-			comp_type = NAME;
-			break;
+			if (req_type == POST)
+			{
+				comp_str = "Name";
+				comp_type = NAME;
+			}
+			return NAME;
+
 		}
 		case 2:
 		{
-			comp_str = "Content";
-			comp_type = CONTENT;
-			break;
+			if (req_type == POST)
+			{
+				comp_str = "Content";
+				comp_type = CONTENT;
+			}
+			return CONTENT;
+
 		}
 		case 3:
 		{
-			comp_str = "Weight";
-			comp_type = WEIGHT;
-			break;
+			if (req_type == POST)
+			{
+				comp_str = "Weight";
+				comp_type = WEIGHT;
+			}
+			return WEIGHT;
+
 		}
 		case 4:
 		{
-			comp_str = "Price";
-			comp_type = PRICE;
-			break;
+			if (req_type == POST)
+			{
+				comp_str = "Price";
+				comp_type = PRICE;
+			}
+			return PRICE;
+
 		}
 		case 5:
 		{
-			comp_type = DELI_PRICE;
-			comp_str = "Delivery price";
-			break;
+			if (req_type == POST)
+			{
+				comp_type = DELI_PRICE;
+				comp_str = "Delivery price";
+			}
+			return DELI_PRICE;
+
 		}
 		case 6:
 		{
-			comp_type = SENDER;
-			comp_str = "Sender (from country)";
-			break;
+			if (req_type == POST)
+			{
+				comp_type = SENDER;
+				comp_str = "Sender (from country)";
+			}
+			return SENDER;
+
 		}
 		case 7:
 		{
-			comp_type = DEPART;
-			comp_str = "Departure point (by company)";
-			break;
+			if (req_type == POST)
+			{
+				comp_type = DEPART;
+				comp_str = "Departure point (by company)";
+			}
+			return DEPART;
+
 		}
 		case 8:
 		{
-			comp_type = RECIEVER;
-			comp_str = "Reciever (to country)";
-			break;
+			if (req_type == POST)
+			{
+				comp_type = RECIEVER;
+				comp_str = "Reciever (to country)";
+			}
+			return RECIEVER;
+
 		}
 		case 9:
 		{
-			comp_type = DESTINATION;
-			comp_str = "Destination point (for company)";
-			break;
+			if (req_type == POST)
+			{
+				comp_type = DESTINATION;
+				comp_str = "Destination point (for company)";
+			}
+			return DESTINATION;
+
 		}
 		case 10:
 		{
-			comp_type = TRANSPORT;
-			comp_str = "Type of transport";
-			break;
+			if (req_type == POST)
+			{
+				comp_type = TRANSPORT;
+				comp_str = "Type of transport";
+			}
+			return TRANSPORT;
 		}
+		/*case 11: TODO:
+		{
+			return SEND_TIME;
+		}
+		case 12:
+		{
+			return RECI_TIME;
+		}*/
 		//TODO: TIME 11( SEND ), 12 ( RECIEVE )
 		
 	}
@@ -139,6 +192,31 @@ std::string* DeliveryManager<TKey, TData>::getStringInput(DELITYPES type, const 
 }
 
 template<typename TKey, typename TData>
+unsigned int DeliveryManager<TKey, TData>::getHashInput()
+{
+	std::string input_data;
+	std::string* dataField;
+	unsigned int hash_value;
+	while (true)
+	{
+		std::cout << blue << "You have to choose delivery by " << pink << "hash:" << blue << std::endl << "Input hash value (unsigned int number):" << std::endl << white << "> ";
+		input_data.clear();
+		std::cin.clear();
+		std::getline(std::cin, input_data);
+		std::cin.clear();
+		hash_value = strtoul(input_data.c_str(), nullptr, 10);
+		if (hash_value == 0)
+		{
+			std::cout << red << "Transform to unsigned int error. Please, try again." << white << std::endl;
+				continue;
+		}
+		break;
+	}
+
+	return hash_value;
+}
+
+template<typename TKey, typename TData>
 float DeliveryManager<TKey, TData>::getFloatInput(REQ_TYPE req_type, const std::string& request_str)
 {
 	std::string number_str = "";
@@ -151,7 +229,7 @@ float DeliveryManager<TKey, TData>::getFloatInput(REQ_TYPE req_type, const std::
 		dot_counter = 0;
 		number_err = false;
 		number_str.clear();
-		if (req_type == POST)
+		if (req_type == POST || req_type == PATCH)
 		{
 			std::cout << blue << "Please, input data in " << yellow << request_str << blue << " field: (example: 123.45)" << white << std::endl << "> ";
 		}
@@ -266,6 +344,7 @@ void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::addDeliv
 	}
 }
 
+
 void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::addDeliveryInCollection(Delivery*& delivery)
 {
 	switch (comp_type)
@@ -317,40 +396,13 @@ Delivery* DeliveryManager<TKey, TData>::createUserDelivery(std::string* const& l
 	generator->generateHash(*delivery, gen);
 	return delivery;
 }
-//Specialization
-//void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::generateData(const int cmp_choice)
-//{
-//	std::list<Delivery*>* deliveries;
-//
-//	setChoice(cmp_choice);
-//	auto begin = std::chrono::steady_clock::now();
-//
-//	for (int i = 0; i < 100; i++)
-//	{
-//		deliveries = &generator->generateData();
-//
-//		for (auto delivery : *deliveries) {
-//
-//			addDeliveryInCollection(delivery);
-//		}
-//		delete deliveries;
-//	}
-//
-//	auto end = std::chrono::steady_clock::now();
-//	std::cout << azure << "Generated value: " << cyan << generator->getGeneratedCount() << white << std::endl;
-//	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-//	std::cout << blue << "The time of generation: " << cyan << elapsed_ms.count() << blue << " ms" << white << std::endl;
-//
-//}
 
-
-//Specialization
 template <typename TKey, typename TData>
 void DeliveryManager<TKey, TData>::generateData(const int cmp_choice)
 {
 	std::list<Delivery*>* deliveries;
 
-	setChoice(cmp_choice);
+	setChoiceGetType(cmp_choice, POST);
 	auto begin = std::chrono::steady_clock::now();
 
 	for (int i = 0; i < 100; i++)
@@ -391,40 +443,7 @@ int DeliveryManager<TKey, TData>::workWithUser(int choice_number)
 		else if (choice_number == 2) //FIND
 		{
 			std::cout << "find" << std::endl;
-
-			std::list<Delivery*>* found_data = findData();
-			if (found_data->size() == 0)
-			{
-				std::cout << red << "Not found information by your search request." << white << std::endl;
-			}
-			else
-			{
-				std::cout << cyan << "Was found: " << green << found_data->size() << cyan << " deliveries." << white << std::endl;
-				for (auto it = found_data->begin(); it != found_data->end(); it++)
-				{
-					std::cout << **it << std::endl;
-				}
-				while (true)
-				{
-					int choice_number;
-					std::cout << cyan << "Choose field to change data:" << white << std::endl;
-					chooseFieldPrint();
-					choice_number = userChoice(1, 10);
-					if (found_data->size() == 1)
-					{
-
-					}
-					else //find by HASH
-					{
-
-					}
-
-
-				}
-
-			}
-			delete found_data;
-
+			getUserData();
 		}
 		else if (choice_number == 3) //DELETE
 		{
@@ -473,6 +492,172 @@ void DeliveryManager<TKey, TData>::addData()
 		std::cout << std::endl << green << "Added " << yellow << i + 1 << green << "/" << value_of_deliveries << white << std::endl;
 	}
 	
+}
+template<typename TKey, typename TData>
+void DeliveryManager<TKey, TData>::getUserData()
+{
+	std::list<Delivery*>* found_data = findData();
+	if (found_data->size() == 0)
+	{
+		std::cout << red << "Not found information by your search request." << white << std::endl;
+	}
+	else
+	{
+		std::cout << cyan << "Was found: " << green << found_data->size() << cyan << " deliveries." << white << std::endl;
+		for (auto it = found_data->begin(); it != found_data->end(); it++)
+		{
+			std::cout << **it << std::endl;
+		}
+		while (true)
+		{
+			int choice_number;
+			DELITYPES type;
+			if (!wantToChangeData())
+			{
+				break;
+			}
+
+			if (found_data->size() == 1)
+			{
+				Delivery* delivery = found_data->back();
+				makeChanging(delivery);
+			}
+			else //find by HASH
+			{
+				unsigned int hash_value;
+				Delivery* actual_delivery;
+				std::list<Delivery*>::iterator iter;
+				std::cout << cyan << "Was found: " << green << found_data->size() << cyan << " deliveries." << white << std::endl;
+				while (true)
+				{
+					hash_value = getHashInput();
+
+					for (iter = found_data->begin(); iter != found_data->end(); iter++)
+					{
+						if ((*iter)->hash_code == hash_value)
+						{
+							break;
+						}
+					}
+					if (iter == found_data->end())
+					{
+						std::cout << red << "Hash was not found by your search request." << white << std::endl;
+						continue;
+					}
+					makeChanging(*iter);
+					break;
+				}
+			}
+
+		}
+
+	}
+	delete found_data;
+
+}
+template<typename TKey, typename TData>
+bool DeliveryManager<TKey, TData>::wantToChangeData()
+{
+	
+	std::string find_request = "";
+	while (true)
+	{
+		std::cout << cyan << "Do you want to change data (y/n)?" << white << std::endl << "> ";
+		find_request.clear();
+		std::cin.clear();
+		std::getline(std::cin, find_request);
+		std::cin.clear();
+		if (find_request.size() != 1)
+		{
+			std::cout << red << "You have to input 'y' or 'n'. " << white << std::endl;
+			continue;
+		}
+		
+		if (tolower(find_request[0]) == 'y')
+		{
+			return true;
+		}
+		else if (tolower(find_request[0]) == 'n')
+		{
+			return false;
+		}
+		else
+		{
+			std::cout << red << "You have to input 'y' or 'n'. " << white << std::endl;
+			continue;
+		}
+	}
+}
+template<typename TKey, typename TData>
+void DeliveryManager<TKey, TData>::makeChanging(Delivery* delivery)
+{
+	int choice_number;
+	std::cout << cyan << "Choose field to change data:" << white << std::endl;
+	chooseFieldPrint();
+	choice_number = userChoice(1, 10);
+	DELITYPES type = setChoiceGetType(choice_number, PATCH);
+	changeByField(type, delivery);
+	std::cout << green << "Data changed!" << white << std::endl;
+	std::cout << *delivery << std::endl;
+}
+template<typename TKey, typename TData>
+void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery* delivery)
+{
+	switch (type)
+	{
+		case NAME: //name
+		{
+			delivery->name = getStringInput(type, "name");
+			break;
+		}
+		case CONTENT: //content
+		{
+			delivery->content = getStringInput(type, "content");
+			break;
+		}
+		case SENDER: //sender
+		{
+			delivery->sender = getStringInput(type, "sender (from country)");
+			break;
+		}
+		case DEPART: //departure point
+		{
+			delivery->departure_comp = getStringInput(type, "departure point (by company)");
+			break;
+		}
+		case RECIEVER: //reciever
+		{
+			delivery->reciever = getStringInput(type, "reciever (to country)");
+			break;
+		}
+		case DESTINATION: //destination point
+		{
+			delivery->destination_comp = getStringInput(type, "destination (for company)");
+			break;
+		}
+		case TRANSPORT: //type of transport
+		{
+			delivery->type_of_transport = getStringInput(type, "type of transport");
+			DeliGenerator* delivery_gen = reinterpret_cast<DeliGenerator*>(generator);
+			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
+			break;
+		}
+		case WEIGHT: //weight
+		{
+			delivery->weight = getFloatInput(PATCH, "weight");
+			break;
+		}
+		case PRICE: //price
+		{
+			delivery->price = getFloatInput(PATCH, "price");
+			break;
+		}
+		case DELI_PRICE: //delivery price
+		{
+			std::cout << red << "Delivery price generates automatically. You don`t have access to change this field." << white << std::endl;
+			break;
+		}
+	}
 }
 #pragma endregion
 

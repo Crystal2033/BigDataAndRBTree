@@ -97,7 +97,6 @@ int main(int argc, char* argv[])
 	catch (...)
 	{
 		std::cout << red << "Unpredictable exception." << white << std::endl;
-
 	}
 	return 0;
 }

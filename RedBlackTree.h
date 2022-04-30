@@ -72,13 +72,13 @@ void RedBlackTree<TKey, TData>::clean_tree(RedBlackTree<TKey, TData>::RBNode* no
 	if (node_ptr != nullptr) {
 		clean_tree(node_ptr->right);
 		clean_tree(node_ptr->left);
-		/*if (node_ptr->repeat_keys_nodes != nullptr)
+		if (node_ptr->repeat_keys_nodes != nullptr)
 		{
-			for (auto iter : node_ptr->repeat_keys_nodes->begin())
+			for (auto iter = node_ptr->repeat_keys_nodes->begin(); iter != node_ptr->repeat_keys_nodes->end(); iter++)
 			{
 				delete *iter;
 			}
-		}*/
+		}
 		delete node_ptr;
 	}
 }
