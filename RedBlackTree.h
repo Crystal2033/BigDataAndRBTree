@@ -959,9 +959,9 @@ void RedBlackTree<TKey, TData>::deleteHook(TKey key, RBNode* node)
 	nullFirstPairField(key);
 	if (comparator->compare(key, node->key) == 0)
 	{
-		
-		*node->data = *node->repeat_keys_nodes->front()->data;
-		delete node->repeat_keys_nodes->front()->data;
+		delete node->data;
+		node->data = node->repeat_keys_nodes->front()->data;
+		//delete node->repeat_keys_nodes->front()->data;
 		node->repeat_keys_nodes->pop_front();
 	}
 	else

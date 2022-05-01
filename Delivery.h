@@ -4,6 +4,7 @@ typedef enum {NAME, CONTENT, WEIGHT, PRICE, DELI_PRICE, SENDER, DEPART, RECIEVER
 class Delivery {
 public:
 	Delivery();
+	Delivery(const Delivery& del);
 	unsigned int hash_code;
 	std::string* name;					// Название груза. names DONE
 	std::string* content;				// Содержимое  contents  DONE
@@ -20,7 +21,7 @@ public:
 	//std::string* send_time;			// Время отправки
 	//std::string* recieve_time;		//Время получения
 	friend std::ostream& operator<<(std::ostream& out, const Delivery& delivery);
-	void operator=(const Delivery& first);
+	//Delivery& operator=(const Delivery& first);
 };
 
 Delivery::Delivery() {
@@ -39,20 +40,27 @@ Delivery::Delivery() {
 	type_of_transport = nullptr;
 }
 
-inline void Delivery::operator=(const Delivery& first)
+inline Delivery::Delivery(const Delivery& del)
 {
-	this->content = first.content;
-	this->deliver_price = first.deliver_price;
-	this->departure_comp = first.departure_comp;
-	this->destination_comp = first.destination_comp;
-	this->name = first.name;
-	this->price = first.price;
-	this->reciever = first.reciever;
-	this->sender = first.sender;
-	this->type_of_transport = first.type_of_transport;
-	this->weight = first.weight;
-
+	*this = del;
 }
+
+//inline Delivery& Delivery::operator=(const Delivery& first)
+//{
+//	this->hash_code = first.hash_code;
+//	this->content = first.content;
+//	this->deliver_price = first.deliver_price;
+//	this->departure_comp = first.departure_comp;
+//	this->destination_comp = first.destination_comp;
+//	this->name = first.name;
+//	this->price = first.price;
+//	this->reciever = first.reciever;
+//	this->sender = first.sender;
+//	this->type_of_transport = first.type_of_transport;
+//	this->weight = first.weight;
+//	return *this;
+//
+//}
 
 std::ostream& operator<<(std::ostream& out, const Delivery& delivery) {
 	out << blue << "HashCode: " << pink << delivery.hash_code << white << std::endl;

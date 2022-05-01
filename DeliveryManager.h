@@ -5,7 +5,7 @@
 #include <string>
 #include "UserFuncsAndCallbacks.h"
 
-typedef enum RequestType {POST, GET, PATCH} REQ_TYPE;
+typedef enum RequestType {POST, GET, PATCH, DEL} REQ_TYPE;
 template <typename TKey, typename TData>
 class DeliveryManager {
 private:
@@ -25,12 +25,12 @@ private:
 	void getUserData();
 	bool wantToChangeData();
 	void makeChanging(Delivery* delivery);
-	void changeByField(const DELITYPES type, Delivery* delivery);
+	void changeByField(const DELITYPES type, Delivery*& delivery);
 	std::list<Delivery*>* findData();
 
 	void removeData();
 	void makeDeleting(Delivery* delivery);
-	bool deleteHook(const DELITYPES type, Delivery* const& delivery);
+	bool deleteHook(const DELITYPES type, Delivery* const& delivery, const REQ_TYPE req_type);
 	Delivery* createUserDelivery(std::string* const& sender_chain = nullptr);
 	void generateData(const int user_choice);
 	const std::string& getStringChoice() const { return comp_str; };
@@ -38,10 +38,11 @@ private:
 	public:
 	int workWithUser(int choice_user);
 	
-	DeliveryManager(Container<TKey, TData>* col, InterfaceGenerator<Delivery>* gen)
+	DeliveryManager(Container<TKey, TData>* col, InterfaceGenerator<Delivery>* gen, CONT_TYPE cont_type)
 	{
 		collection = col;
 		generator = gen;
+		container_type = cont_type;
 	}
 
 	void PrintData(void (*callback)(const TKey&,const TData&, int));
@@ -607,104 +608,145 @@ void DeliveryManager<TKey, TData>::makeChanging(Delivery* delivery)
 	std::cout << *delivery << std::endl;
 }
 template<typename TKey, typename TData>
-void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery* delivery)
+void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*& delivery)
 {
 	bool is_deleted = false;
+	std::string* new_data_field;
+	float new_number;
+	Delivery saved_data(*delivery);
+	DeliGenerator* delivery_gen = reinterpret_cast<DeliGenerator*>(generator);
 	switch (type)
 	{
-		
 		case NAME: //name
 		{
-			is_deleted = deleteHook(type, delivery);
-			delivery->name = getStringInput(type, "name");
+			is_deleted = deleteHook(type, delivery, PATCH);
+			new_data_field = getStringInput(type, "name");
 			if (is_deleted)
 			{
+				delivery = new Delivery(saved_data);
+				delivery->name = new_data_field;
 				addDeliveryInCollection(delivery);
+				return;
 			}
+			delivery->name = new_data_field;
 			break;
 		}
 		case CONTENT: //content
 		{
-			is_deleted = deleteHook(type, delivery);
-			delivery->content = getStringInput(type, "content");
+			is_deleted = deleteHook(type, delivery, PATCH);
+			new_data_field = getStringInput(type, "content");
 			if (is_deleted)
 			{
+				delivery = new Delivery(saved_data);
+				delivery->content = new_data_field;
 				addDeliveryInCollection(delivery);
+				return;
 			}
+			delivery->content = new_data_field;
 			break;
 		}
 		case SENDER: //sender
 		{
-			is_deleted = deleteHook(type, delivery);
-			delivery->sender = getStringInput(type, "sender (from country)");
+			is_deleted = deleteHook(type, delivery, PATCH);
+			new_data_field = getStringInput(type, "sender (from country)");
 			if (is_deleted)
 			{
+				delivery = new Delivery(saved_data);
+				delivery->sender = new_data_field;
 				addDeliveryInCollection(delivery);
+				return;
 			}
+			delivery->sender = new_data_field;
 			break;
 		}
 		case DEPART: //departure point
 		{
-			is_deleted = deleteHook(type, delivery);
-			delivery->departure_comp = getStringInput(type, "departure point (by company)");
+			is_deleted = deleteHook(type, delivery, PATCH);
+			new_data_field = getStringInput(type, "departure point (by company)");
 			if (is_deleted)
 			{
+				delivery = new Delivery(saved_data);
+				delivery->departure_comp = new_data_field;
 				addDeliveryInCollection(delivery);
+				return;
 			}
+			delivery->departure_comp = new_data_field;
 			break;
 		}
 		case RECIEVER: //reciever
 		{
-			is_deleted = deleteHook(type, delivery);
-			delivery->reciever = getStringInput(type, "reciever (to country)");
+			is_deleted = deleteHook(type, delivery, PATCH);
+			new_data_field = getStringInput(type, "reciever (to country)");
 			if (is_deleted)
 			{
+				delivery = new Delivery(saved_data);
+				delivery->reciever = new_data_field;
 				addDeliveryInCollection(delivery);
+				return;
 			}
+			delivery->reciever = new_data_field;
 			break;
 		}
 		case DESTINATION: //destination point
 		{
-			is_deleted = deleteHook(type, delivery);
-			delivery->destination_comp = getStringInput(type, "destination (for company)");
+			is_deleted = deleteHook(type, delivery, PATCH);
+			new_data_field = getStringInput(type, "destination (for company)");
 			if (is_deleted)
 			{
+				delivery = new Delivery(saved_data);
+				delivery->destination_comp = new_data_field;
 				addDeliveryInCollection(delivery);
+				return;
 			}
+			delivery->destination_comp = new_data_field;
 			break;
 		}
 		case TRANSPORT: //type of transport
 		{
-			is_deleted = deleteHook(type, delivery);
-			delivery->type_of_transport = getStringInput(type, "type of transport");
-			DeliGenerator* delivery_gen = reinterpret_cast<DeliGenerator*>(generator);
-			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
+
+			is_deleted = deleteHook(type, delivery, PATCH);
+			new_data_field = getStringInput(type, "type of transport");
+			
 			if (is_deleted)
 			{
+				delivery = new Delivery(saved_data);
+				delivery->type_of_transport = new_data_field;
+				delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
 				addDeliveryInCollection(delivery);
+				return;
 			}
+			delivery->type_of_transport = new_data_field;
+			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
 			break;
 		}
 		case WEIGHT: //weight
 		{
-			is_deleted = deleteHook(type, delivery);
-			delivery->weight = getFloatInput(PATCH, "weight");
-			DeliGenerator* delivery_gen = reinterpret_cast<DeliGenerator*>(generator);
-			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
+			is_deleted = deleteHook(type, delivery, PATCH);
+			new_number = getFloatInput(PATCH, "weight");
+			
 			if (is_deleted)
 			{
+				delivery = new Delivery(saved_data);
+				delivery->weight = new_number;
+				delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
 				addDeliveryInCollection(delivery);
+				return;
 			}
+			delivery->weight = new_number;
+			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
 			break;
 		}
 		case PRICE: //price
 		{
-			is_deleted = deleteHook(type, delivery);
-			delivery->price = getFloatInput(PATCH, "price");
+			is_deleted = deleteHook(type, delivery, PATCH);
+			new_number = getFloatInput(PATCH, "price");
 			if (is_deleted)
 			{
+				delivery = new Delivery(saved_data);
+				delivery->price = new_number;
 				addDeliveryInCollection(delivery);
 			}
+			delivery->price = new_number;
 			break;
 		}
 		case DELI_PRICE: //delivery price
@@ -741,7 +783,7 @@ std::list<Delivery*>* DeliveryManager<std::pair<std::string*, unsigned int>, Del
 
 #pragma region RemoveRequest
 
-bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHook(const DELITYPES type, Delivery* const& delivery)
+bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHook(const DELITYPES type, Delivery* const& delivery, const REQ_TYPE req_type)
 {
 	switch (type)
 	{
@@ -749,8 +791,12 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				collection->remove(std::make_pair(delivery->name, delivery->hash_code));
-				return true;
+				if (!(req_type == PATCH && container_type == QUEUE))
+				{
+					collection->remove(std::make_pair(delivery->name, delivery->hash_code));
+					return true;
+				}
+				
 			}
 			return false;
 		}
@@ -758,8 +804,11 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				collection->remove(std::make_pair(delivery->content, delivery->hash_code));
-				return true;
+				if (!(req_type == PATCH && container_type == QUEUE))
+				{
+					collection->remove(std::make_pair(delivery->content, delivery->hash_code));
+					return true;
+				}
 			}
 			return false;
 		}
@@ -767,8 +816,11 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				collection->remove(std::make_pair(delivery->sender, delivery->hash_code));
-				return true;
+				if (!(req_type == PATCH && container_type == QUEUE))
+				{
+					collection->remove(std::make_pair(delivery->sender, delivery->hash_code));
+					return true;
+				}
 			}
 			return false;
 		}
@@ -776,8 +828,11 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				collection->remove(std::make_pair(delivery->departure_comp, delivery->hash_code));
-				return true;
+				if (!(req_type == PATCH && container_type == QUEUE))
+				{
+					collection->remove(std::make_pair(delivery->departure_comp, delivery->hash_code));
+					return true;
+				}
 			}
 			return false;
 		}
@@ -785,8 +840,11 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				collection->remove(std::make_pair(delivery->reciever, delivery->hash_code));
-				return true;
+				if (!(req_type == PATCH && container_type == QUEUE))
+				{
+					collection->remove(std::make_pair(delivery->reciever, delivery->hash_code));
+					return true;
+				}
 			}
 			return false;
 		}
@@ -794,8 +852,11 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				collection->remove(std::make_pair(delivery->destination_comp, delivery->hash_code));
-				return true;
+				if (!(req_type == PATCH && container_type == QUEUE))
+				{
+					collection->remove(std::make_pair(delivery->destination_comp, delivery->hash_code));
+					return true;
+				}
 			}
 			return false;
 		}
@@ -803,8 +864,11 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				collection->remove(std::make_pair(delivery->type_of_transport, delivery->hash_code));
-				return true;
+				if (!(req_type == PATCH && container_type == QUEUE))
+				{
+					collection->remove(std::make_pair(delivery->type_of_transport, delivery->hash_code));
+					return true;
+				}
 			}
 			return false;
 		}
@@ -812,7 +876,7 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 	return false;
 }
 
-bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(const DELITYPES type, Delivery* const& delivery)
+bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(const DELITYPES type, Delivery* const& delivery, const REQ_TYPE req_type)
 {
 	switch (type)
 	{
@@ -820,8 +884,11 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 		{
 			if (type == comp_type || comp_type == DELI_PRICE) //deli_price формируется из веса +  вид транспорта.
 			{
-				collection->remove(std::make_pair(delivery->weight, delivery->hash_code));
-				return true;
+				if (!(req_type == PATCH && container_type == QUEUE))
+				{
+					collection->remove(std::make_pair(delivery->weight, delivery->hash_code));
+					return true;
+				}
 			}
 			return false;
 		}
@@ -829,8 +896,11 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 		{
 			if (type == comp_type)
 			{
-				collection->remove(std::make_pair(delivery->price, delivery->hash_code));
-				return true;
+				if (!(req_type == PATCH && container_type == QUEUE))
+				{
+					collection->remove(std::make_pair(delivery->price, delivery->hash_code));
+					return true;
+				}
 			}
 			return false;
 		}
@@ -838,8 +908,11 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 		{
 			if (comp_type == DELI_PRICE)
 			{
-				collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
-				return true;
+				if (!(req_type == PATCH && container_type == QUEUE))
+				{
+					collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
+					return true;
+				}
 			}
 			return false;
 		}
@@ -870,7 +943,7 @@ void DeliveryManager<TKey, TData>::removeData()
 		if (found_data->size() == 1)
 		{
 			actual_delivery = found_data->back();
-			deleteHook(comp_type, actual_delivery);
+			deleteHook(comp_type, actual_delivery, DEL);
 		}
 		else //find by HASH
 		{
@@ -894,7 +967,7 @@ void DeliveryManager<TKey, TData>::removeData()
 					continue;
 				}
 				actual_delivery = *iter;
-				deleteHook(comp_type, actual_delivery);
+				deleteHook(comp_type, actual_delivery, DEL);
 				break;
 			}
 		}
