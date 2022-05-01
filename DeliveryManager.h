@@ -32,6 +32,7 @@ private:
 	void changeByField(const DELITYPES type, Delivery* delivery);
 	std::list<Delivery*>* findData();
 	void removeData();
+	bool deleteHook(const DELITYPES type, Delivery* const& delivery);
 	Delivery* createUserDelivery(std::string* const& sender_chain=nullptr) ;
 	
 	DeliveryManager(Container<TKey, TData>* col, InterfaceGenerator<Delivery>* gen)
@@ -596,6 +597,7 @@ void DeliveryManager<TKey, TData>::makeChanging(Delivery* delivery)
 	chooseFieldPrint();
 	choice_number = userChoice(1, 10);
 	DELITYPES type = setChoiceGetType(choice_number, PATCH);
+	
 	changeByField(type, delivery);
 	std::cout << green << "Data changed!" << white << std::endl;
 	std::cout << *delivery << std::endl;
@@ -603,53 +605,102 @@ void DeliveryManager<TKey, TData>::makeChanging(Delivery* delivery)
 template<typename TKey, typename TData>
 void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery* delivery)
 {
+	bool is_deleted = false;
 	switch (type)
 	{
+		
 		case NAME: //name
 		{
+			is_deleted = deleteHook(type, delivery);
 			delivery->name = getStringInput(type, "name");
+			if (is_deleted)
+			{
+				addDeliveryInCollection(delivery);
+			}
 			break;
 		}
 		case CONTENT: //content
 		{
+			is_deleted = deleteHook(type, delivery);
 			delivery->content = getStringInput(type, "content");
+			if (is_deleted)
+			{
+				addDeliveryInCollection(delivery);
+			}
 			break;
 		}
 		case SENDER: //sender
 		{
+			is_deleted = deleteHook(type, delivery);
 			delivery->sender = getStringInput(type, "sender (from country)");
+			if (is_deleted)
+			{
+				addDeliveryInCollection(delivery);
+			}
 			break;
 		}
 		case DEPART: //departure point
 		{
+			is_deleted = deleteHook(type, delivery);
 			delivery->departure_comp = getStringInput(type, "departure point (by company)");
+			if (is_deleted)
+			{
+				addDeliveryInCollection(delivery);
+			}
 			break;
 		}
 		case RECIEVER: //reciever
 		{
+			is_deleted = deleteHook(type, delivery);
 			delivery->reciever = getStringInput(type, "reciever (to country)");
+			if (is_deleted)
+			{
+				addDeliveryInCollection(delivery);
+			}
 			break;
 		}
 		case DESTINATION: //destination point
 		{
+			is_deleted = deleteHook(type, delivery);
 			delivery->destination_comp = getStringInput(type, "destination (for company)");
+			if (is_deleted)
+			{
+				addDeliveryInCollection(delivery);
+			}
 			break;
 		}
 		case TRANSPORT: //type of transport
 		{
+			is_deleted = deleteHook(type, delivery);
 			delivery->type_of_transport = getStringInput(type, "type of transport");
 			DeliGenerator* delivery_gen = reinterpret_cast<DeliGenerator*>(generator);
 			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
+			if (is_deleted)
+			{
+				addDeliveryInCollection(delivery);
+			}
 			break;
 		}
 		case WEIGHT: //weight
 		{
+			is_deleted = deleteHook(type, delivery);
 			delivery->weight = getFloatInput(PATCH, "weight");
+			DeliGenerator* delivery_gen = reinterpret_cast<DeliGenerator*>(generator);
+			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
+			if (is_deleted)
+			{
+				addDeliveryInCollection(delivery);
+			}
 			break;
 		}
 		case PRICE: //price
 		{
+			is_deleted = deleteHook(type, delivery);
 			delivery->price = getFloatInput(PATCH, "price");
+			if (is_deleted)
+			{
+				addDeliveryInCollection(delivery);
+			}
 			break;
 		}
 		case DELI_PRICE: //delivery price
@@ -658,6 +709,7 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 			break;
 		}
 	}
+	
 }
 #pragma endregion
 
@@ -688,6 +740,103 @@ std::list<Delivery*>* DeliveryManager<std::pair<std::string*, unsigned int>, Del
 void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::removeData()
 {
 
+}
+
+
+bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHook(const DELITYPES type, Delivery* const& delivery)
+{
+	switch (type)
+	{
+		case NAME: //name
+		{
+			if (type == comp_type)
+			{
+				
+				collection->remove(std::make_pair(delivery->name, delivery->hash_code));
+				return true;
+			}
+			return false;
+		}
+		case CONTENT: //content
+		{
+			if (type == comp_type)
+			{
+				collection->remove(std::make_pair(delivery->content, delivery->hash_code));
+				return true;
+			}
+			return false;
+		}
+		case SENDER: //sender
+		{
+			if (type == comp_type)
+			{
+				collection->remove(std::make_pair(delivery->sender, delivery->hash_code));
+				return true;
+			}
+			return false;
+		}
+		case DEPART: //departure point
+		{
+			if (type == comp_type)
+			{
+				collection->remove(std::make_pair(delivery->departure_comp, delivery->hash_code));
+				return true;
+			}
+			return false;
+		}
+		case RECIEVER: //reciever
+		{
+			if (type == comp_type)
+			{
+				collection->remove(std::make_pair(delivery->reciever, delivery->hash_code));
+				return true;
+			}
+			return false;
+		}
+		case DESTINATION: //destination point
+		{
+			if (type == comp_type)
+			{
+				collection->remove(std::make_pair(delivery->destination_comp, delivery->hash_code));
+				return true;
+			}
+			return false;
+		}
+	}
+}
+
+bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(const DELITYPES type, Delivery* const& delivery)
+{
+	switch (type)
+	{
+		case WEIGHT: //weight
+		{
+			if (type == comp_type || type == DELI_PRICE) //deli_price формируется из веса +  вид транспорта.
+			{
+				collection->remove(std::make_pair(delivery->weight, delivery->hash_code));
+				return true;
+			}
+			return false;
+		}
+		case PRICE: //price
+		{
+			if (type == comp_type)
+			{
+				collection->remove(std::make_pair(delivery->price, delivery->hash_code));
+				return true;
+			}
+			return false;
+		}
+		case TRANSPORT:
+		{
+			if (type == DELI_PRICE)
+			{
+				collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
+				return true;
+			}
+			return false;
+		}
+	}
 }
 
 
