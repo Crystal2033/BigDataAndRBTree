@@ -59,6 +59,7 @@ void Queue<TKey, TData>::remove(const TKey& key_pair){
 		}
 		new_queue->push(check_data_ptr);	
 	}
+
 	deleteHook(key_pair, found_data_list);
 	for (auto iter = found_data_list.begin(); iter != found_data_list.end(); iter++)
 	{
@@ -87,8 +88,9 @@ void Queue<TKey, TData>::deleteHook(TKey key, std::list<std::pair<TKey, TData>>&
 	{
 		if (comparator->compare(key, iter->first) == 0)
 		{
-			list.erase(iter);
 			delete iter->second;
+			list.erase(iter);
+			break;
 		}
 	}
 

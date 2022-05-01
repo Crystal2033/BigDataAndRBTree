@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 			{
 				Comparator<std::pair<float, unsigned int>>* comparator = new ComparatorPairFloat(INCREASE);
 				RedBlackTree<std::pair<float, unsigned int>, Delivery*>* tree = new RedBlackTree<std::pair<float, unsigned int>, Delivery*>(comparator);
-				DeliveryManager< std::pair<float, unsigned int>, Delivery*> manager(tree, generator, RBTREE);
+				DeliveryManager< std::pair<float, unsigned int>, Delivery*> manager(tree, generator);
 				manager.workWithUser(choice_number);
 				delete tree;
 				delete comparator;
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 			{
 				Comparator<std::pair<std::string*, unsigned int>>* comparator = new ComparatorPairStr(INCREASE);
 				RedBlackTree<std::pair<std::string*, unsigned int>, Delivery*>* tree = new RedBlackTree<std::pair<std::string*, unsigned int>, Delivery*>(comparator);
-				DeliveryManager< std::pair<std::string*, unsigned int>, Delivery*> manager(tree, generator, RBTREE);
+				DeliveryManager< std::pair<std::string*, unsigned int>, Delivery*> manager(tree, generator);
 				manager.workWithUser(choice_number);
 				delete tree;
 				delete comparator;
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 			{
 				Comparator<std::pair<float, unsigned int>>* comparator = new ComparatorPairFloat(INCREASE);
 				Queue<std::pair<float, unsigned int>, Delivery*>* queue = new Queue<std::pair<float, unsigned int>, Delivery*>(comparator);
-				DeliveryManager< std::pair<float, unsigned int>, Delivery*> manager(queue, generator, QUEUE);
+				DeliveryManager< std::pair<float, unsigned int>, Delivery*> manager(queue, generator);
 				manager.workWithUser(choice_number);
 				delete queue;
 				delete comparator;
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 			{
 				Comparator<std::pair<std::string*, unsigned int>>* comparator = new ComparatorPairStr(INCREASE);
 				Queue<std::pair<std::string*, unsigned int>, Delivery*>* queue = new Queue<std::pair<std::string*, unsigned int>, Delivery*>(comparator);
-				DeliveryManager< std::pair<std::string*, unsigned int>, Delivery*> manager(queue, generator, QUEUE);
+				DeliveryManager< std::pair<std::string*, unsigned int>, Delivery*> manager(queue, generator);
 				manager.workWithUser(choice_number);
 				delete queue;
 				delete comparator;
