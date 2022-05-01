@@ -4,6 +4,7 @@
 #include <chrono>
 #include <string>
 #include "UserFuncsAndCallbacks.h"
+
 typedef enum RequestType {POST, GET, PATCH} REQ_TYPE;
 template <typename TKey, typename TData>
 class DeliveryManager {
@@ -408,7 +409,7 @@ void DeliveryManager<TKey, TData>::generateData(const int cmp_choice)
 	setChoiceGetType(cmp_choice, POST);
 	auto begin = std::chrono::steady_clock::now();
 
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < DATA_SIZE; i++)
 	{
 		deliveries = &generator->generateData();
 
@@ -747,7 +748,6 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				
 				collection->remove(std::make_pair(delivery->name, delivery->hash_code));
 				return true;
 			}
@@ -798,7 +798,17 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 			}
 			return false;
 		}
+		case TRANSPORT:
+		{
+			if (type == comp_type)
+			{
+				collection->remove(std::make_pair(delivery->type_of_transport, delivery->hash_code));
+				return true;
+			}
+			return false;
+		}
 	}
+	return false;
 }
 
 bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(const DELITYPES type, Delivery* const& delivery)
@@ -807,7 +817,7 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 	{
 		case WEIGHT: //weight
 		{
-			if (type == comp_type || type == DELI_PRICE) //deli_price формируется из веса +  вид транспорта.
+			if (type == comp_type || comp_type == DELI_PRICE) //deli_price формируется из веса +  вид транспорта.
 			{
 				collection->remove(std::make_pair(delivery->weight, delivery->hash_code));
 				return true;
@@ -825,7 +835,7 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 		}
 		case TRANSPORT:
 		{
-			if (type == DELI_PRICE)
+			if (comp_type == DELI_PRICE)
 			{
 				collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
 				return true;
@@ -833,6 +843,7 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 			return false;
 		}
 	}
+	return false;
 }
 
 template<typename TKey, typename TData>
