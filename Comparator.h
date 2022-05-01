@@ -258,7 +258,19 @@ public:
 
 int ComparatorPairFloat::compare(const std::pair<float, unsigned int>& left, const std::pair<float, unsigned int>& right) const
 {
-	if (left.first > 0 && right.second > 0) //it means comparator by keys.
+	if ((left.first < 0 || right.first < 0 ) && left.second != 0 && right.second != 0)
+	{// in remove hook case. Where we are set nullptr.
+		if (left.second > right.second)
+		{
+			return (compare_status == INCREASE) ? 1 : -1;
+		}
+		else if (left.second == right.second)
+		{
+			return 0;
+		}
+		else return (compare_status == DECREASE) ? 1 : -1;
+	}
+	else if (left.first > 0 && right.second > 0) //it means comparator by keys.
 	{
 		float epsilone = 0.001;
 		if (left.first - right.first > epsilone)

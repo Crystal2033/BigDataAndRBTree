@@ -31,7 +31,9 @@ private:
 	void makeChanging(Delivery* delivery);
 	void changeByField(const DELITYPES type, Delivery* delivery);
 	std::list<Delivery*>* findData();
+
 	void removeData();
+	void makeDeleting(Delivery* delivery);
 	bool deleteHook(const DELITYPES type, Delivery* const& delivery);
 	Delivery* createUserDelivery(std::string* const& sender_chain=nullptr) ;
 	
@@ -232,11 +234,11 @@ float DeliveryManager<TKey, TData>::getFloatInput(REQ_TYPE req_type, const std::
 		number_str.clear();
 		if (req_type == POST || req_type == PATCH)
 		{
-			std::cout << blue << "Please, input data in " << yellow << request_str << blue << " field: (example: 123.45)" << white << std::endl << "> ";
+			std::cout << blue << "Please, input data in " << yellow << request_str << blue << " field: (example: 123,456)" << white << std::endl << "> ";
 		}
 		else if (req_type == GET)
 		{
-			std::cout << blue << "Please, input data which you want to find, comparator is a " << yellow << request_str << blue << " field: (example: 123.45)" << white << std::endl << "> ";
+			std::cout << blue << "Please, input data which you want to find, comparator is a " << yellow << request_str << blue << " field: (example: 123,456)" << white << std::endl << "> ";
 		}
 		std::cin.clear();
 		std::getline(std::cin, number_str);
@@ -245,9 +247,9 @@ float DeliveryManager<TKey, TData>::getFloatInput(REQ_TYPE req_type, const std::
 		{
 
 			curr_char = number_str[i];
-			if (isdigit(curr_char) || curr_char == '.')
+			if (isdigit(curr_char) || curr_char == ',')
 			{
-				if (curr_char == '.')
+				if (curr_char == ',')
 				{
 					dot_counter++;
 				}
@@ -260,21 +262,21 @@ float DeliveryManager<TKey, TData>::getFloatInput(REQ_TYPE req_type, const std::
 		}
 		if (dot_counter > 1 || number_err)
 		{
-			std::cout << red << "You have to input float number (example 123.45). Please try again." << white << std::endl;
+			std::cout << red << "You have to input float number (example 123,45). Please try again." << white << std::endl;
 			continue;
 		}
 		try
 		{
-			number = std::stof(number_str.c_str());
+			number = std::stof(number_str);
 		}
 		catch (std::invalid_argument)
 		{
-			std::cout << red << "You have to input float number (example 123.45). Please try again." << white << std::endl;
+			std::cout << red << "You have to input float number (example 123,45). Please try again." << white << std::endl;
 			continue;
 		}
 		catch (std::out_of_range)
 		{
-			std::cout << red << "You have to input not big float number (example 123.45). Please try again." << white << std::endl;
+			std::cout << red << "You have to input not big float number (example 123,45). Please try again." << white << std::endl;
 			continue;
 		}
 		break;
@@ -737,12 +739,6 @@ std::list<Delivery*>* DeliveryManager<std::pair<std::string*, unsigned int>, Del
 
 #pragma region RemoveRequest
 
-void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::removeData()
-{
-
-}
-
-
 bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHook(const DELITYPES type, Delivery* const& delivery)
 {
 	switch (type)
@@ -839,10 +835,76 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 	}
 }
 
-
-void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::removeData()
+template<typename TKey, typename TData>
+void DeliveryManager<TKey, TData>::removeData()
 {
+	std::cout << cyan << "You have to find data before deleting." << white << std::endl;
+	std::list<Delivery*>* found_data = findData();
+	if (found_data->size() == 0)
+	{
+		std::cout << red << "Not found information by your search request." << white << std::endl;
+	}
+	else
+	{
+		std::cout << cyan << "Was found: " << green << found_data->size() << cyan << " deliveries." << white << std::endl;
+		for (auto it = found_data->begin(); it != found_data->end(); it++)
+		{
+			std::cout << **it << std::endl;
+		}
 
+		int choice_number;
+		DELITYPES type;
+		Delivery* actual_delivery;
+		if (found_data->size() == 1)
+		{
+			actual_delivery = found_data->back();
+			deleteHook(comp_type, actual_delivery);
+		}
+		else //find by HASH
+		{
+			unsigned int hash_value;
+			std::list<Delivery*>::iterator iter;
+			std::cout << cyan << "Was found: " << green << found_data->size() << cyan << " deliveries." << white << std::endl;
+			while (true)
+			{
+				hash_value = getHashInput();
+
+				for (iter = found_data->begin(); iter != found_data->end(); iter++)
+				{
+					if ((*iter)->hash_code == hash_value)
+					{
+						break;
+					}
+				}
+				if (iter == found_data->end())
+				{
+					std::cout << red << "Hash was not found by your search request." << white << std::endl;
+					continue;
+				}
+				actual_delivery = *iter;
+				deleteHook(comp_type, actual_delivery);
+				break;
+			}
+		}
+		
+		std::cout << green << "Delivery successfully deleted." << white << std::endl;
+		std::cout << *actual_delivery << std::endl;
+		delete actual_delivery;
+	}
+	delete found_data;
+}
+template<typename TKey, typename TData>
+void DeliveryManager<TKey, TData>::makeDeleting(Delivery* delivery)
+{
+	int choice_number;
+	std::cout << cyan << "Choose field to change data:" << white << std::endl;
+	chooseFieldPrint();
+	choice_number = userChoice(1, 10);
+	DELITYPES type = setChoiceGetType(choice_number, PATCH);
+
+	changeByField(type, delivery);
+	std::cout << green << "Data changed!" << white << std::endl;
+	std::cout << *delivery << std::endl;
 }
 #pragma endregion
 

@@ -87,9 +87,11 @@ void RedBlackTree<TKey, TData>::clean_tree(RedBlackTree<TKey, TData>::RBNode* no
 		{
 			for (auto iter = node_ptr->repeat_keys_nodes->begin(); iter != node_ptr->repeat_keys_nodes->end(); iter++)
 			{
+				delete (*iter)->data;
 				delete *iter;
 			}
 		}
+		delete node_ptr->data;
 		delete node_ptr;
 	}
 }
