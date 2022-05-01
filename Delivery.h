@@ -20,6 +20,7 @@ public:
 	//std::string* send_time;			// Время отправки
 	//std::string* recieve_time;		//Время получения
 	friend std::ostream& operator<<(std::ostream& out, const Delivery& delivery);
+	void operator=(const Delivery& first);
 };
 
 Delivery::Delivery() {
@@ -36,6 +37,21 @@ Delivery::Delivery() {
 	destination_comp = nullptr; 
 	//Time dest_time;
 	type_of_transport = nullptr;
+}
+
+inline void Delivery::operator=(const Delivery& first)
+{
+	this->content = first.content;
+	this->deliver_price = first.deliver_price;
+	this->departure_comp = first.departure_comp;
+	this->destination_comp = first.destination_comp;
+	this->name = first.name;
+	this->price = first.price;
+	this->reciever = first.reciever;
+	this->sender = first.sender;
+	this->type_of_transport = first.type_of_transport;
+	this->weight = first.weight;
+
 }
 
 std::ostream& operator<<(std::ostream& out, const Delivery& delivery) {

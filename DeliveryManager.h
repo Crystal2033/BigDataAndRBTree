@@ -899,8 +899,8 @@ void DeliveryManager<TKey, TData>::removeData()
 		}
 		
 		std::cout << green << "Delivery successfully deleted." << white << std::endl;
-		std::cout << *actual_delivery << std::endl;
-		delete actual_delivery;
+		/*std::cout << *actual_delivery << std::endl;*/
+		//delete actual_delivery;
 	}
 	delete found_data;
 }
