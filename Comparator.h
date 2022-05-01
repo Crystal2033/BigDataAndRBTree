@@ -197,12 +197,24 @@ int ComparatorPairStr::compare(const std::pair<std::string*, unsigned int>& left
 		return 0;
 	}
 	else return (compare_status == DECREASE) ? 1 : -1;*/
-	if (left.first == nullptr || right.first == nullptr)
+	if ((left.first == nullptr || right.first == nullptr) && (left.second == 0 && right.second == 0))
 	{
 		throw ComparatorNullException("Trying to unpointer nullptr.");
 	}
 
-	if (left.first->size() != 0 && right.first->size() != 0) //it means comparator by keys.
+	if ((left.first == nullptr || right.first == nullptr) && left.second != 0 && right.second != 0)
+	{// in remove hook case. Where we are set nullptr.
+		if (left.second > right.second)
+		{
+			return (compare_status == INCREASE) ? 1 : -1;
+		}
+		else if (left.second == right.second)
+		{
+			return 0;
+		}
+		else return (compare_status == DECREASE) ? 1 : -1;
+	}
+	else if ((left.first->size() != 0 && right.first->size() != 0)) //it means comparator by keys.
 	{
 		if (*left.first > * right.first)
 		{
@@ -226,6 +238,10 @@ int ComparatorPairStr::compare(const std::pair<std::string*, unsigned int>& left
 		}
 		else return (compare_status == DECREASE) ? 1 : -1;
 	}
+	
+
+	std::cout << "Need to check better" << std::endl;
+	
 }
 
 #pragma endregion

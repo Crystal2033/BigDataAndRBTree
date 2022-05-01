@@ -5,6 +5,7 @@
 #include <cctype>
 #include "DeliveryManager.h"
 #include "Factory.h"
+#include <locale>
 #define FLOAT_DATA_START 2
 #define FLOAT_DATA_END 6
 #define FIRST_STR_DATA_END 3
@@ -12,6 +13,7 @@
 
 int main(int argc, char* argv[])
 {
+	setlocale(LC_ALL, "Russian");
 	InterfaceFactory<Delivery>* factory = new DeliGeneratorFactory;
 	InterfaceGenerator<Delivery>* generator = factory->createGenerator();
 	int choice_number;

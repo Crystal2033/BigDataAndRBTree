@@ -2,6 +2,7 @@
 #include "Container.h"
 #include "Comparator.h"
 #include "Exceptions.h"
+#include "Delivery.h"
 #include <stack>
 #include<list>
 typedef enum {RED, BLACK} COLOR;
@@ -45,6 +46,16 @@ private:
 	void postfix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth = 0) const;
 
 	void clean_tree(typename RedBlackTree<TKey, TData>::RBNode* node_ptr);
+
+	
+	void nullFirstPairField(std::pair<std::string*, unsigned int>& key);
+	void nullFirstPairField(std::pair<float, unsigned int>& key);
+
+	void deleteHook(TKey key, RBNode* node);
+	//void deleteHook(std::pair<float, unsigned int> key, RBNode* node);
+
+	//void deleteHook(std::pair<float, unsigned int> key, RBNode* node);
+	//void deleteHook(TKey key, RBNode* node);
 public:
 	RedBlackTree(Comparator<TKey>* const &);
 	void add(const TKey&, const TData&) override;
@@ -471,8 +482,8 @@ void RedBlackTree<TKey, TData>::remove(const TKey& key) //like Kormen
 		rb_delete(node_for_delete, way);
 	}
 	else {
-		std::cout << red <<"DELETING REPEATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-		node_for_delete->repeat_keys_nodes->pop_front();
+		//std::cout << red <<"DELETING REPEATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << white << std::endl;
+		deleteHook(key, node_for_delete);
 	}
 }
 
@@ -927,3 +938,40 @@ void RedBlackTree<TKey, TData>::postfix_stepover_tree(void(*call_back)(const TKe
 }
 
 #pragma endregion
+
+
+template<typename TKey, typename TData>
+inline void RedBlackTree<TKey, TData>::nullFirstPairField(std::pair<std::string*, unsigned int>& key)
+{
+	key.first = nullptr;
+}
+
+template<typename TKey, typename TData>
+inline void RedBlackTree<TKey, TData>::nullFirstPairField(std::pair<float, unsigned int>& key)
+{
+	key.first = -1;
+}
+
+template <typename TKey, typename TData>
+void RedBlackTree<TKey, TData>::deleteHook(TKey key, RBNode* node)
+{
+	nullFirstPairField(key);
+	if (comparator->compare(key, node->key) == 0)
+	{
+		node->data = node->repeat_keys_nodes->front()->data;
+		node->repeat_keys_nodes->pop_front();
+		//надо удалить это. Перенести элемент из списка в нодуы
+	}
+	else
+	{
+		for (auto iter = node->repeat_keys_nodes->begin(); iter != node->repeat_keys_nodes->end(); iter++)
+		{
+			if (comparator->compare(key, (*iter)->key) == 0)
+			{
+				node->repeat_keys_nodes->erase(iter);
+				return;
+			}
+		}
+	}
+}
+

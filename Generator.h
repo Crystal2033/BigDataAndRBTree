@@ -7,7 +7,7 @@
 #include <boost/functional/hash.hpp>
 #include "DataPool.h"
 #define WEIGHT_FREE_LIMIT 1000
-#define WEIGHT_FINE 0.1
+#define WEIGHT_FINE 0.5
 
 #define CAR_FINE 1
 #define PLANE_FINE 2
@@ -99,7 +99,7 @@ Delivery& DeliGenerator::startChain() const {
 float DeliGenerator::get_delivery_price(const Delivery& delivery) const {
 	const float start_delivery_price = 200.0;
 	float total_delivery_price = start_delivery_price;
-	if (delivery.weight > WEIGHT_FREE_LIMIT) {
+	if (delivery.weight < WEIGHT_FREE_LIMIT) {
 		total_delivery_price += start_delivery_price * WEIGHT_FINE;
 	}
 
