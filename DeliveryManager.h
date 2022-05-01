@@ -24,7 +24,7 @@ private:
 	void addData();
 	void getUserData();
 	bool wantToChangeData();
-	void makeChanging(Delivery* delivery);
+	void makeChanging(Delivery*& delivery);
 	void changeByField(const DELITYPES type, Delivery*& delivery);
 	std::list<Delivery*>* findData();
 
@@ -531,7 +531,7 @@ void DeliveryManager<TKey, TData>::getUserData()
 			else //find by HASH
 			{
 				unsigned int hash_value;
-				Delivery* actual_delivery;
+				Delivery* actual_delivery = nullptr;
 				std::list<Delivery*>::iterator iter;
 				std::cout << cyan << "Was found: " << green << found_data->size() << cyan << " deliveries." << white << std::endl;
 				while (true)
@@ -542,15 +542,18 @@ void DeliveryManager<TKey, TData>::getUserData()
 					{
 						if ((*iter)->hash_code == hash_value)
 						{
+							actual_delivery = *iter;
+							found_data->erase(iter);
 							break;
 						}
 					}
-					if (iter == found_data->end())
+					if (actual_delivery == nullptr)
 					{
 						std::cout << red << "Hash was not found by your search request." << white << std::endl;
 						continue;
 					}
-					makeChanging(*iter);
+					makeChanging(actual_delivery);
+					found_data->push_back(actual_delivery);
 					break;
 				}
 			}
@@ -595,7 +598,7 @@ bool DeliveryManager<TKey, TData>::wantToChangeData()
 	}
 }
 template<typename TKey, typename TData>
-void DeliveryManager<TKey, TData>::makeChanging(Delivery* delivery)
+void DeliveryManager<TKey, TData>::makeChanging(Delivery*& delivery)
 {
 	int choice_number;
 	std::cout << cyan << "Choose field to change data:" << white << std::endl;
@@ -939,7 +942,7 @@ void DeliveryManager<TKey, TData>::removeData()
 
 		int choice_number;
 		DELITYPES type;
-		Delivery* actual_delivery;
+		Delivery* actual_delivery = nullptr;
 		if (found_data->size() == 1)
 		{
 			actual_delivery = found_data->back();
@@ -958,15 +961,17 @@ void DeliveryManager<TKey, TData>::removeData()
 				{
 					if ((*iter)->hash_code == hash_value)
 					{
+						actual_delivery = *iter;
+						found_data->erase(iter);
 						break;
 					}
 				}
-				if (iter == found_data->end())
+				if (actual_delivery == nullptr)
 				{
 					std::cout << red << "Hash was not found by your search request." << white << std::endl;
 					continue;
 				}
-				actual_delivery = *iter;
+				
 				deleteHook(comp_type, actual_delivery, DEL);
 				break;
 			}

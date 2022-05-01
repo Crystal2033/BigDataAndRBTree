@@ -961,6 +961,7 @@ void RedBlackTree<TKey, TData>::deleteHook(TKey key, RBNode* node)
 	{
 		delete node->data;
 		node->data = node->repeat_keys_nodes->front()->data;
+		node->key = node->repeat_keys_nodes->front()->key;
 		//delete node->repeat_keys_nodes->front()->data;
 		node->repeat_keys_nodes->pop_front();
 	}
