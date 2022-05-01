@@ -57,6 +57,25 @@ int main(int argc, char* argv[])
 			std::cout << green << "Queue was chosen." << white << std::endl;
 			chooseFieldPrint();
 			choice_number = userChoice(1, 10);
+			if (choice_number > FLOAT_DATA_START && choice_number < FLOAT_DATA_END) //float comparator
+			{
+				Comparator<std::pair<float, unsigned int>>* comparator = new ComparatorPairFloat(INCREASE);
+				Queue<std::pair<float, unsigned int>, Delivery*>* queue = new Queue<std::pair<float, unsigned int>, Delivery*>(comparator);
+				DeliveryManager< std::pair<float, unsigned int>, Delivery*> manager(queue, generator);
+				manager.workWithUser(choice_number);
+				delete queue;
+				delete comparator;
+			}
+			else if (choice_number < FIRST_STR_DATA_END || choice_number > SECOND_STR_DATA_START) //string comparator
+			{
+				Comparator<std::pair<std::string*, unsigned int>>* comparator = new ComparatorPairStr(INCREASE);
+				Queue<std::pair<std::string*, unsigned int>, Delivery*>* queue = new Queue<std::pair<std::string*, unsigned int>, Delivery*>(comparator);
+				DeliveryManager< std::pair<std::string*, unsigned int>, Delivery*> manager(queue, generator);
+				manager.workWithUser(choice_number);
+				delete queue;
+				delete comparator;
+
+			}
 
 		}
 			

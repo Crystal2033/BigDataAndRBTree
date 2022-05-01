@@ -6,7 +6,7 @@
 #include <math.h>
 #include <boost/functional/hash.hpp>
 #include "DataPool.h"
-#define DATA_SIZE 5000
+#define DATA_SIZE 20
 
 #define WEIGHT_FREE_LIMIT 1000
 #define WEIGHT_FINE 0.5

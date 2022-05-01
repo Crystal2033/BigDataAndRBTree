@@ -13,6 +13,7 @@ private:
 	InterfaceGenerator<Delivery>* generator;
 	std::string comp_str;
 	DELITYPES comp_type;
+	CONT_TYPE container_type; // нужно для deleteHook, чтобы из очереди при поиске и смене поля компаратора не удалялась доставка.
 	DELITYPES setChoiceGetType(const int choice_num, RequestType req_type=POST);
 	std::string* getStringInput(DELITYPES type, const std::string& request_str);
 	unsigned int getHashInput();
@@ -899,8 +900,7 @@ void DeliveryManager<TKey, TData>::removeData()
 		}
 		
 		std::cout << green << "Delivery successfully deleted." << white << std::endl;
-		/*std::cout << *actual_delivery << std::endl;*/
-		//delete actual_delivery;
+
 	}
 	delete found_data;
 }
