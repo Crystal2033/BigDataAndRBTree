@@ -95,7 +95,8 @@ void Queue<TKey, TData>::printByBegin(void(*call_back)(const TKey&, const TData&
 	TKey* check_data_ptr;
 	while (!queue->empty())
 	{
-		check_data_ptr = &(queue->front());
+		check_data_ptr = &(queue->back());
+		call_back(check_data_ptr);
 		new_queue->push(*check_data_ptr);
 		queue->pop();
 	}

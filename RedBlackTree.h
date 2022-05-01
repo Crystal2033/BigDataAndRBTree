@@ -468,7 +468,7 @@ std::pair<typename RedBlackTree<TKey, TData>::RBNode*, typename RedBlackTree<TKe
 template <typename TKey, typename TData>
 void RedBlackTree<TKey, TData>::remove(const TKey& key) //like Kormen
 {
-	//std::cout << purple << key << white << std::endl;
+
 	if (root == nullptr){
 		throw KeyNotFoundException<TKey>("Key wasn`t found. Tree is empty.", key);
 	}
@@ -484,7 +484,6 @@ void RedBlackTree<TKey, TData>::remove(const TKey& key) //like Kormen
 		rb_delete(node_for_delete, way);
 	}
 	else {
-		//std::cout << red <<"DELETING REPEATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << white << std::endl;
 		deleteHook(key, node_for_delete);
 	}
 }
@@ -962,7 +961,6 @@ void RedBlackTree<TKey, TData>::deleteHook(TKey key, RBNode* node)
 	{
 		node->data = node->repeat_keys_nodes->front()->data;
 		node->repeat_keys_nodes->pop_front();
-		//надо удалить это. Перенести элемент из списка в нодуы
 	}
 	else
 	{

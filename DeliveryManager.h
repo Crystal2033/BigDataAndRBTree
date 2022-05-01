@@ -20,12 +20,6 @@ private:
 
 	float getFloatInput(REQ_TYPE type, const std::string& request_str);
 	void addDeliveryInCollection(Delivery*& delivery);
-
-	/////////////////////////////////PUBLIC////////////////////////////////////
-	public:
-	void generateData(const int user_choice);
-	const std::string& getStringChoice() const { return comp_str; };
-	int workWithUser(int choice_user);
 	void addData();
 	void getUserData();
 	bool wantToChangeData();
@@ -36,7 +30,12 @@ private:
 	void removeData();
 	void makeDeleting(Delivery* delivery);
 	bool deleteHook(const DELITYPES type, Delivery* const& delivery);
-	Delivery* createUserDelivery(std::string* const& sender_chain=nullptr) ;
+	Delivery* createUserDelivery(std::string* const& sender_chain = nullptr);
+	void generateData(const int user_choice);
+	const std::string& getStringChoice() const { return comp_str; };
+	/////////////////////////////////PUBLIC////////////////////////////////////
+	public:
+	int workWithUser(int choice_user);
 	
 	DeliveryManager(Container<TKey, TData>* col, InterfaceGenerator<Delivery>* gen)
 	{
@@ -486,6 +485,7 @@ void DeliveryManager<TKey, TData>::addData()
 	created_deliveries.push_back(createUserDelivery());
 	addDeliveryInCollection(created_deliveries.back());
 	std::cout << std::endl << green << "Added new delivery:" << std::endl;
+	std::cout << *created_deliveries.back() << std::endl;
 	std::cout << std::endl << green << "Added " << yellow << 1 << green << "/" << value_of_deliveries << white << std::endl;
 	for (int i = 1; i < value_of_deliveries; i++)
 	{
