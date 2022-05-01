@@ -553,9 +553,10 @@ void DeliveryManager<TKey, TData>::getUserData()
 						continue;
 					}
 					makeChanging(actual_delivery);
-					found_data->push_back(actual_delivery);
+					//found_data->push_back(actual_delivery);
 					break;
 				}
+				break;
 			}
 
 		}
