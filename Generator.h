@@ -81,6 +81,10 @@ std::list<std::string>* DeliGenerator::getPoolCollection(DELITYPES typeOfData) c
 	{
 		return &data->transport_types;
 	}
+	else if (typeOfData == SEND_TIME || typeOfData == RECI_TIME)
+	{
+		return &data->time;
+	}
 }
 
 void DeliGenerator::generateHash(Delivery& delivery, std::mt19937& gen) const
@@ -165,6 +169,7 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 	auto countries_front = data->countries.begin();
 	auto companies_front = data->companies.begin();
 	auto transports_front = data->transport_types.begin();
+	auto times_front = data->time.begin();
 
 	//////////////////////////////////////NAME///////////////////////////////////////
 	random_number = gen() % data->names.size();
@@ -194,6 +199,10 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 		delivery.sender = last_dep_point;
 	}
 
+	//////////////////////////////////////SEND_TIME///////////////////////////////////////
+	random_number = gen() % data->time.size();
+	getListNode(&times_front, &data->time, delivery.send_time, random_number);
+
 	//////////////////////////////////////DEPARTURE_COMP///////////////////////////////////////
 	random_number = gen() % data->companies.size();
 	getListNode(&companies_front, &data->companies, delivery.departure_comp, random_number);
@@ -209,6 +218,10 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 		}
 	}
 
+	//////////////////////////////////////RECEIVER_TIME///////////////////////////////////////
+	random_number = gen() % data->time.size();
+	getListNode(&times_front, &data->time, delivery.recieve_time, random_number);
+
 	//////////////////////////////////////DESTINATION///////////////////////////////////////
 	random_number = gen() % data->companies.size();
 	getListNode(&companies_front, &data->companies, delivery.destination_comp, random_number);
@@ -217,11 +230,9 @@ void DeliGenerator::createData(Delivery& delivery, std::string* const& last_dep_
 	//////////////////////////////////////TRANSPORT_TYPE///////////////////////////////////////
 	random_number = gen() % data->transport_types.size();
 	getListNode(&transports_front, &data->transport_types, delivery.type_of_transport, random_number);
-	//delivery.type_of_transport = &(data->transport_types[random_number]);
 
 	//////////////////////////////////////DEPARTURE_PRICE///////////////////////////////////////
 	delivery.deliver_price = get_delivery_price(delivery);
-	
 	generateHash(delivery, gen);
 	
 }

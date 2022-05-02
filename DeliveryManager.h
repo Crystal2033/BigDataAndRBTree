@@ -4,6 +4,7 @@
 #include <chrono>
 #include <string>
 #include "UserFuncsAndCallbacks.h"
+#include <regex>
 
 typedef enum RequestType {POST, GET, PATCH} REQ_TYPE;
 template <typename TKey, typename TData>
@@ -18,6 +19,8 @@ private:
 	std::string* getStringInput(DELITYPES type, const std::string& request_str);
 	unsigned int getHashInput();
 	std::string* addToDataPool(DELITYPES type, const std::string& str);
+	bool getTimeStr(std::string& str, std::cmatch& matcher);
+	void inputTimeStr(std::string& str);
 
 	float getFloatInput(REQ_TYPE type, const std::string& request_str);
 	void addDeliveryInCollection(Delivery*& delivery);
@@ -128,13 +131,23 @@ DELITYPES DeliveryManager<TKey, TData>::setChoiceGetType(const int choice_num, R
 		{
 			if (req_type == POST)
 			{
+				comp_type = SEND_TIME;
+				comp_str = "Sending time";
+			}
+			return SEND_TIME;
+
+		}
+		case 8:
+		{
+			if (req_type == POST)
+			{
 				comp_type = DEPART;
 				comp_str = "Departure point (by company)";
 			}
 			return DEPART;
 
 		}
-		case 8:
+		case 9:
 		{
 			if (req_type == POST)
 			{
@@ -144,7 +157,17 @@ DELITYPES DeliveryManager<TKey, TData>::setChoiceGetType(const int choice_num, R
 			return RECIEVER;
 
 		}
-		case 9:
+		case 10:
+		{
+			if (req_type == POST)
+			{
+				comp_type = RECI_TIME;
+				comp_str = "Recieving time";
+			}
+			return RECI_TIME;
+
+		}
+		case 11:
 		{
 			if (req_type == POST)
 			{
@@ -154,7 +177,7 @@ DELITYPES DeliveryManager<TKey, TData>::setChoiceGetType(const int choice_num, R
 			return DESTINATION;
 
 		}
-		case 10:
+		case 12:
 		{
 			if (req_type == POST)
 			{
@@ -163,18 +186,10 @@ DELITYPES DeliveryManager<TKey, TData>::setChoiceGetType(const int choice_num, R
 			}
 			return TRANSPORT;
 		}
-		/*case 11: TODO:
-		{
-			return SEND_TIME;
-		}
-		case 12:
-		{
-			return RECI_TIME;
-		}*/
-		//TODO: TIME 11( SEND ), 12 ( RECIEVE )
-		
 	}
 }
+
+
 
 template<typename TKey, typename TData>
 std::string* DeliveryManager<TKey, TData>::getStringInput(DELITYPES type, const std::string& request_str) 
@@ -184,9 +199,14 @@ std::string* DeliveryManager<TKey, TData>::getStringInput(DELITYPES type, const 
 
 	input_data.clear();
 	std::cout << blue << "Please, input data in " << yellow << request_str << blue << " field:" << white << std::endl << "> ";
-	std::cin.clear();
-	std::getline(std::cin, input_data);
-	std::cin.clear();
+	if (type == RECI_TIME || type == SEND_TIME)
+	{
+		inputTimeStr(input_data);
+	}
+	else
+	{
+		userInput(input_data);
+	}
 	dataField = addToDataPool(type, input_data);
 	if (dataField == nullptr)
 	{
@@ -205,9 +225,7 @@ unsigned int DeliveryManager<TKey, TData>::getHashInput()
 	{
 		std::cout << blue << "You have to choose delivery by " << pink << "hash:" << blue << std::endl << "Input hash value (unsigned int number):" << std::endl << white << "> ";
 		input_data.clear();
-		std::cin.clear();
-		std::getline(std::cin, input_data);
-		std::cin.clear();
+		userInput(input_data);
 		hash_value = strtoul(input_data.c_str(), nullptr, 10);
 		if (hash_value == 0)
 		{
@@ -241,9 +259,7 @@ float DeliveryManager<TKey, TData>::getFloatInput(REQ_TYPE req_type, const std::
 		{
 			std::cout << blue << "Please, input data which you want to find, comparator is a " << yellow << request_str << blue << " field: (example: 123,456)" << white << std::endl << "> ";
 		}
-		std::cin.clear();
-		std::getline(std::cin, number_str);
-		std::cin.clear();
+		userInput(number_str);
 		for (int i = 0; i < number_str.size(); i++)
 		{
 
@@ -303,6 +319,72 @@ std::string* DeliveryManager<TKey, TData>::addToDataPool(DELITYPES type, const s
 	return &data_list->back();
 }
 
+template<typename TKey, typename TData>
+bool DeliveryManager<TKey, TData>::getTimeStr(std::string& str, std::cmatch& matcher)
+{
+	int day;
+	int month;
+	int year;
+
+	if (matcher[1].str().size() != 2)//day
+	{
+		return false;
+	}
+	day = std::stoi(matcher[1].str());
+	if (day > 31 || day <= 0) // need to correct to other months
+	{
+		return false;
+	}
+
+	if (matcher[2].str().size() != 2)
+	{
+		return false;
+	}
+	month = std::stoi(matcher[2].str());
+	if (month > 12 || month <= 0)
+	{
+		return false;
+	}
+
+	if (matcher[3].str().size() != 4)//day
+	{
+		return false;
+	}
+	year = std::stoi(matcher[3].str());
+	if (year <= 0)
+	{
+		return false;
+	}
+	str = "";
+	str = ((day < 10)? "0" : "") + std::to_string(day) + ':' + ((month < 10) ? "0" : "") + std::to_string(month) + ':' + std::to_string(year);
+	return true;
+}
+
+template<typename TKey, typename TData>
+void DeliveryManager<TKey, TData>::inputTimeStr(std::string& str)
+{
+	while (true)
+	{
+		std::regex regular;
+		std::cmatch regular_match;
+		regular = "([\\d]{2}):([\\d]{2}):([\\d]{4})";
+		userInput(str);
+		if (!std::regex_match(str.c_str(), regular_match, regular))
+		{
+			std::cout << red << "Incorrect time. Example: 01:02:2002." << white << std::endl;
+			std::cout << blue << "Please, try again:" << std::endl << white << "> ";
+			continue;
+		}
+		if (!getTimeStr(str, regular_match))
+		{
+			std::cout << red << "Incorrect time. Example: 01:02:2002." << white << std::endl;
+			std::cout << blue << "Please, try again:" << std::endl << white << "> ";
+			continue;
+		}
+		break;
+	}
+}
+
 
 
 
@@ -343,6 +425,16 @@ void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::addDeliv
 		case TRANSPORT: //type of transport
 		{
 			collection->add(std::make_pair(delivery->type_of_transport, delivery->hash_code), delivery);
+			break;
+		}
+		case SEND_TIME:
+		{
+			collection->add(std::make_pair(delivery->send_time, delivery->hash_code), delivery);
+			break;
+		}
+		case RECI_TIME:
+		{
+			collection->add(std::make_pair(delivery->recieve_time, delivery->hash_code), delivery);
 			break;
 		}
 	}
@@ -390,8 +482,10 @@ Delivery* DeliveryManager<TKey, TData>::createUserDelivery(std::string* const& l
 	{
 		delivery->sender = last_reciever;
 	}
+	delivery->send_time = getStringInput(SEND_TIME, "sending time");
 	delivery->departure_comp = getStringInput(DEPART, "departure point (by company)");
 	delivery->reciever = getStringInput(RECIEVER, "reciever (to country)");
+	delivery->recieve_time = getStringInput(RECI_TIME, "recieving time");
 	delivery->destination_comp = getStringInput(DESTINATION, "destination (for company)");
 	delivery->type_of_transport = getStringInput(TRANSPORT, "type of transport");
 
@@ -573,9 +667,7 @@ bool DeliveryManager<TKey, TData>::wantToChangeData()
 	{
 		std::cout << cyan << "Do you want to change data (y/n)?" << white << std::endl << "> ";
 		find_request.clear();
-		std::cin.clear();
-		std::getline(std::cin, find_request);
-		std::cin.clear();
+		userInput(find_request);
 		if (find_request.size() != 1)
 		{
 			std::cout << red << "You have to input 'y' or 'n'. " << white << std::endl;
@@ -620,7 +712,7 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 	DeliGenerator* delivery_gen = reinterpret_cast<DeliGenerator*>(generator);
 	switch (type)
 	{
-		case NAME: //name
+		case NAME:
 		{
 			is_deleted = deleteHook(type, delivery);
 			new_data_field = getStringInput(type, "name");
@@ -634,7 +726,7 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 			delivery->name = new_data_field;
 			break;
 		}
-		case CONTENT: //content
+		case CONTENT:
 		{
 			is_deleted = deleteHook(type, delivery);
 			new_data_field = getStringInput(type, "content");
@@ -648,7 +740,7 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 			delivery->content = new_data_field;
 			break;
 		}
-		case SENDER: //sender
+		case SENDER:
 		{
 			is_deleted = deleteHook(type, delivery);
 			new_data_field = getStringInput(type, "sender (from country)");
@@ -662,7 +754,21 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 			delivery->sender = new_data_field;
 			break;
 		}
-		case DEPART: //departure point
+		case SEND_TIME:
+		{
+			is_deleted = deleteHook(type, delivery);
+			new_data_field = getStringInput(type, "sending time");
+			if (is_deleted)
+			{
+				delivery = new Delivery(saved_data);
+				delivery->send_time = new_data_field;
+				addDeliveryInCollection(delivery);
+				return;
+			}
+			delivery->send_time = new_data_field;
+			break;
+		}
+		case DEPART:
 		{
 			is_deleted = deleteHook(type, delivery);
 			new_data_field = getStringInput(type, "departure point (by company)");
@@ -676,7 +782,7 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 			delivery->departure_comp = new_data_field;
 			break;
 		}
-		case RECIEVER: //reciever
+		case RECIEVER:
 		{
 			is_deleted = deleteHook(type, delivery);
 			new_data_field = getStringInput(type, "reciever (to country)");
@@ -690,7 +796,21 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 			delivery->reciever = new_data_field;
 			break;
 		}
-		case DESTINATION: //destination point
+		case RECI_TIME:
+		{
+			is_deleted = deleteHook(type, delivery);
+			new_data_field = getStringInput(type, "recieving time");
+			if (is_deleted)
+			{
+				delivery = new Delivery(saved_data);
+				delivery->recieve_time = new_data_field;
+				addDeliveryInCollection(delivery);
+				return;
+			}
+			delivery->recieve_time = new_data_field;
+			break;
+		}
+		case DESTINATION:
 		{
 			is_deleted = deleteHook(type, delivery);
 			new_data_field = getStringInput(type, "destination (for company)");
@@ -704,7 +824,7 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 			delivery->destination_comp = new_data_field;
 			break;
 		}
-		case TRANSPORT: //type of transport
+		case TRANSPORT:
 		{
 
 			is_deleted = deleteHook(type, delivery);
@@ -722,7 +842,7 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
 			break;
 		}
-		case WEIGHT: //weight
+		case WEIGHT:
 		{
 			is_deleted = deleteHook(type, delivery);
 			new_number = getFloatInput(PATCH, "weight");
@@ -739,7 +859,7 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
 			break;
 		}
-		case PRICE: //price
+		case PRICE:
 		{
 			is_deleted = deleteHook(type, delivery);
 			new_number = getFloatInput(PATCH, "price");
@@ -752,7 +872,7 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 			delivery->price = new_number;
 			break;
 		}
-		case DELI_PRICE: //delivery price
+		case DELI_PRICE:
 		{
 			std::cout << red << "Delivery price generates automatically. You don`t have access to change this field." << white << std::endl;
 			break;
@@ -776,9 +896,7 @@ std::list<Delivery*>* DeliveryManager<std::pair<std::string*, unsigned int>, Del
 	std::list<Delivery*>* foundData;
 	std::cout << blue << "You can search only by comparator type: " << yellow << comp_str << white << std::endl << "> ";
 	std::string find_request = "";
-	std::cin.clear();
-	std::getline(std::cin, find_request);
-	std::cin.clear();
+	userInput(find_request);
 	foundData = collection->find(std::make_pair(&find_request, 0));
 	return foundData;
 }
@@ -790,7 +908,7 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 {
 	switch (type)
 	{
-		case NAME: //name
+		case NAME:
 		{
 			if (type == comp_type)
 			{
@@ -802,7 +920,7 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 			}
 			return false;
 		}
-		case CONTENT: //content
+		case CONTENT:
 		{
 			if (type == comp_type)
 			{
@@ -813,7 +931,7 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 			}
 			return false;
 		}
-		case SENDER: //sender
+		case SENDER:
 		{
 			if (type == comp_type)
 			{
@@ -824,7 +942,18 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 			}
 			return false;
 		}
-		case DEPART: //departure point
+		case SEND_TIME:
+		{
+			if (type == comp_type)
+			{
+
+				collection->remove(std::make_pair(delivery->send_time, delivery->hash_code));
+				return true;
+
+			}
+			return false;
+		}
+		case DEPART:
 		{
 			if (type == comp_type)
 			{
@@ -835,7 +964,7 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 			}
 			return false;
 		}
-		case RECIEVER: //reciever
+		case RECIEVER:
 		{
 			if (type == comp_type)
 			{
@@ -846,7 +975,18 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 			}
 			return false;
 		}
-		case DESTINATION: //destination point
+		case RECI_TIME:
+		{
+			if (type == comp_type)
+			{
+
+				collection->remove(std::make_pair(delivery->recieve_time, delivery->hash_code));
+				return true;
+
+			}
+			return false;
+		}
+		case DESTINATION:
 		{
 			if (type == comp_type)
 			{
@@ -876,7 +1016,7 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 {
 	switch (type)
 	{
-		case WEIGHT: //weight
+		case WEIGHT:
 		{
 			if (type == comp_type || comp_type == DELI_PRICE) //deli_price формируется из веса +  вид транспорта.
 			{
@@ -887,7 +1027,7 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 			}
 			return false;
 		}
-		case PRICE: //price
+		case PRICE:
 		{
 			if (type == comp_type)
 			{

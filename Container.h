@@ -1,7 +1,6 @@
 #pragma once
 #include <list>
 #include <iostream>
-//typedef enum CONT_TYPE {QUEUE, RBTREE} CONT_TYPE;
 template <typename TKey, typename TData>
 class Container
 {

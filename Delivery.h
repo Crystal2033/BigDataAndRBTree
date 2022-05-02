@@ -8,18 +8,19 @@ public:
 	unsigned int hash_code;
 	std::string* name;					// Название груза. names DONE
 	std::string* content;				// Содержимое  contents  DONE
-	float weight;						 // Вес
-	float price;						 // Цена содержимого
+	float weight;						// Вес
+	float price;						// Цена содержимого
 	float deliver_price;				// Цена доставки
 	std::string* sender;				// Отправитель contries  DONE
-	std::string* departure_comp;		 // Пункт отсылки    companies DONE
+	std::string* departure_comp;		// Пункт отсылки    companies DONE
 	//Time depart_time;
 	std::string* reciever;				// Получатель  contries  DONE
-	std::string* destination_comp;       // Пункт назначения companies DONE 
+	std::string* destination_comp;      // Пункт назначения companies DONE 
 	//Time dest_time;
 	std::string* type_of_transport;		// Тип транспорта. transport_types DONE
-	//std::string* send_time;			// Время отправки
-	//std::string* recieve_time;		//Время получения
+	std::string* send_time;			    // Время отправки
+	std::string* recieve_time;		    //Время получения
+
 	friend std::ostream& operator<<(std::ostream& out, const Delivery& delivery);
 	//Delivery& operator=(const Delivery& first);
 };
@@ -33,34 +34,17 @@ Delivery::Delivery() {
 	deliver_price = 0.0;        
 	sender = nullptr;           
 	departure_comp = nullptr;   
-	//Time depart_time;
 	reciever = nullptr;         
 	destination_comp = nullptr; 
-	//Time dest_time;
 	type_of_transport = nullptr;
+	send_time = nullptr;
+	recieve_time = nullptr;
 }
 
 inline Delivery::Delivery(const Delivery& del)
 {
 	*this = del;
 }
-
-//inline Delivery& Delivery::operator=(const Delivery& first)
-//{
-//	this->hash_code = first.hash_code;
-//	this->content = first.content;
-//	this->deliver_price = first.deliver_price;
-//	this->departure_comp = first.departure_comp;
-//	this->destination_comp = first.destination_comp;
-//	this->name = first.name;
-//	this->price = first.price;
-//	this->reciever = first.reciever;
-//	this->sender = first.sender;
-//	this->type_of_transport = first.type_of_transport;
-//	this->weight = first.weight;
-//	return *this;
-//
-//}
 
 std::ostream& operator<<(std::ostream& out, const Delivery& delivery) {
 	out << blue << "HashCode: " << pink << delivery.hash_code << white << std::endl;
@@ -95,6 +79,13 @@ std::ostream& operator<<(std::ostream& out, const Delivery& delivery) {
 		throw DeliveryNullException("Sender is nullptr");
 	}
 
+	if (delivery.send_time != nullptr) {
+		out << blue << "send time: " << cyan << *delivery.send_time << white << std::endl;
+	}
+	else {
+		throw DeliveryNullException("Send time is nullptr");
+	}
+
 
 	if (delivery.departure_comp != nullptr) {
 		out << blue << "by (company): " << cyan << *delivery.departure_comp << white << std::endl;
@@ -108,6 +99,13 @@ std::ostream& operator<<(std::ostream& out, const Delivery& delivery) {
 	}
 	else {
 		throw DeliveryNullException("Reciever is nullptr");
+	}
+
+	if (delivery.recieve_time != nullptr) {
+		out << blue << "recieve_time time: " << cyan << *delivery.recieve_time << white << std::endl;
+	}
+	else {
+		throw DeliveryNullException("Recieve time is nullptr");
 	}
 
 	if (delivery.destination_comp != nullptr) {

@@ -34,6 +34,13 @@ void print_tree_for_deliv_pair_float(const std::pair<float, unsigned int>& key, 
 #pragma endregion
 
 #pragma region CIN operation choice
+void userInput(std::string& str)
+{
+	std::cin.clear();
+	std::getline(std::cin, str);
+	std::cin.clear();
+}
+
 int userChoice(const int left_edge, const int right_edge=INT_MAX)
 {
 	std::string choice_str;
@@ -42,10 +49,7 @@ int userChoice(const int left_edge, const int right_edge=INT_MAX)
 	{
 		choice_str.clear();
 		std::cout << blue << "Input a number:" << white <<std::endl <<  "> ";
-		std::cin.clear();
-		std::getline(std::cin, choice_str);
-		std::cin.clear();
-		//std::cin >> choice_str;
+		userInput(choice_str);
 		choice_number = atoi(choice_str.c_str()); //return 0 in bad case. So i don`t need 0 in any case.
 
 		if (choice_number < left_edge || choice_number > right_edge) {
@@ -67,8 +71,8 @@ void chooseFieldPrint()
 	
 	std::cout << blue << "1. Name" << std::endl << "2. Content" << std::endl << "3. Weight" << std::endl
 		<< "4. Price" << std::endl << "5. Delivery price" << std::endl << "6. Sender (from country)" << std::endl
-		<< "7. Departure point (by company)" << std::endl << "8. Reciever (to country)" << std::endl
-		<< "9. Destination point (for company)" << std::endl << "10. Type of transport" << std::endl << white;
+		<< "7. Sending time" << std::endl << "8. Departure point (by company)" << std::endl << "9. Reciever (to country)" << std::endl
+		<< "10. Recieving time" << std::endl << "11. Destination point (for company)" << std::endl << "12. Type of transport" << std::endl << white;
 }
 void greetingsPrint() {
 	std::cout << cyan << "Hello, my name is Kulikov Pavel, FIIT, M80-211B-20." << white << std::endl;
