@@ -1027,6 +1027,11 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 				collection->remove(std::make_pair(delivery->weight, delivery->hash_code));
 				return true;
 			}
+			else if (comp_type == DELI_PRICE)
+			{
+				collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
+				return true;
+			}
 			return false;
 		}
 		case PRICE:
@@ -1041,6 +1046,15 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 		case TRANSPORT:
 		{
 			if (comp_type == DELI_PRICE)
+			{
+				collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
+				return true;
+			}
+			return false;
+		}
+		case DELI_PRICE:
+		{
+			if (type == DELI_PRICE) // MB comp_type
 			{
 				collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
 				return true;
