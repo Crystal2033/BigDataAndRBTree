@@ -538,12 +538,10 @@ int DeliveryManager<TKey, TData>::workWithUser(int choice_number)
 		}
 		else if (choice_number == 2) //FIND
 		{
-			std::cout << "find" << std::endl;
 			getUserData();
 		}
 		else if (choice_number == 3) //DELETE
 		{
-			std::cout << "delete" << std::endl;
 			removeData();
 		}
 		else if (choice_number == 4) //exit
