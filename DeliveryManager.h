@@ -14,7 +14,6 @@ private:
 	InterfaceGenerator<Delivery>* generator;
 	std::string comp_str;
 	DELITYPES comp_type;
-	//CONT_TYPE container_type; // нужно для deleteHook, чтобы из очереди при поиске и смене поля компаратора не удалялась доставка.
 	DELITYPES setChoiceGetType(const int choice_num, RequestType req_type=POST);
 	std::string* getStringInput(DELITYPES type, const std::string& request_str);
 	unsigned int getHashInput();
@@ -35,11 +34,11 @@ private:
 	void makeDeleting(Delivery* delivery);
 	bool deleteHook(const DELITYPES type, Delivery* const& delivery);
 	Delivery* createUserDelivery(std::string* const& sender_chain = nullptr);
-	void generateData(const int user_choice);
+	void generateData(const int user_choice);//said
 	const std::string& getStringChoice() const { return comp_str; };
 	/////////////////////////////////PUBLIC////////////////////////////////////
 	public:
-	int workWithUser(int choice_user);
+	int workWithUser(int choice_user); //said
 	
 	DeliveryManager(Container<TKey, TData>* col, InterfaceGenerator<Delivery>* gen)
 	{
@@ -132,7 +131,7 @@ DELITYPES DeliveryManager<TKey, TData>::setChoiceGetType(const int choice_num, R
 			if (req_type == POST)
 			{
 				comp_type = SEND_TIME;
-				comp_str = "Sending time";
+				comp_str = "Sending data";
 			}
 			return SEND_TIME;
 
@@ -162,7 +161,7 @@ DELITYPES DeliveryManager<TKey, TData>::setChoiceGetType(const int choice_num, R
 			if (req_type == POST)
 			{
 				comp_type = RECI_TIME;
-				comp_str = "Recieving time";
+				comp_str = "Recieving data";
 			}
 			return RECI_TIME;
 
@@ -371,13 +370,13 @@ void DeliveryManager<TKey, TData>::inputTimeStr(std::string& str)
 		userInput(str);
 		if (!std::regex_match(str.c_str(), regular_match, regular))
 		{
-			std::cout << red << "Incorrect time. Example: 01:02:2002." << white << std::endl;
+			std::cout << red << "Incorrect data. Example: 01:02:2002." << white << std::endl;
 			std::cout << blue << "Please, try again:" << std::endl << white << "> ";
 			continue;
 		}
 		if (!getTimeStr(str, regular_match))
 		{
-			std::cout << red << "Incorrect time. Example: 01:02:2002." << white << std::endl;
+			std::cout << red << "Incorrect data. Example: 01:02:2002." << white << std::endl;
 			std::cout << blue << "Please, try again:" << std::endl << white << "> ";
 			continue;
 		}
@@ -482,10 +481,10 @@ Delivery* DeliveryManager<TKey, TData>::createUserDelivery(std::string* const& l
 	{
 		delivery->sender = last_reciever;
 	}
-	delivery->send_time = getStringInput(SEND_TIME, "sending time");
+	delivery->send_time = getStringInput(SEND_TIME, "sending data");
 	delivery->departure_comp = getStringInput(DEPART, "departure point (by company)");
 	delivery->reciever = getStringInput(RECIEVER, "reciever (to country)");
-	delivery->recieve_time = getStringInput(RECI_TIME, "recieving time");
+	delivery->recieve_time = getStringInput(RECI_TIME, "recieving data");
 	delivery->destination_comp = getStringInput(DESTINATION, "destination (for company)");
 	delivery->type_of_transport = getStringInput(TRANSPORT, "type of transport");
 
@@ -574,14 +573,26 @@ void DeliveryManager<TKey, TData>::addData()
 	}
 
 	created_deliveries.push_back(createUserDelivery());
+
+	auto begin = std::chrono::steady_clock::now();
 	addDeliveryInCollection(created_deliveries.back());
+	auto end = std::chrono::steady_clock::now();
+	auto elapsed_ms = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+	std::cout << blue << "The time of inserting: " << cyan << elapsed_ms.count() << blue << " micro s" << white << std::endl;
+
 	std::cout << std::endl << green << "Added new delivery:" << std::endl;
 	std::cout << *created_deliveries.back() << std::endl;
 	std::cout << std::endl << green << "Added " << yellow << 1 << green << "/" << value_of_deliveries << white << std::endl;
 	for (int i = 1; i < value_of_deliveries; i++)
 	{
 		created_deliveries.push_back(createUserDelivery(created_deliveries.back()->reciever));
+
+		begin = std::chrono::steady_clock::now();
 		addDeliveryInCollection(created_deliveries.back());
+		end = std::chrono::steady_clock::now();
+		elapsed_ms = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+		std::cout << blue << "The time of inserting: " << cyan << elapsed_ms.count() << blue << " micro s" << white << std::endl;
+
 		std::cout << std::endl << green << "Added new delivery:" << std::endl;
 		std::cout << *created_deliveries.back() << std::endl;
 		std::cout << std::endl << green << "Added " << yellow << i + 1 << green << "/" << value_of_deliveries << white << std::endl;
@@ -755,7 +766,7 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 		case SEND_TIME:
 		{
 			is_deleted = deleteHook(type, delivery);
-			new_data_field = getStringInput(type, "sending time");
+			new_data_field = getStringInput(type, "sending data");
 			if (is_deleted)
 			{
 				delivery = new Delivery(saved_data);
@@ -797,7 +808,7 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 		case RECI_TIME:
 		{
 			is_deleted = deleteHook(type, delivery);
-			new_data_field = getStringInput(type, "recieving time");
+			new_data_field = getStringInput(type, "recieving data");
 			if (is_deleted)
 			{
 				delivery = new Delivery(saved_data);
@@ -886,7 +897,14 @@ std::list<Delivery*>* DeliveryManager<std::pair<float, unsigned int>, Delivery*>
 	std::list<Delivery*>* foundData;
 	std::cout << blue << "You can search only by comparator type: " << yellow << comp_str << white << std::endl;
 	float search_param = getFloatInput(GET, comp_str);
+
+
+	auto begin = std::chrono::steady_clock::now();
 	foundData = collection->find(std::make_pair(search_param, 0));
+
+	auto end = std::chrono::steady_clock::now();
+	auto elapsed_ms = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+	std::cout << blue << "The time of searching: " << cyan << elapsed_ms.count() << blue << " mcs" << white << std::endl;
 	return foundData;
 }
 
@@ -895,7 +913,13 @@ std::list<Delivery*>* DeliveryManager<std::pair<std::string*, unsigned int>, Del
 	std::cout << blue << "You can search only by comparator type: " << yellow << comp_str << white << std::endl << "> ";
 	std::string find_request = "";
 	userInput(find_request);
+
+	auto begin = std::chrono::steady_clock::now();
 	foundData = collection->find(std::make_pair(&find_request, 0));
+	auto end = std::chrono::steady_clock::now();
+	auto elapsed_ms = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+	std::cout << blue << "The time of searching: " << cyan << elapsed_ms.count() << blue << " micro s" << white << std::endl;
+
 	return foundData;
 }
 #pragma endregion
@@ -1050,7 +1074,13 @@ void DeliveryManager<TKey, TData>::removeData()
 		if (found_data->size() == 1)
 		{
 			actual_delivery = found_data->back();
+
+			auto begin = std::chrono::steady_clock::now();
 			deleteHook(comp_type, actual_delivery);
+			auto end = std::chrono::steady_clock::now();
+			auto elapsed_ms = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+			std::cout << blue << "The time of deleting: " << cyan << elapsed_ms.count() << blue << " micro s" << white << std::endl;
+
 		}
 		else //find by HASH
 		{
@@ -1075,8 +1105,11 @@ void DeliveryManager<TKey, TData>::removeData()
 					std::cout << red << "Hash was not found by your search request." << white << std::endl;
 					continue;
 				}
-				
+				auto begin = std::chrono::steady_clock::now();
 				deleteHook(comp_type, actual_delivery);
+				auto end = std::chrono::steady_clock::now();
+				auto elapsed_ms = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+				std::cout << blue << "The time of deleting: " << cyan << elapsed_ms.count() << blue << " micro s" << white << std::endl;
 				break;
 			}
 		}

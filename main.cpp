@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 		if (choice_number == 1) //Tree case
 		{
 			std::cout << green << "Red Black tree was chosen." << white << std::endl;
-			std::cout << cyan << "You have to choose the comparator by field for your tree (input 1-10):" << white <<  std::endl;
+			std::cout << cyan << "You have to choose the comparator by field for your tree (input 1-12):" << white <<  std::endl;
 			chooseFieldPrint();
 			choice_number = userChoice(1, 12);
 
