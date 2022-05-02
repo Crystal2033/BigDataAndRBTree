@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 			std::cout << green << "Red Black tree was chosen." << white << std::endl;
 			std::cout << cyan << "You have to choose the comparator by field for your tree (input 1-10):" << white <<  std::endl;
 			chooseFieldPrint();
-			choice_number = userChoice(1, 10);
+			choice_number = userChoice(1, 12);
 
 			if (choice_number > FLOAT_DATA_START && choice_number < FLOAT_DATA_END) //float comparator
 			{
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 		{
 			std::cout << green << "Queue was chosen." << white << std::endl;
 			chooseFieldPrint();
-			choice_number = userChoice(1, 10);
+			choice_number = userChoice(1, 12);
 			if (choice_number > FLOAT_DATA_START && choice_number < FLOAT_DATA_END) //float comparator
 			{
 				Comparator<std::pair<float, unsigned int>>* comparator = new ComparatorPairFloat(INCREASE);

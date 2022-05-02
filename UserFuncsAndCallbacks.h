@@ -36,9 +36,18 @@ void print_tree_for_deliv_pair_float(const std::pair<float, unsigned int>& key, 
 #pragma region CIN operation choice
 void userInput(std::string& str)
 {
-	std::cin.clear();
-	std::getline(std::cin, str);
-	std::cin.clear();
+	while (true)
+	{
+		std::cin.clear();
+		std::getline(std::cin, str);
+		if (str.size() == 0)
+		{
+			std::cout << red << "Your input is blank." << blue << "Please, try again." << white << "> " << std::endl;
+			continue;
+		}
+		std::cin.clear();
+		break;
+	}
 }
 
 int userChoice(const int left_edge, const int right_edge=INT_MAX)

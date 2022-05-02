@@ -392,37 +392,37 @@ void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::addDeliv
 {
 	switch (comp_type)
 	{
-		case NAME: //name
+		case NAME:
 		{
 			collection->add(std::make_pair(delivery->name, delivery->hash_code), delivery);
 			break;
 		}
-		case CONTENT: //content
+		case CONTENT:
 		{
 			collection->add(std::make_pair(delivery->content, delivery->hash_code), delivery);
 			break;
 		}
-		case SENDER: //sender
+		case SENDER:
 		{
 			collection->add(std::make_pair(delivery->sender, delivery->hash_code), delivery);
 			break;
 		}
-		case DEPART: //departure point
+		case DEPART:
 		{
 			collection->add(std::make_pair(delivery->departure_comp, delivery->hash_code), delivery);
 			break;
 		}
-		case RECIEVER: //reciever
+		case RECIEVER:
 		{
 			collection->add(std::make_pair(delivery->reciever, delivery->hash_code), delivery);
 			break;
 		}
-		case DESTINATION: //destination point
+		case DESTINATION:
 		{
 			collection->add(std::make_pair(delivery->destination_comp, delivery->hash_code), delivery);
 			break;
 		}
-		case TRANSPORT: //type of transport
+		case TRANSPORT:
 		{
 			collection->add(std::make_pair(delivery->type_of_transport, delivery->hash_code), delivery);
 			break;
@@ -445,17 +445,17 @@ void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::addDeliveryInCo
 {
 	switch (comp_type)
 	{
-		case WEIGHT: //weight
+		case WEIGHT:
 		{
 			collection->add(std::make_pair(delivery->weight, delivery->hash_code), delivery);
 			break;
 		}
-		case PRICE: //price
+		case PRICE:
 		{
 			collection->add(std::make_pair(delivery->price, delivery->hash_code), delivery);
 			break;
 		}
-		case DELI_PRICE: //delivery price
+		case DELI_PRICE:
 		{
 			collection->add(std::make_pair(delivery->deliver_price, delivery->hash_code), delivery);
 			break;
@@ -527,9 +527,7 @@ int DeliveryManager<TKey, TData>::workWithUser(int choice_number)
 {
 	std::cout << cyan << "To start " << blue << "generating " << cyan << "data press any keyboard button." << white << std::endl;
 	getchar();
-	//getchar();
 	generateData(choice_number);
-	//manager.PrintData(print_tree_for_deliv_pair_float);
 	while (true)
 	{
 		chooseOperationPrint();
@@ -620,6 +618,7 @@ void DeliveryManager<TKey, TData>::getUserData()
 			{
 				Delivery* delivery = found_data->back();
 				makeChanging(delivery);
+				break;
 			}
 			else //find by HASH
 			{
@@ -646,7 +645,6 @@ void DeliveryManager<TKey, TData>::getUserData()
 						continue;
 					}
 					makeChanging(actual_delivery);
-					//found_data->push_back(actual_delivery);
 					break;
 				}
 				break;
@@ -693,9 +691,11 @@ template<typename TKey, typename TData>
 void DeliveryManager<TKey, TData>::makeChanging(Delivery*& delivery)
 {
 	int choice_number;
+	std::cout << cyan << "Was found:" << white << std::endl;
+	std::cout << *delivery << std::endl;
 	std::cout << cyan << "Choose field to change data:" << white << std::endl;
 	chooseFieldPrint();
-	choice_number = userChoice(1, 10);
+	choice_number = userChoice(1, 12);
 	DELITYPES type = setChoiceGetType(choice_number, PATCH);
 	
 	changeByField(type, delivery);
@@ -912,11 +912,8 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-
 				collection->remove(std::make_pair(delivery->name, delivery->hash_code));
 				return true;
-
-				
 			}
 			return false;
 		}
@@ -924,10 +921,8 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				
 				collection->remove(std::make_pair(delivery->content, delivery->hash_code));
 				return true;
-				
 			}
 			return false;
 		}
@@ -935,10 +930,8 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				
 				collection->remove(std::make_pair(delivery->sender, delivery->hash_code));
 				return true;
-				
 			}
 			return false;
 		}
@@ -949,7 +942,6 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 
 				collection->remove(std::make_pair(delivery->send_time, delivery->hash_code));
 				return true;
-
 			}
 			return false;
 		}
@@ -957,10 +949,8 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				
 				collection->remove(std::make_pair(delivery->departure_comp, delivery->hash_code));
 				return true;
-				
 			}
 			return false;
 		}
@@ -968,10 +958,8 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				
 				collection->remove(std::make_pair(delivery->reciever, delivery->hash_code));
 				return true;
-				
 			}
 			return false;
 		}
@@ -979,10 +967,8 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-
 				collection->remove(std::make_pair(delivery->recieve_time, delivery->hash_code));
 				return true;
-
 			}
 			return false;
 		}
@@ -990,10 +976,8 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				
 				collection->remove(std::make_pair(delivery->destination_comp, delivery->hash_code));
 				return true;
-				
 			}
 			return false;
 		}
@@ -1001,10 +985,8 @@ bool DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::deleteHo
 		{
 			if (type == comp_type)
 			{
-				
 				collection->remove(std::make_pair(delivery->type_of_transport, delivery->hash_code));
 				return true;
-				
 			}
 			return false;
 		}
@@ -1018,12 +1000,10 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 	{
 		case WEIGHT:
 		{
-			if (type == comp_type || comp_type == DELI_PRICE) //deli_price формируется из веса +  вид транспорта.
+			if (type == comp_type)
 			{
-				
 				collection->remove(std::make_pair(delivery->weight, delivery->hash_code));
 				return true;
-				
 			}
 			return false;
 		}
@@ -1031,10 +1011,8 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 		{
 			if (type == comp_type)
 			{
-				
 				collection->remove(std::make_pair(delivery->price, delivery->hash_code));
 				return true;
-				
 			}
 			return false;
 		}
@@ -1042,10 +1020,8 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 		{
 			if (comp_type == DELI_PRICE)
 			{
-				
 				collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
 				return true;
-				
 			}
 			return false;
 		}
@@ -1118,7 +1094,7 @@ void DeliveryManager<TKey, TData>::makeDeleting(Delivery* delivery)
 	int choice_number;
 	std::cout << cyan << "Choose field to change data:" << white << std::endl;
 	chooseFieldPrint();
-	choice_number = userChoice(1, 10);
+	choice_number = userChoice(1, 12);
 	DELITYPES type = setChoiceGetType(choice_number, PATCH);
 
 	changeByField(type, delivery);

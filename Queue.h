@@ -9,7 +9,6 @@ class Queue : public Container<TKey, TData>
 private:
 	std::queue<std::pair<TKey, TData>>* queue;
 	Comparator<TKey>* comparator;
-	void printByBegin(void(*call_back)(const TKey&, const TData&, int)); //const;
 	void nullFirstPairField(std::pair<std::string*, unsigned int>& key);
 	void nullFirstPairField(std::pair<float, unsigned int>& key);
 	void deleteHook(TKey key, std::list<std::pair<TKey, TData>>& list);
@@ -18,7 +17,6 @@ public:
 	void add(const TKey&, const TData&) override;
 	void remove(const TKey&) override;
 	std::list<TData>* find(const TKey&) override;
-	void stepover(void(*call_back)(const TKey&, const TData&, int)) override; //const override;
 	~Queue() = default;
 };
 
@@ -126,30 +124,5 @@ std::list<TData>* Queue<TKey, TData>::find(const TKey& key_pair)
 
 #pragma endregion
 
-#pragma region ASSIST METHODS
-template <typename TKey, typename TData>
-void Queue<TKey, TData>::printByBegin(void(*call_back)(const TKey&, const TData&, int)) //const
-{
-	/*std::queue<TKey>* new_queue = new std::queue<TKey>;
-	TKey* check_data_ptr;
-	while (!queue->empty())
-	{
-		check_data_ptr = &(queue->back());
-		call_back(check_data_ptr);
-		new_queue->push(*check_data_ptr);
-		queue->pop();
-	}
 
-	delete queue;
-	queue = new_queue;*/
-}
-
-
-
-template <typename TKey, typename TData>
-void Queue<TKey, TData>::stepover(void(*call_back)(const TKey&, const TData&, int)) //const
-{
-	//printByBegin(call_back);
-}
-#pragma endregion
 

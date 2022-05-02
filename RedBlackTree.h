@@ -52,17 +52,11 @@ private:
 	void nullFirstPairField(std::pair<float, unsigned int>& key);
 
 	void deleteHook(TKey key, RBNode* node);
-	//void deleteHook(std::pair<float, unsigned int> key, RBNode* node);
-
-	//void deleteHook(std::pair<float, unsigned int> key, RBNode* node);
-	//void deleteHook(TKey key, RBNode* node);
 public:
 	RedBlackTree(Comparator<TKey>* const &);
 	void add(const TKey&, const TData&) override;
 	void remove(const TKey&) override;
-	std::list<TData>* find(const TKey&) override;
-	void stepover(void(*call_back)(const TKey&, const TData&, int)) override; //const override;
-	
+	std::list<TData>* find(const TKey&) override;	
 
 	void prefix_stepover_tree(void(*call_back)(const TKey&, const TData&, int)) const;
 	void infix_stepover_tree(void(*call_back)(const TKey&, const TData&, int)) const;
@@ -880,11 +874,7 @@ void RedBlackTree<TKey, TData>::prefix(void(*call_back)(const TKey&, const TData
 	return;
 }
 
-template <typename TKey, typename TData>
-void RedBlackTree<TKey, TData>::stepover(void(*call_back)(const TKey&, const TData&, int)) //const
-{
-	infix_stepover_tree(call_back);
-}
+
 
 template <typename TKey, typename TData>
 void RedBlackTree<TKey, TData>::infix(void(*call_back)(const TKey&, const TData&, int), RBNode* cur_root, int depth) const
