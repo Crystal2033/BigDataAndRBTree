@@ -458,7 +458,9 @@ int DeliveryManager<TKey, TData>::workWithUser(int choice_number)
 {
 	std::cout << cyan << "To start " << blue << "generating " << cyan << "data press any keyboard button." << white << std::endl;
 	getchar();
+	std::cout << cyan << "Please, wait, deliveries are generating..." << white << std::endl;
 	generateData(choice_number);
+	std::cout << green << "Deliveries are successfully generated." << white << std::endl;
 	while (true)
 	{
 		chooseOperationPrint();
