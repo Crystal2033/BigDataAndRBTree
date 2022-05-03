@@ -17,15 +17,27 @@ public:
 	void add(const TKey&, const TData&) override;
 	void remove(const TKey&) override;
 	std::list<TData>* find(const TKey&) override;
-	~Queue() = default;
+	~Queue();
 };
 
 
-#pragma region Constructor
+#pragma region Constructor Destructor
 template <typename TKey, typename TData>
 Queue<TKey, TData>::Queue(Comparator<TKey>* cmp) {
 	comparator = cmp;
 	queue = new std::queue<std::pair<TKey, TData>>;
+}
+template <typename TKey, typename TData>
+Queue<TKey, TData>::Queue::~Queue()
+{
+	std::pair<TKey, TData> check_data_ptr;
+	while (!queue->empty())
+	{
+		check_data_ptr = queue->front();
+		delete check_data_ptr.second;
+		queue->pop();
+	}
+	delete queue;
 }
 #pragma endregion
 
