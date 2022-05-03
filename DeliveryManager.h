@@ -46,18 +46,7 @@ private:
 		generator = gen;
 	}
 
-	void PrintData(void (*callback)(const TKey&,const TData&, int));
-	//DeliveryManager() = default;
-
 };
-
-#pragma region PrintData
-template <typename TKey, typename TData>
-void DeliveryManager<TKey, TData>::PrintData(void (*callback)(const TKey&, const TData&, int))
-{
-	collection->stepover(callback);
-}
-#pragma endregion
 
 
 #pragma region Generation
@@ -187,8 +176,6 @@ DELITYPES DeliveryManager<TKey, TData>::setChoiceGetType(const int choice_num, R
 		}
 	}
 }
-
-
 
 template<typename TKey, typename TData>
 std::string* DeliveryManager<TKey, TData>::getStringInput(DELITYPES type, const std::string& request_str) 
@@ -385,61 +372,6 @@ void DeliveryManager<TKey, TData>::inputTimeStr(std::string& str)
 }
 
 
-
-
-void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::addDeliveryInCollection(Delivery*& delivery)
-{
-	switch (comp_type)
-	{
-		case NAME:
-		{
-			collection->add(std::make_pair(delivery->name, delivery->hash_code), delivery);
-			break;
-		}
-		case CONTENT:
-		{
-			collection->add(std::make_pair(delivery->content, delivery->hash_code), delivery);
-			break;
-		}
-		case SENDER:
-		{
-			collection->add(std::make_pair(delivery->sender, delivery->hash_code), delivery);
-			break;
-		}
-		case DEPART:
-		{
-			collection->add(std::make_pair(delivery->departure_comp, delivery->hash_code), delivery);
-			break;
-		}
-		case RECIEVER:
-		{
-			collection->add(std::make_pair(delivery->reciever, delivery->hash_code), delivery);
-			break;
-		}
-		case DESTINATION:
-		{
-			collection->add(std::make_pair(delivery->destination_comp, delivery->hash_code), delivery);
-			break;
-		}
-		case TRANSPORT:
-		{
-			collection->add(std::make_pair(delivery->type_of_transport, delivery->hash_code), delivery);
-			break;
-		}
-		case SEND_TIME:
-		{
-			collection->add(std::make_pair(delivery->send_time, delivery->hash_code), delivery);
-			break;
-		}
-		case RECI_TIME:
-		{
-			collection->add(std::make_pair(delivery->recieve_time, delivery->hash_code), delivery);
-			break;
-		}
-	}
-}
-
-
 void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::addDeliveryInCollection(Delivery*& delivery)
 {
 	switch (comp_type)
@@ -553,6 +485,57 @@ int DeliveryManager<TKey, TData>::workWithUser(int choice_number)
 #pragma endregion
 
 #pragma region AddRequest
+void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::addDeliveryInCollection(Delivery*& delivery)
+{
+	switch (comp_type)
+	{
+	case NAME:
+	{
+		collection->add(std::make_pair(delivery->name, delivery->hash_code), delivery);
+		break;
+	}
+	case CONTENT:
+	{
+		collection->add(std::make_pair(delivery->content, delivery->hash_code), delivery);
+		break;
+	}
+	case SENDER:
+	{
+		collection->add(std::make_pair(delivery->sender, delivery->hash_code), delivery);
+		break;
+	}
+	case DEPART:
+	{
+		collection->add(std::make_pair(delivery->departure_comp, delivery->hash_code), delivery);
+		break;
+	}
+	case RECIEVER:
+	{
+		collection->add(std::make_pair(delivery->reciever, delivery->hash_code), delivery);
+		break;
+	}
+	case DESTINATION:
+	{
+		collection->add(std::make_pair(delivery->destination_comp, delivery->hash_code), delivery);
+		break;
+	}
+	case TRANSPORT:
+	{
+		collection->add(std::make_pair(delivery->type_of_transport, delivery->hash_code), delivery);
+		break;
+	}
+	case SEND_TIME:
+	{
+		collection->add(std::make_pair(delivery->send_time, delivery->hash_code), delivery);
+		break;
+	}
+	case RECI_TIME:
+	{
+		collection->add(std::make_pair(delivery->recieve_time, delivery->hash_code), delivery);
+		break;
+	}
+	}
+}
 
 template<typename TKey, typename TData>
 void DeliveryManager<TKey, TData>::addData()
@@ -696,6 +679,11 @@ bool DeliveryManager<TKey, TData>::wantToChangeData()
 		}
 	}
 }
+
+
+#pragma endregion
+
+#pragma region FindRequest
 template<typename TKey, typename TData>
 void DeliveryManager<TKey, TData>::makeChanging(Delivery*& delivery)
 {
@@ -706,11 +694,12 @@ void DeliveryManager<TKey, TData>::makeChanging(Delivery*& delivery)
 	chooseFieldPrint();
 	choice_number = userChoice(1, 12);
 	DELITYPES type = setChoiceGetType(choice_number, PATCH);
-	
+
 	changeByField(type, delivery);
-	std::cout << green << "Data changed!" << white << std::endl;
+
 	std::cout << *delivery << std::endl;
 }
+
 template<typename TKey, typename TData>
 void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*& delivery)
 {
@@ -721,178 +710,196 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 	DeliGenerator* delivery_gen = reinterpret_cast<DeliGenerator*>(generator);
 	switch (type)
 	{
-		case NAME:
+	case NAME:
+	{
+		is_deleted = deleteHook(type, delivery);
+		new_data_field = getStringInput(type, "name");
+		if (is_deleted)
 		{
-			is_deleted = deleteHook(type, delivery);
-			new_data_field = getStringInput(type, "name");
-			if (is_deleted)
-			{
-				delivery = new Delivery(saved_data);
-				delivery->name = new_data_field;
-				addDeliveryInCollection(delivery);
-				return;
-			}
+			delivery = new Delivery(saved_data);
 			delivery->name = new_data_field;
-			break;
+			addDeliveryInCollection(delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
+			return;
 		}
-		case CONTENT:
+		delivery->name = new_data_field;
+		std::cout << green << "Data changed!" << white << std::endl;
+		break;
+	}
+	case CONTENT:
+	{
+		is_deleted = deleteHook(type, delivery);
+		new_data_field = getStringInput(type, "content");
+		if (is_deleted)
 		{
-			is_deleted = deleteHook(type, delivery);
-			new_data_field = getStringInput(type, "content");
-			if (is_deleted)
-			{
-				delivery = new Delivery(saved_data);
-				delivery->content = new_data_field;
-				addDeliveryInCollection(delivery);
-				return;
-			}
+			delivery = new Delivery(saved_data);
 			delivery->content = new_data_field;
-			break;
+			addDeliveryInCollection(delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
+			return;
 		}
-		case SENDER:
+		delivery->content = new_data_field;
+		std::cout << green << "Data changed!" << white << std::endl;
+		break;
+	}
+	case SENDER:
+	{
+		is_deleted = deleteHook(type, delivery);
+		new_data_field = getStringInput(type, "sender (from country)");
+		if (is_deleted)
 		{
-			is_deleted = deleteHook(type, delivery);
-			new_data_field = getStringInput(type, "sender (from country)");
-			if (is_deleted)
-			{
-				delivery = new Delivery(saved_data);
-				delivery->sender = new_data_field;
-				addDeliveryInCollection(delivery);
-				return;
-			}
+			delivery = new Delivery(saved_data);
 			delivery->sender = new_data_field;
-			break;
+			addDeliveryInCollection(delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
+			return;
 		}
-		case SEND_TIME:
+		delivery->sender = new_data_field;
+		std::cout << green << "Data changed!" << white << std::endl;
+		break;
+	}
+	case SEND_TIME:
+	{
+		is_deleted = deleteHook(type, delivery);
+		new_data_field = getStringInput(type, "sending data");
+		if (is_deleted)
 		{
-			is_deleted = deleteHook(type, delivery);
-			new_data_field = getStringInput(type, "sending data");
-			if (is_deleted)
-			{
-				delivery = new Delivery(saved_data);
-				delivery->send_time = new_data_field;
-				addDeliveryInCollection(delivery);
-				return;
-			}
+			delivery = new Delivery(saved_data);
 			delivery->send_time = new_data_field;
-			break;
+			addDeliveryInCollection(delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
+			return;
 		}
-		case DEPART:
+		delivery->send_time = new_data_field;
+		std::cout << green << "Data changed!" << white << std::endl;
+		break;
+	}
+	case DEPART:
+	{
+		is_deleted = deleteHook(type, delivery);
+		new_data_field = getStringInput(type, "departure point (by company)");
+		if (is_deleted)
 		{
-			is_deleted = deleteHook(type, delivery);
-			new_data_field = getStringInput(type, "departure point (by company)");
-			if (is_deleted)
-			{
-				delivery = new Delivery(saved_data);
-				delivery->departure_comp = new_data_field;
-				addDeliveryInCollection(delivery);
-				return;
-			}
+			delivery = new Delivery(saved_data);
 			delivery->departure_comp = new_data_field;
-			break;
+			addDeliveryInCollection(delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
+			return;
 		}
-		case RECIEVER:
+		delivery->departure_comp = new_data_field;
+		std::cout << green << "Data changed!" << white << std::endl;
+		break;
+	}
+	case RECIEVER:
+	{
+		is_deleted = deleteHook(type, delivery);
+		new_data_field = getStringInput(type, "reciever (to country)");
+		if (is_deleted)
 		{
-			is_deleted = deleteHook(type, delivery);
-			new_data_field = getStringInput(type, "reciever (to country)");
-			if (is_deleted)
-			{
-				delivery = new Delivery(saved_data);
-				delivery->reciever = new_data_field;
-				addDeliveryInCollection(delivery);
-				return;
-			}
+			delivery = new Delivery(saved_data);
 			delivery->reciever = new_data_field;
-			break;
+			addDeliveryInCollection(delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
+			return;
 		}
-		case RECI_TIME:
+		delivery->reciever = new_data_field;
+		std::cout << green << "Data changed!" << white << std::endl;
+		break;
+	}
+	case RECI_TIME:
+	{
+		is_deleted = deleteHook(type, delivery);
+		new_data_field = getStringInput(type, "recieving data");
+		if (is_deleted)
 		{
-			is_deleted = deleteHook(type, delivery);
-			new_data_field = getStringInput(type, "recieving data");
-			if (is_deleted)
-			{
-				delivery = new Delivery(saved_data);
-				delivery->recieve_time = new_data_field;
-				addDeliveryInCollection(delivery);
-				return;
-			}
+			delivery = new Delivery(saved_data);
 			delivery->recieve_time = new_data_field;
-			break;
+			addDeliveryInCollection(delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
+			return;
 		}
-		case DESTINATION:
+		delivery->recieve_time = new_data_field;
+		std::cout << green << "Data changed!" << white << std::endl;
+		break;
+	}
+	case DESTINATION:
+	{
+		is_deleted = deleteHook(type, delivery);
+		new_data_field = getStringInput(type, "destination (for company)");
+		if (is_deleted)
 		{
-			is_deleted = deleteHook(type, delivery);
-			new_data_field = getStringInput(type, "destination (for company)");
-			if (is_deleted)
-			{
-				delivery = new Delivery(saved_data);
-				delivery->destination_comp = new_data_field;
-				addDeliveryInCollection(delivery);
-				return;
-			}
+			delivery = new Delivery(saved_data);
 			delivery->destination_comp = new_data_field;
-			break;
+			addDeliveryInCollection(delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
+			return;
 		}
-		case TRANSPORT:
-		{
+		delivery->destination_comp = new_data_field;
+		std::cout << green << "Data changed!" << white << std::endl;
+		break;
+	}
+	case TRANSPORT:
+	{
 
-			is_deleted = deleteHook(type, delivery);
-			new_data_field = getStringInput(type, "type of transport");
-			
-			if (is_deleted)
-			{
-				delivery = new Delivery(saved_data);
-				delivery->type_of_transport = new_data_field;
-				delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
-				addDeliveryInCollection(delivery);
-				return;
-			}
+		is_deleted = deleteHook(type, delivery);
+		new_data_field = getStringInput(type, "type of transport");
+
+		if (is_deleted)
+		{
+			delivery = new Delivery(saved_data);
 			delivery->type_of_transport = new_data_field;
 			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
-			break;
+			addDeliveryInCollection(delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
+			return;
 		}
-		case WEIGHT:
+		delivery->type_of_transport = new_data_field;
+		delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
+		std::cout << green << "Data changed!" << white << std::endl;
+		break;
+	}
+	case WEIGHT:
+	{
+		is_deleted = deleteHook(type, delivery);
+		new_number = getFloatInput(PATCH, "weight");
+
+		if (is_deleted)
 		{
-			is_deleted = deleteHook(type, delivery);
-			new_number = getFloatInput(PATCH, "weight");
-			
-			if (is_deleted)
-			{
-				delivery = new Delivery(saved_data);
-				delivery->weight = new_number;
-				delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
-				addDeliveryInCollection(delivery);
-				return;
-			}
+			delivery = new Delivery(saved_data);
 			delivery->weight = new_number;
 			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
-			break;
+			addDeliveryInCollection(delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
+			return;
 		}
-		case PRICE:
-		{
-			is_deleted = deleteHook(type, delivery);
-			new_number = getFloatInput(PATCH, "price");
-			if (is_deleted)
-			{
-				delivery = new Delivery(saved_data);
-				delivery->price = new_number;
-				addDeliveryInCollection(delivery);
-			}
-			delivery->price = new_number;
-			break;
-		}
-		case DELI_PRICE:
-		{
-			std::cout << red << "Delivery price generates automatically. You don`t have access to change this field." << white << std::endl;
-			break;
-		}
+		delivery->weight = new_number;
+		delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
+		std::cout << green << "Data changed!" << white << std::endl;
+		break;
 	}
-	
+	case PRICE:
+	{
+		is_deleted = deleteHook(type, delivery);
+		new_number = getFloatInput(PATCH, "price");
+		if (is_deleted)
+		{
+			delivery = new Delivery(saved_data);
+			delivery->price = new_number;
+			addDeliveryInCollection(delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
+		}
+		delivery->price = new_number;
+		std::cout << green << "Data changed!" << white << std::endl;
+		break;
+	}
+	case DELI_PRICE:
+	{
+		std::cout << red << "Delivery price generates automatically. You don`t have access to change this field." << white << std::endl;
+		break;
+	}
+	}
+
 }
-#pragma endregion
-
-#pragma region FindRequest
-
 std::list<Delivery*>* DeliveryManager<std::pair<float, unsigned int>, Delivery*>::findData() {
 	std::list<Delivery*>* foundData;
 	std::cout << blue << "You can search only by comparator type: " << yellow << comp_str << white << std::endl;
@@ -1054,12 +1061,8 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 		}
 		case DELI_PRICE:
 		{
-			if (type == DELI_PRICE) // MB comp_type
-			{
-				collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
-				return true;
-			}
-			return false;
+			collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
+			return true;
 		}
 	}
 	return false;
@@ -1143,7 +1146,7 @@ void DeliveryManager<TKey, TData>::makeDeleting(Delivery* delivery)
 	DELITYPES type = setChoiceGetType(choice_number, PATCH);
 
 	changeByField(type, delivery);
-	std::cout << green << "Data changed!" << white << std::endl;
+
 	std::cout << *delivery << std::endl;
 }
 #pragma endregion
