@@ -708,7 +708,7 @@ void DeliveryManager<TKey, TData>::makeChanging(Delivery*& delivery)
 	DELITYPES type = setChoiceGetType(choice_number, PATCH);
 	
 	changeByField(type, delivery);
-	std::cout << green << "Data changed!" << white << std::endl;
+	
 	std::cout << *delivery << std::endl;
 }
 template<typename TKey, typename TData>
@@ -730,9 +730,11 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 				delivery = new Delivery(saved_data);
 				delivery->name = new_data_field;
 				addDeliveryInCollection(delivery);
+				std::cout << green << "Data changed!" << white << std::endl;
 				return;
 			}
 			delivery->name = new_data_field;
+			std::cout << green << "Data changed!" << white << std::endl;
 			break;
 		}
 		case CONTENT:
@@ -744,9 +746,11 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 				delivery = new Delivery(saved_data);
 				delivery->content = new_data_field;
 				addDeliveryInCollection(delivery);
+				std::cout << green << "Data changed!" << white << std::endl;
 				return;
 			}
 			delivery->content = new_data_field;
+			std::cout << green << "Data changed!" << white << std::endl;
 			break;
 		}
 		case SENDER:
@@ -758,9 +762,11 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 				delivery = new Delivery(saved_data);
 				delivery->sender = new_data_field;
 				addDeliveryInCollection(delivery);
+				std::cout << green << "Data changed!" << white << std::endl;
 				return;
 			}
 			delivery->sender = new_data_field;
+			std::cout << green << "Data changed!" << white << std::endl;
 			break;
 		}
 		case SEND_TIME:
@@ -772,9 +778,11 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 				delivery = new Delivery(saved_data);
 				delivery->send_time = new_data_field;
 				addDeliveryInCollection(delivery);
+				std::cout << green << "Data changed!" << white << std::endl;
 				return;
 			}
 			delivery->send_time = new_data_field;
+			std::cout << green << "Data changed!" << white << std::endl;
 			break;
 		}
 		case DEPART:
@@ -786,9 +794,11 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 				delivery = new Delivery(saved_data);
 				delivery->departure_comp = new_data_field;
 				addDeliveryInCollection(delivery);
+				std::cout << green << "Data changed!" << white << std::endl;
 				return;
 			}
 			delivery->departure_comp = new_data_field;
+			std::cout << green << "Data changed!" << white << std::endl;
 			break;
 		}
 		case RECIEVER:
@@ -800,9 +810,11 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 				delivery = new Delivery(saved_data);
 				delivery->reciever = new_data_field;
 				addDeliveryInCollection(delivery);
+				std::cout << green << "Data changed!" << white << std::endl;
 				return;
 			}
 			delivery->reciever = new_data_field;
+			std::cout << green << "Data changed!" << white << std::endl;
 			break;
 		}
 		case RECI_TIME:
@@ -814,9 +826,11 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 				delivery = new Delivery(saved_data);
 				delivery->recieve_time = new_data_field;
 				addDeliveryInCollection(delivery);
+				std::cout << green << "Data changed!" << white << std::endl;
 				return;
 			}
 			delivery->recieve_time = new_data_field;
+			std::cout << green << "Data changed!" << white << std::endl;
 			break;
 		}
 		case DESTINATION:
@@ -828,9 +842,11 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 				delivery = new Delivery(saved_data);
 				delivery->destination_comp = new_data_field;
 				addDeliveryInCollection(delivery);
+				std::cout << green << "Data changed!" << white << std::endl;
 				return;
 			}
 			delivery->destination_comp = new_data_field;
+			std::cout << green << "Data changed!" << white << std::endl;
 			break;
 		}
 		case TRANSPORT:
@@ -845,10 +861,12 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 				delivery->type_of_transport = new_data_field;
 				delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
 				addDeliveryInCollection(delivery);
+				std::cout << green << "Data changed!" << white << std::endl;
 				return;
 			}
 			delivery->type_of_transport = new_data_field;
 			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
 			break;
 		}
 		case WEIGHT:
@@ -862,10 +880,12 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 				delivery->weight = new_number;
 				delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
 				addDeliveryInCollection(delivery);
+				std::cout << green << "Data changed!" << white << std::endl;
 				return;
 			}
 			delivery->weight = new_number;
 			delivery->deliver_price = delivery_gen->get_delivery_price(*delivery);
+			std::cout << green << "Data changed!" << white << std::endl;
 			break;
 		}
 		case PRICE:
@@ -877,8 +897,10 @@ void DeliveryManager<TKey, TData>::changeByField(const DELITYPES type, Delivery*
 				delivery = new Delivery(saved_data);
 				delivery->price = new_number;
 				addDeliveryInCollection(delivery);
+				std::cout << green << "Data changed!" << white << std::endl;
 			}
 			delivery->price = new_number;
+			std::cout << green << "Data changed!" << white << std::endl;
 			break;
 		}
 		case DELI_PRICE:
@@ -1054,7 +1076,7 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 		}
 		case DELI_PRICE:
 		{
-			if (type == DELI_PRICE) // MB comp_type
+			if (type == DELI_PRICE)
 			{
 				collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
 				return true;
@@ -1143,7 +1165,7 @@ void DeliveryManager<TKey, TData>::makeDeleting(Delivery* delivery)
 	DELITYPES type = setChoiceGetType(choice_number, PATCH);
 
 	changeByField(type, delivery);
-	std::cout << green << "Data changed!" << white << std::endl;
+
 	std::cout << *delivery << std::endl;
 }
 #pragma endregion
