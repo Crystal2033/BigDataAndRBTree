@@ -1075,7 +1075,7 @@ bool DeliveryManager<std::pair<float, unsigned int>, Delivery*>::deleteHook(cons
 			return false;
 		}
 		case DELI_PRICE:
-		{
+		{ 
 			if (type == DELI_PRICE)
 			{
 				collection->remove(std::make_pair(delivery->deliver_price, delivery->hash_code));
