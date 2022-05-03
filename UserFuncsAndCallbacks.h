@@ -42,7 +42,7 @@ void userInput(std::string& str)
 		std::getline(std::cin, str);
 		if (str.size() == 0)
 		{
-			std::cout << red << "Your input is blank." << blue << "Please, try again." << white << "> " << std::endl;
+			std::cout << red << "Your input is blank." << std::endl << blue << "Please, try again." << white << "> " << std::endl;
 			continue;
 		}
 		std::cin.clear();
