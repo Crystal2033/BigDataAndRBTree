@@ -312,7 +312,7 @@ bool DeliveryManager<TKey, TData>::getTimeStr(std::string& str, std::cmatch& mat
 	int month;
 	int year;
 
-	if (matcher[1].str().size() != 2)//day
+	if (matcher[1].str().size() > 2)//day
 	{
 		return false;
 	}
@@ -322,7 +322,7 @@ bool DeliveryManager<TKey, TData>::getTimeStr(std::string& str, std::cmatch& mat
 		return false;
 	}
 
-	if (matcher[2].str().size() != 2)
+	if (matcher[2].str().size() > 2)
 	{
 		return false;
 	}
@@ -353,7 +353,7 @@ void DeliveryManager<TKey, TData>::inputTimeStr(std::string& str)
 	{
 		std::regex regular;
 		std::cmatch regular_match;
-		regular = "([\\d]{2}):([\\d]{2}):([\\d]{4})";
+		regular = "([\\d]{1,2}):([\\d]{1,2}):([\\d]{4})";
 		userInput(str);
 		if (!std::regex_match(str.c_str(), regular_match, regular))
 		{
@@ -372,27 +372,6 @@ void DeliveryManager<TKey, TData>::inputTimeStr(std::string& str)
 }
 
 
-void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::addDeliveryInCollection(Delivery*& delivery)
-{
-	switch (comp_type)
-	{
-		case WEIGHT:
-		{
-			collection->add(std::make_pair(delivery->weight, delivery->hash_code), delivery);
-			break;
-		}
-		case PRICE:
-		{
-			collection->add(std::make_pair(delivery->price, delivery->hash_code), delivery);
-			break;
-		}
-		case DELI_PRICE:
-		{
-			collection->add(std::make_pair(delivery->deliver_price, delivery->hash_code), delivery);
-			break;
-		}
-	}
-}
 
 template <typename TKey, typename TData>
 Delivery* DeliveryManager<TKey, TData>::createUserDelivery(std::string* const& last_reciever)
@@ -487,6 +466,29 @@ int DeliveryManager<TKey, TData>::workWithUser(int choice_number)
 #pragma endregion
 
 #pragma region AddRequest
+void DeliveryManager<std::pair<float, unsigned int>, Delivery*>::addDeliveryInCollection(Delivery*& delivery)
+{
+	switch (comp_type)
+	{
+	case WEIGHT:
+	{
+		collection->add(std::make_pair(delivery->weight, delivery->hash_code), delivery);
+		break;
+	}
+	case PRICE:
+	{
+		collection->add(std::make_pair(delivery->price, delivery->hash_code), delivery);
+		break;
+	}
+	case DELI_PRICE:
+	{
+		collection->add(std::make_pair(delivery->deliver_price, delivery->hash_code), delivery);
+		break;
+	}
+	}
+}
+
+
 void DeliveryManager<std::pair<std::string*, unsigned int>, Delivery*>::addDeliveryInCollection(Delivery*& delivery)
 {
 	switch (comp_type)
@@ -906,7 +908,6 @@ std::list<Delivery*>* DeliveryManager<std::pair<float, unsigned int>, Delivery*>
 	std::list<Delivery*>* foundData;
 	std::cout << blue << "You can search only by comparator type: " << yellow << comp_str << white << std::endl;
 	float search_param = getFloatInput(GET, comp_str);
-
 
 	auto begin = std::chrono::steady_clock::now();
 	foundData = collection->find(std::make_pair(search_param, 0));
