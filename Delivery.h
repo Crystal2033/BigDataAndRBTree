@@ -77,7 +77,7 @@ std::ostream& operator<<(std::ostream& out, const Delivery& delivery) {
 	}
 
 	if (delivery.send_time != nullptr) {
-		out << blue << "send time:         " << cyan << *delivery.send_time << white << std::endl;
+		out << blue << "send data:         " << cyan << *delivery.send_time << white << std::endl;
 	}
 	else {
 		throw DeliveryNullException("Send time is nullptr");
@@ -99,7 +99,7 @@ std::ostream& operator<<(std::ostream& out, const Delivery& delivery) {
 	}
 
 	if (delivery.recieve_time != nullptr) {
-		out << blue << "recieve_time time: " << cyan << *delivery.recieve_time << white << std::endl;
+		out << blue << "recieve data:      " << cyan << *delivery.recieve_time << white << std::endl;
 	}
 	else {
 		throw DeliveryNullException("Recieve time is nullptr");
